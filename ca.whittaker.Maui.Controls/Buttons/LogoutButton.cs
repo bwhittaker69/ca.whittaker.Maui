@@ -1,11 +1,7 @@
-﻿
-using System.Runtime.CompilerServices;
-
-namespace ca.whittaker.Maui.Controls.Buttons;
+﻿namespace ca.whittaker.Maui.Controls.Buttons;
 
 public class LogoutButton : ButtonBase
 {
-    // ChangeState Bindable Property
     public static readonly BindableProperty LogoutButtonStateProperty = BindableProperty.Create(
         propertyName: nameof(LogoutButtonState),
         returnType: typeof(ButtonStateEnum),
@@ -32,6 +28,5 @@ public class LogoutButton : ButtonBase
 
     public LogoutButton() : base()
     {
-        // Constructor logic if needed
     }
 }

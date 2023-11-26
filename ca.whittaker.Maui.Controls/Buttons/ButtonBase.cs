@@ -6,11 +6,10 @@ namespace ca.whittaker.Maui.Controls.Buttons;
 public abstract class ButtonBase : Button
 {
 
-    private string _baseImageSource;
+    private string _baseImageSource = "";
 
     public ButtonBase() : base()
     {
-        // Constructor logic if needed
     }
 
     public string BaseImageSource

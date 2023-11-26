@@ -6,6 +6,5 @@ public class CustomCancelButton : ButtonBase
 {
     public CustomCancelButton() : base()
     {
-        // Constructor logic if needed
     }
 }

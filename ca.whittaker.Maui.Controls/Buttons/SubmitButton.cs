@@ -4,7 +4,6 @@ namespace ca.whittaker.Maui.Controls.Buttons;
 
 public class SubmitButton : ButtonBase
 {
-    // ChangeState Bindable Property
     public static readonly BindableProperty SubmitButtonStateProperty = BindableProperty.Create(
         propertyName: nameof(SubmitButtonState),
         returnType: typeof(ButtonStateEnum),
@@ -46,6 +45,5 @@ public class SubmitButton : ButtonBase
 
     public SubmitButton() : base()
     {
-        // Constructor logic if needed
     }
 }

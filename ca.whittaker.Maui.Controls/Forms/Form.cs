@@ -45,10 +45,10 @@ public class Form : ContentView
     public Form()
     {
     }
-    protected async override void OnParentSet()
+    protected override void OnParentSet()
     {
         base.OnParentSet();
-        await WireUpControls();
+        WireUpControls();
     }
 
     private void CalcSubmitButtonState()
@@ -96,7 +96,7 @@ public class Form : ContentView
         }
     }
 
-    private async Task WireUpControls()
+    private void WireUpControls()
     {
         var controlCount = this.Content.GetVisualTreeDescendants().Count;
         if (controlCount == 0) throw new InvalidOperationException("Form missing controls");

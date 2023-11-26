@@ -103,8 +103,8 @@ public class TextBox : ContentView
     }
 
     // Event handlers for HasNoChanges and HasValidationChanges
-    public event EventHandler<HasChangesEventArgs> HasChanges;
-    public event EventHandler<ValidationDataChangesEventArgs> HasValidationChanges;
+    public event EventHandler<HasChangesEventArgs>? HasChanges;
+    public event EventHandler<ValidationDataChangesEventArgs>? HasValidationChanges;
 
     // Bindable properties getters and setters
     public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
@@ -151,7 +151,7 @@ public class TextBox : ContentView
         _originalText = Text;
         UpdateValidationState();
     }
-    protected override void OnPropertyChanged(string propertyName = null)
+    protected override void OnPropertyChanged(string propertyName = "")
     {
         base.OnPropertyChanged(propertyName);
         switch (propertyName)
@@ -190,7 +190,7 @@ public class TextBox : ContentView
         if (string.IsNullOrEmpty(urlString) || urlString.Length < 5)
             return false;
 
-        if (!Uri.TryCreate(urlString, UriKind.Absolute, out Uri uriResult))
+        if (!Uri.TryCreate(urlString, UriKind.Absolute, out Uri? uriResult))
             return false;
 
         if (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps)
