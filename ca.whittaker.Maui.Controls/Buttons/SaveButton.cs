@@ -1,11 +1,9 @@
-﻿using Microsoft.Maui.Controls;
+﻿namespace ca.whittaker.Maui.Controls.Buttons;
 
-namespace ca.whittaker.Maui.Controls.Buttons;
-
-public class SubmitButton : ButtonBase
+public class SaveButton : ButtonBase
 {
-    public static readonly BindableProperty SubmitButtonStateProperty = BindableProperty.Create(
-        propertyName: nameof(SubmitButtonState),
+    public static readonly BindableProperty SaveButtonStateProperty = BindableProperty.Create(
+        propertyName: nameof(SaveButtonState),
         returnType: typeof(ButtonStateEnum),
         declaringType: typeof(ButtonBase),
         defaultValue: ButtonStateEnum.Disabled,
@@ -17,14 +15,14 @@ public class SubmitButton : ButtonBase
         if (oldValue != newValue)
             if (bindable is ButtonBase buttonBase)
             {
-                buttonBase.ConfigureButton((ButtonStateEnum)newValue);
+                buttonBase.SetButtonState((ButtonStateEnum)newValue);
             }
     }
 
-    public ButtonStateEnum SubmitButtonState
+    public ButtonStateEnum SaveButtonState
     {
-        get => (ButtonStateEnum)GetValue(SubmitButtonStateProperty);
-        set => SetValue(SubmitButtonStateProperty, value);
+        get => (ButtonStateEnum)GetValue(SaveButtonStateProperty);
+        set => SetValue(SaveButtonStateProperty, value);
     }
 
     private void ParentForm_HasChanges(object? sender, HasFormChangesEventArgs e)
@@ -32,18 +30,18 @@ public class SubmitButton : ButtonBase
         switch (e.FormState)
         {
             case FormStateEnum.Enabled:
-                ConfigureButton(ButtonStateEnum.Enabled);
+                SetButtonState(ButtonStateEnum.Enabled);
                 break;
             case FormStateEnum.Disabled:
-                ConfigureButton(ButtonStateEnum.Disabled);
+                SetButtonState(ButtonStateEnum.Disabled);
                 break;
             case FormStateEnum.Hidden:
-                SubmitButtonState = ButtonStateEnum.Hidden;
+                SaveButtonState = ButtonStateEnum.Hidden;
                 break;
         }
     }
 
-    public SubmitButton() : base()
+    public SaveButton() : base(BaseButtonTypeEnum.Save)
     {
     }
 }

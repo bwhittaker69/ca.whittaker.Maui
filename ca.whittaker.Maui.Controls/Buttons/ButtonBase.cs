@@ -1,41 +1,42 @@
-﻿using Microsoft.Maui.Controls;
-using System.Diagnostics;
-
-namespace ca.whittaker.Maui.Controls.Buttons;
+﻿namespace ca.whittaker.Maui.Controls.Buttons;
 
 public abstract class ButtonBase : Button
 {
+    public enum BaseButtonTypeEnum { Signin, Signout, Cancel, Save, Undo, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple }
 
-    private string _baseImageSource = "";
+    public static readonly BindableProperty ButtonSizeProperty = BindableProperty.Create(
+        propertyName: nameof(ButtonSize),
+        returnType: typeof(ButtonSizeEnum),
+        declaringType: typeof(ButtonBase),
+        defaultValue: ButtonSizeEnum.Normal,
+        defaultBindingMode: BindingMode.OneWay);
 
-    public ButtonBase() : base()
+    public BaseButtonTypeEnum _baseButtonType = BaseButtonTypeEnum.Save;
+
+    public ButtonSizeEnum ButtonSize
     {
+        get => (ButtonSizeEnum)GetValue(ButtonSizeProperty);
+        set => SetValue(ButtonSizeProperty, value);
     }
 
-    public string BaseImageSource
+    public ButtonBase(BaseButtonTypeEnum baseButtonType) : base()
     {
-        get => _baseImageSource;
-        set
-        {
-            _baseImageSource = value;
-            ConfigureButton();
-        }
+        _baseButtonType = baseButtonType;
     }
    
-    public void ConfigureButton(ButtonStateEnum buttonState = ButtonStateEnum.Enabled)
+    public void SetButtonState(ButtonStateEnum buttonState = ButtonStateEnum.Enabled)
     {
-        Debug.Print(this.GetType().ToString());
         switch (buttonState)
         {
             case ButtonStateEnum.Enabled:
                 IsVisible = true;
                 IsEnabled = true;
-                ImageSource = GetImageSource("");
+                ImageSource = SetImageSource(buttonState);
                 break;
             case ButtonStateEnum.Disabled:
                 IsVisible = true;
                 IsEnabled = false;
-                ImageSource = GetImageSource("_disabled");
+                ImageSource = SetImageSource(buttonState);
                 break;
             case ButtonStateEnum.Hidden:
                 IsEnabled = false;
@@ -44,11 +45,8 @@ public abstract class ButtonBase : Button
         }
     }
 
-    private ImageSource GetImageSource(string suffix)
+    private ImageSource SetImageSource(ButtonStateEnum buttonState)
     {
-        if (!String.IsNullOrEmpty(BaseImageSource))
-            return ImageSource.FromFile($"{BaseImageSource.Replace(".png", "")}{suffix}.png");
-        else
-            return "";
+        return ImageSource.FromFile($"{_baseButtonType}X{((int)ButtonSize).ToString()}{(buttonState.Equals(ButtonStateEnum.Disabled) ? "disabled" : "")}.png");
     }
 }

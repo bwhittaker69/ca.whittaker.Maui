@@ -1,9 +1,9 @@
 ﻿namespace ca.whittaker.Maui.Controls.Buttons;
 
-public class LoginButton : ButtonBase
+public class SignoutButton : ButtonBase
 {
-    public static readonly BindableProperty LoginButtonStateProperty = BindableProperty.Create(
-        propertyName: nameof(LoginButtonState),
+    public static readonly BindableProperty SignoutButtonStateProperty = BindableProperty.Create(
+        propertyName: nameof(SignoutButtonState),
         returnType: typeof(ButtonStateEnum),
         declaringType: typeof(ButtonBase),
         defaultValue: ButtonStateEnum.Disabled,
@@ -15,18 +15,18 @@ public class LoginButton : ButtonBase
         if (oldValue != newValue)
             if (bindable is ButtonBase buttonBase)
             {
-                buttonBase.ConfigureButton((ButtonStateEnum)newValue);
+                buttonBase.SetButtonState((ButtonStateEnum)newValue);
             }
     }
 
-    public ButtonStateEnum LoginButtonState
+    public ButtonStateEnum SignoutButtonState
     {
-        get => (ButtonStateEnum)GetValue(LoginButtonStateProperty);
-        set =>  SetValue(LoginButtonStateProperty, value);
+        get => (ButtonStateEnum)GetValue(SignoutButtonStateProperty);
+        set =>  SetValue(SignoutButtonStateProperty, value);
     }
 
 
-    public LoginButton() : base()
+    public SignoutButton() : base(BaseButtonTypeEnum.Signout)
     {
     }
 }

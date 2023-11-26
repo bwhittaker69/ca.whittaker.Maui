@@ -60,22 +60,22 @@ public class Form : ContentView
                 IsEnabled = true;
                 IsVisible = true;
                 if (HasNoChanges)
-                    submitButton.ConfigureButton(ButtonStateEnum.Disabled);
+                    submitButton.SetButtonState(ButtonStateEnum.Disabled);
                 else
                 {
                     if (HasNoErrors)
-                        submitButton.ConfigureButton(ButtonStateEnum.Enabled);
+                        submitButton.SetButtonState(ButtonStateEnum.Enabled);
                     else
-                        submitButton.ConfigureButton(ButtonStateEnum.Disabled);
+                        submitButton.SetButtonState(ButtonStateEnum.Disabled);
                 }
                 break;
             case FormStateEnum.Disabled:
                 IsEnabled = false;
-                submitButton.ConfigureButton(ButtonStateEnum.Hidden);
+                submitButton.SetButtonState(ButtonStateEnum.Hidden);
                 break;
             case FormStateEnum.Hidden:
                 IsVisible = false;
-                submitButton.ConfigureButton(ButtonStateEnum.Hidden);
+                submitButton.SetButtonState(ButtonStateEnum.Hidden);
                 break;
         }
     }
@@ -120,8 +120,8 @@ public class Form : ContentView
         CalcSubmitButtonState();
     }
 
-    private SubmitButton GetSubmitButton() =>
-        this.GetVisualTreeDescendants().OfType<SubmitButton>().FirstOrDefault()
+    private SaveButton GetSubmitButton() =>
+        this.GetVisualTreeDescendants().OfType<SaveButton>().FirstOrDefault()
         ?? throw new InvalidOperationException("Form missing a submit button");
 
     private bool IsFormDataValid() =>
@@ -149,6 +149,5 @@ public class Form : ContentView
                 return false;
         }
         return true;
-        //.Any(ctb => ctb.ChangeState == ChangeStateEnum.NotChanged);
     }
 }

@@ -19,184 +19,92 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 		<Title>Custom controls for .NET8 MAUI</Title>
+		<Authors>Brett Whittaker</Authors>
+		<Description>form controls for .NET8 MAUI</Description>
+		<RepositoryUrl>https://github.com/bwhittaker69/ca.whittaker.Maui/tree/master/ca.whittaker.Maui.Controls</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>MAUI;MAUI form controls</PackageTags>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
 
 	<ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
   <ItemGroup>
-	  <None Remove="Resources\Images\CancelX16.png" />
-	  <None Remove="Resources\Images\CanceLX16disabled.png" />
 	  <None Remove="Resources\Images\CancelX24.png" />
 	  <None Remove="Resources\Images\CancelX24disabled.png" />
-	  <None Remove="Resources\Images\CancelX32.png" />
-	  <None Remove="Resources\Images\CancelX32disabled.png" />
 	  <None Remove="Resources\Images\CancelX48.png" />
 	  <None Remove="Resources\Images\CancelX48disabled.png" />
+	  <None Remove="Resources\Images\LoginX24.png" />
+	  <None Remove="Resources\Images\LoginX24disabled.png" />
+	  <None Remove="Resources\Images\LoginX48.png" />
+	  <None Remove="Resources\Images\LoginX48disabled.png" />
 	  <None Remove="Resources\Images\SaveX128.png" />
 	  <None Remove="Resources\Images\SaveX128_disabled.png" />
-	  <None Remove="Resources\Images\SaveX16.png" />
-	  <None Remove="Resources\Images\SaveX16disabled.png" />
 	  <None Remove="Resources\Images\SaveX16_disabled.png" />
 	  <None Remove="Resources\Images\SaveX24.png" />
 	  <None Remove="Resources\Images\SaveX24disabled.png" />
 	  <None Remove="Resources\Images\SaveX24_disabled.png" />
-	  <None Remove="Resources\Images\SaveX32.png" />
-	  <None Remove="Resources\Images\SaveX32disabled.png" />
 	  <None Remove="Resources\Images\SaveX32_disabled.png" />
 	  <None Remove="Resources\Images\SaveX48.png" />
 	  <None Remove="Resources\Images\SaveX48disabled.png" />
 	  <None Remove="Resources\Images\SaveX48_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\apple.png" />
-	  <None Remove="Resources\Images\SocialMedia\AppleX128.png" />
-	  <None Remove="Resources\Images\SocialMedia\AppleX128disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\AppleX24.png" />
-	  <None Remove="Resources\Images\SocialMedia\AppleX24disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\AppleX48.png" />
-	  <None Remove="Resources\Images\SocialMedia\AppleX48disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\apple_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\apple_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\apple_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\apple_disabled_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\apple_disabled_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\facebook.png" />
-	  <None Remove="Resources\Images\SocialMedia\FacebookX128.png" />
-	  <None Remove="Resources\Images\SocialMedia\FacebookX128disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\FacebookX24.png" />
-	  <None Remove="Resources\Images\SocialMedia\FacebookX24disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\FacebookX48.png" />
-	  <None Remove="Resources\Images\SocialMedia\FacebookX48disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\facebook_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\facebook_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\facebook_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\facebook_disabled_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\facebook_disabled_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\google.png" />
-	  <None Remove="Resources\Images\SocialMedia\GoogleX128.png" />
-	  <None Remove="Resources\Images\SocialMedia\GoogleX128disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\GoogleX24.png" />
-	  <None Remove="Resources\Images\SocialMedia\GoogleX24disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\GoogleX48.png" />
-	  <None Remove="Resources\Images\SocialMedia\GoogleX48disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\google_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\google_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\google_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\google_disabled_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\google_disabled_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\linkedin.png" />
-	  <None Remove="Resources\Images\SocialMedia\LinkedinX128.png" />
-	  <None Remove="Resources\Images\SocialMedia\LinkedinX128disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\LinkedinX24.png" />
-	  <None Remove="Resources\Images\SocialMedia\LinkedinX24disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\LinkedinX48.png" />
-	  <None Remove="Resources\Images\SocialMedia\LinkedinX48disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\linkedin_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\linkedin_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\linkedin_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\linkedin_disabled_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\linkedin_disabled_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\microsoft.png" />
-	  <None Remove="Resources\Images\SocialMedia\MicrosoftX128.png" />
-	  <None Remove="Resources\Images\SocialMedia\MicrosoftX128disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\MicrosoftX24.png" />
-	  <None Remove="Resources\Images\SocialMedia\MicrosoftX24disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\MicrosoftX48.png" />
-	  <None Remove="Resources\Images\SocialMedia\MicrosoftX48disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\microsoft_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\microsoft_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\microsoft_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\microsoft_disabled_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\microsoft_disabled_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\SignoutX24.png" />
-	  <None Remove="Resources\Images\SocialMedia\SignoutX24disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\SignoutX48.png" />
-	  <None Remove="Resources\Images\SocialMedia\SignoutX48disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\signout_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\signout_24_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\signout_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\signout_48_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\tiktok.png" />
-	  <None Remove="Resources\Images\SocialMedia\TiktokX128.png" />
-	  <None Remove="Resources\Images\SocialMedia\TiktokX128disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\TiktokX24.png" />
-	  <None Remove="Resources\Images\SocialMedia\TiktokX24disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\TiktokX48.png" />
-	  <None Remove="Resources\Images\SocialMedia\TiktokX48disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\tiktok_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\tiktok_48.png" />
-	  <None Remove="Resources\Images\SocialMedia\tiktok_disabled.png" />
-	  <None Remove="Resources\Images\SocialMedia\tiktok_disabled_24.png" />
-	  <None Remove="Resources\Images\SocialMedia\tiktok_disabled_48.png" />
 	  <None Remove="Resources\Images\UndoX24.png" />
 	  <None Remove="Resources\Images\UndoX24disabled.png" />
-	  <None Remove="Resources\Images\UndoX32.png" />
-	  <None Remove="Resources\Images\UndoX32disabled.png" />
 	  <None Remove="Resources\Images\UndoX48.png" />
 	  <None Remove="Resources\Images\UndoX48disabled.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiImage Include="Resources\Images\CancelX16.png" />
-	  <MauiImage Include="Resources\Images\CanceLX16disabled.png" />
 	  <MauiImage Include="Resources\Images\CancelX24.png" />
 	  <MauiImage Include="Resources\Images\CancelX24disabled.png" />
-	  <MauiImage Include="Resources\Images\CancelX32.png" />
-	  <MauiImage Include="Resources\Images\CancelX32disabled.png" />
 	  <MauiImage Include="Resources\Images\CancelX48.png" />
 	  <MauiImage Include="Resources\Images\CancelX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SaveX16.png" />
-	  <MauiImage Include="Resources\Images\SaveX16disabled.png" />
+	  <MauiImage Include="Resources\Images\GenericX24.png" />
+	  <MauiImage Include="Resources\Images\GenericX24disabled.png" />
+	  <MauiImage Include="Resources\Images\GenericX48.png" />
+	  <MauiImage Include="Resources\Images\GenericX48disabled.png" />
 	  <MauiImage Include="Resources\Images\SaveX24.png" />
 	  <MauiImage Include="Resources\Images\SaveX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SaveX32.png" />
-	  <MauiImage Include="Resources\Images\SaveX32disabled.png" />
 	  <MauiImage Include="Resources\Images\SaveX48.png" />
 	  <MauiImage Include="Resources\Images\SaveX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\AppleX128.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\AppleX128disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\AppleX24.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\AppleX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\AppleX48.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\AppleX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\FacebookX128.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\FacebookX128disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\FacebookX24.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\FacebookX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\FacebookX48.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\FacebookX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\GoogleX128.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\GoogleX128disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\GoogleX24.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\GoogleX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\GoogleX48.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\GoogleX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\LinkedinX128.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\LinkedinX128disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\LinkedinX24.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\LinkedinX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\LinkedinX48.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\LinkedinX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\MicrosoftX128.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\MicrosoftX128disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\MicrosoftX24.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\MicrosoftX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\MicrosoftX48.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\MicrosoftX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\SignoutX24.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\SignoutX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\SignoutX48.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\SignoutX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\TiktokX128.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\TiktokX128disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\TiktokX24.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\TiktokX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\TiktokX48.png" />
-	  <MauiImage Include="Resources\Images\SocialMedia\TiktokX48disabled.png" />
+	  <MauiImage Include="Resources\Images\AppleX24.png" />
+	  <MauiImage Include="Resources\Images\AppleX24disabled.png" />
+	  <MauiImage Include="Resources\Images\AppleX48.png" />
+	  <MauiImage Include="Resources\Images\AppleX48disabled.png" />
+	  <MauiImage Include="Resources\Images\FacebookX24.png" />
+	  <MauiImage Include="Resources\Images\FacebookX24disabled.png" />
+	  <MauiImage Include="Resources\Images\GoogleX24.png" />
+	  <MauiImage Include="Resources\Images\GoogleX24disabled.png" />
+	  <MauiImage Include="Resources\Images\GoogleX48.png" />
+	  <MauiImage Include="Resources\Images\GoogleX48disabled.png" />
+	  <MauiImage Include="Resources\Images\LinkedinX24.png" />
+	  <MauiImage Include="Resources\Images\LinkedinX24disabled.png" />
+	  <MauiImage Include="Resources\Images\LinkedinX48.png" />
+	  <MauiImage Include="Resources\Images\LinkedinX48disabled.png" />
+	  <MauiImage Include="Resources\Images\MicrosoftX24.png" />
+	  <MauiImage Include="Resources\Images\MicrosoftX24disabled.png" />
+	  <MauiImage Include="Resources\Images\MicrosoftX48.png" />
+	  <MauiImage Include="Resources\Images\MicrosoftX48disabled.png" />
+	  <MauiImage Include="Resources\Images\SignoutX24.png" />
+	  <MauiImage Include="Resources\Images\SignoutX24disabled.png" />
+	  <MauiImage Include="Resources\Images\SignoutX48.png" />
+	  <MauiImage Include="Resources\Images\SignoutX48disabled.png" />
+	  <MauiImage Include="Resources\Images\TiktokX24.png" />
+	  <MauiImage Include="Resources\Images\TiktokX24disabled.png" />
+	  <MauiImage Include="Resources\Images\TiktokX48.png" />
+	  <MauiImage Include="Resources\Images\TiktokX48disabled.png" />
 	  <MauiImage Include="Resources\Images\UndoX24.png" />
 	  <MauiImage Include="Resources\Images\UndoX24disabled.png" />
-	  <MauiImage Include="Resources\Images\UndoX32.png" />
-	  <MauiImage Include="Resources\Images\UndoX32disabled.png" />
 	  <MauiImage Include="Resources\Images\UndoX48.png" />
 	  <MauiImage Include="Resources\Images\UndoX48disabled.png" />
 	</ItemGroup>
