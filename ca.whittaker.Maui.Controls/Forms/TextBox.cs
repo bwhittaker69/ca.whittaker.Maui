@@ -423,12 +423,22 @@ public class TextBox : ContentView
         };
     }
 
-
+    /// <summary>
+    /// Handler for the Focused event of the entry control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event data.</param>
     private void Entry_Focused(object? sender, FocusEventArgs e)
     {
 
+
     }
 
+    /// <summary>
+    /// Handler for the TextChanged event of the entry control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event data containing old and new text values.</param>
     private void Entry_TextChanged(object? sender, TextChangedEventArgs e)
     {
         ProcessAndSetText(e.NewTextValue);
@@ -436,11 +446,19 @@ public class TextBox : ContentView
         UpdateNotificationMessage(Text);
     }
 
+    /// <summary>
+    /// Handler for the Unfocused event of the entry control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event data.</param>
     private void Entry_Unfocused(object? sender, FocusEventArgs e)
     {
         UpdateNotificationMessage(Text);
     }
 
+    /// <summary>
+    /// Evaluates and raises the HasChanges event if the text has been modified.
+    /// </summary>
     private void EvaluateToRaiseHasChangesEvent()
     {
         bool hasChanged = _originalText != Text;
@@ -452,6 +470,10 @@ public class TextBox : ContentView
         }
     }
 
+    /// <summary>
+    /// Evaluates and raises the ValidationChanges event based on the current validation state.
+    /// </summary>
+    /// <param name="forceRaise">Forces the event to be raised even if there's no change in validation state.</param>
     private void EvaluateToRaiseValidationChangesEvent(bool forceRaise = false)
     {
         bool isValid = IsValidData(Text);
@@ -463,12 +485,19 @@ public class TextBox : ContentView
         }
     }
 
+    /// <summary>
+    /// Initializes the properties of the text box.
+    /// </summary>
     private void InitializeProperties()
     {
         _originalText = Text;
     }
 
-    // Implementation of IsValidData and related methods
+    /// <summary>
+    /// Checks if the entered data is valid based on the current field type and mandatory status.
+    /// </summary>
+    /// <param name="text">The text to validate.</param>
+    /// <returns>True if the data is valid, otherwise false.</returns>    
     private bool IsValidData(string text)
     {
         // mandatory field, so its not valid
@@ -487,16 +516,30 @@ public class TextBox : ContentView
         return true;
     }
 
+    /// <summary>
+    /// Processes the text to apply the AllLowerCase filter.
+    /// </summary>
+    /// <param name="text">The text to process.</param>
+    /// <returns>Processed text with lowercase applied if needed.</returns>
     private string ProcessAllLowercase(string text)
     {
         return AllLowerCase ? text.ToLower() : text;
     }
 
+    /// <summary>
+    /// Processes the text to apply the AllowWhiteSpace filter.
+    /// </summary>
+    /// <param name="text">The text to process.</param>
+    /// <returns>Processed text with or without white spaces.</returns>
     private string ProcessAllowWhiteSpace(string text)
     {
         return AllowWhiteSpace ? text : text.Replace(" ", "");
     }
 
+    /// <summary>
+    /// Processes the new text value and applies various filters based on the text box settings.
+    /// </summary>
+    /// <param name="newText">The new text to process and set.</param>
     private void ProcessAndSetText(string newText)
     {
         Text = ProcessUsernameFilter(
@@ -505,16 +548,30 @@ public class TextBox : ContentView
                     ProcessAllowWhiteSpace(newText ?? ""))));
     }
 
+    /// <summary>
+    /// Processes the text to apply the email format filter.
+    /// </summary>
+    /// <param name="text">The text to process.</param>
+    /// <returns>Processed text formatted as an email.</returns>
     private string ProcessEmailFilter(string text)
     {
         return FieldType == FieldTypeEnum.Email ? Regex.Replace(text, @"[^a-zA-Z0-9!#$%&'*+/=?^_`{|}~.@-]", "") : text;
     }
 
+    /// <summary>
+    /// Processes the text to apply the username format filter.
+    /// </summary>
+    /// <param name="text">The text to process.</param>
+    /// <returns>Processed text formatted as a username.</returns>
     private string ProcessUsernameFilter(string text)
     {
         return FieldType == FieldTypeEnum.Username ? Regex.Replace(text, @"[^a-zA-Z0-9_]", "") : text;
     }
 
+    /// <summary>
+    /// Updates the notification message based on the current validation state of the text.
+    /// </summary>
+    /// <param name="text">The text to validate and update the notification for.</param>
     private void UpdateNotificationMessage(string text)
     {
         var validationState = CalculateValidationState(text);
@@ -539,6 +596,9 @@ public class TextBox : ContentView
         ValidationState = validationState; // Set the validation state based on calculated value
     }
 
+    /// <summary>
+    /// Updates the validation state and raises relevant events based on the current text.
+    /// </summary>
     private void UpdateValidationState()
     {
         EvaluateToRaiseHasChangesEvent();
