@@ -1,15 +1,13 @@
-﻿
-
-using ca.whittaker.Maui.Controls.Buttons;
+﻿using ca.whittaker.Maui.Controls.Buttons;
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
-
-
+/// <summary>
+/// Represents a form control within a Maui application, providing state management and validation capabilities.
+/// </summary>
 public class Form : ContentView
 {
 
-    // ChangeState Bindable Property
     public static readonly BindableProperty FormStateProperty = BindableProperty.Create(
         propertyName: nameof(FormState),
         returnType: typeof(FormStateEnum),
@@ -45,6 +43,10 @@ public class Form : ContentView
     public Form()
     {
     }
+
+    /// <summary>
+    /// Called when the parent of the form is set. This method is responsible for initializing and wiring up controls within the form.
+    /// </summary>
     protected override void OnParentSet()
     {
         base.OnParentSet();
