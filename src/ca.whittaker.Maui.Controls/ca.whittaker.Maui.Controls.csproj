@@ -29,10 +29,72 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-    <None Include="..\LICENSE.txt">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+	  <None Remove="Resources\Images\apple_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\apple_24_mauiimage.png" />
+	  <None Remove="Resources\Images\apple_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\apple_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\apple_48_mauiimage.png" />
+	  <None Remove="Resources\Images\apple_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\cancel_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\cancel_24_mauiimage.png" />
+	  <None Remove="Resources\Images\cancel_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\cancel_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\cancel_48_mauiimage.png" />
+	  <None Remove="Resources\Images\cancel_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\facebook_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\facebook_24_mauiimage.png" />
+	  <None Remove="Resources\Images\facebook_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\generic_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\generic_24_mauiimage.png" />
+	  <None Remove="Resources\Images\generic_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\generic_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\generic_48_mauiimage.png" />
+	  <None Remove="Resources\Images\generic_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\google_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\google_24_mauiimage.png" />
+	  <None Remove="Resources\Images\google_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\google_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\google_48_mauiimage.png" />
+	  <None Remove="Resources\Images\google_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\linkedin_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\linkedin_24_mauiimage.png" />
+	  <None Remove="Resources\Images\linkedin_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\linkedin_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\linkedin_48_mauiimage.png" />
+	  <None Remove="Resources\Images\linkedin_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\microsoft_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\microsoft_24_mauiimage.png" />
+	  <None Remove="Resources\Images\microsoft_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\microsoft_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\microsoft_48_mauiimage.png" />
+	  <None Remove="Resources\Images\microsoft_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\save_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\save_24_mauiimage.png" />
+	  <None Remove="Resources\Images\save_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\save_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\save_48_mauiimage.png" />
+	  <None Remove="Resources\Images\save_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\signout_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\signout_24_mauiimage.png" />
+	  <None Remove="Resources\Images\signout_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\signout_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\signout_48_mauiimage.png" />
+	  <None Remove="Resources\Images\signout_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\tiktok_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\tiktok_24_mauiimage.png" />
+	  <None Remove="Resources\Images\tiktok_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\tiktok_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\tiktok_48_mauiimage.png" />
+	  <None Remove="Resources\Images\tiktok_48_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\undo_24_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\undo_24_mauiimage.png" />
+	  <None Remove="Resources\Images\undo_24_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\undo_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\undo_48_mauiimage.png" />
+	  <None Remove="Resources\Images\undo_48_mauiimage_disabled.png" />
+	</ItemGroup>
+
+	<ItemGroup>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -41,75 +103,55 @@
 	</ItemGroup>
 
   <ItemGroup>
-	  <None Remove="Resources\Images\CancelX24.png" />
-	  <None Remove="Resources\Images\CancelX24disabled.png" />
-	  <None Remove="Resources\Images\CancelX48.png" />
-	  <None Remove="Resources\Images\CancelX48disabled.png" />
-	  <None Remove="Resources\Images\LoginX24.png" />
-	  <None Remove="Resources\Images\LoginX24disabled.png" />
-	  <None Remove="Resources\Images\LoginX48.png" />
-	  <None Remove="Resources\Images\LoginX48disabled.png" />
-	  <None Remove="Resources\Images\SaveX128.png" />
-	  <None Remove="Resources\Images\SaveX128_disabled.png" />
-	  <None Remove="Resources\Images\SaveX16_disabled.png" />
-	  <None Remove="Resources\Images\SaveX24.png" />
-	  <None Remove="Resources\Images\SaveX24disabled.png" />
-	  <None Remove="Resources\Images\SaveX24_disabled.png" />
-	  <None Remove="Resources\Images\SaveX32_disabled.png" />
-	  <None Remove="Resources\Images\SaveX48.png" />
-	  <None Remove="Resources\Images\SaveX48disabled.png" />
-	  <None Remove="Resources\Images\SaveX48_disabled.png" />
-	  <None Remove="Resources\Images\UndoX24.png" />
-	  <None Remove="Resources\Images\UndoX24disabled.png" />
-	  <None Remove="Resources\Images\UndoX48.png" />
-	  <None Remove="Resources\Images\UndoX48disabled.png" />
-	</ItemGroup>
+    <Content Include="..\..\LICENSE.txt" Link="LICENSE.txt" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <MauiImage Include="Resources\Images\CancelX24.png" />
-	  <MauiImage Include="Resources\Images\CancelX24disabled.png" />
-	  <MauiImage Include="Resources\Images\CancelX48.png" />
-	  <MauiImage Include="Resources\Images\CancelX48disabled.png" />
-	  <MauiImage Include="Resources\Images\GenericX24.png" />
-	  <MauiImage Include="Resources\Images\GenericX24disabled.png" />
-	  <MauiImage Include="Resources\Images\GenericX48.png" />
-	  <MauiImage Include="Resources\Images\GenericX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SaveX24.png" />
-	  <MauiImage Include="Resources\Images\SaveX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SaveX48.png" />
-	  <MauiImage Include="Resources\Images\SaveX48disabled.png" />
-	  <MauiImage Include="Resources\Images\AppleX24.png" />
-	  <MauiImage Include="Resources\Images\AppleX24disabled.png" />
-	  <MauiImage Include="Resources\Images\AppleX48.png" />
-	  <MauiImage Include="Resources\Images\AppleX48disabled.png" />
-	  <MauiImage Include="Resources\Images\FacebookX24.png" />
-	  <MauiImage Include="Resources\Images\FacebookX24disabled.png" />
-	  <MauiImage Include="Resources\Images\GoogleX24.png" />
-	  <MauiImage Include="Resources\Images\GoogleX24disabled.png" />
-	  <MauiImage Include="Resources\Images\GoogleX48.png" />
-	  <MauiImage Include="Resources\Images\GoogleX48disabled.png" />
-	  <MauiImage Include="Resources\Images\LinkedinX24.png" />
-	  <MauiImage Include="Resources\Images\LinkedinX24disabled.png" />
-	  <MauiImage Include="Resources\Images\LinkedinX48.png" />
-	  <MauiImage Include="Resources\Images\LinkedinX48disabled.png" />
-	  <MauiImage Include="Resources\Images\MicrosoftX24.png" />
-	  <MauiImage Include="Resources\Images\MicrosoftX24disabled.png" />
-	  <MauiImage Include="Resources\Images\MicrosoftX48.png" />
-	  <MauiImage Include="Resources\Images\MicrosoftX48disabled.png" />
-	  <MauiImage Include="Resources\Images\SignoutX24.png" />
-	  <MauiImage Include="Resources\Images\SignoutX24disabled.png" />
-	  <MauiImage Include="Resources\Images\SignoutX48.png" />
-	  <MauiImage Include="Resources\Images\SignoutX48disabled.png" />
-	  <MauiImage Include="Resources\Images\TiktokX24.png" />
-	  <MauiImage Include="Resources\Images\TiktokX24disabled.png" />
-	  <MauiImage Include="Resources\Images\TiktokX48.png" />
-	  <MauiImage Include="Resources\Images\TiktokX48disabled.png" />
-	  <MauiImage Include="Resources\Images\UndoX24.png" />
-	  <MauiImage Include="Resources\Images\UndoX24disabled.png" />
-	  <MauiImage Include="Resources\Images\UndoX48.png" />
-	  <MauiImage Include="Resources\Images\UndoX48disabled.png" />
-	</ItemGroup>
-  
+  <ItemGroup>
+    <MauiImage Include="Resources\Images\apple_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\apple_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\apple_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\apple_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\cancel_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\cancel_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\cancel_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\cancel_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\facebook_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\facebook_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\generic_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\generic_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\generic_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\generic_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\google_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\google_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\google_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\google_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\linkedin_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\linkedin_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\linkedin_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\linkedin_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\microsoft_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\microsoft_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\microsoft_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\microsoft_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\save_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\save_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\save_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\save_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\signout_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\signout_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\signout_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\signout_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\tiktok_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\tiktok_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\tiktok_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\tiktok_48_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\undo_24_mauiimage.png" />
+    <MauiImage Include="Resources\Images\undo_24_mauiimage_disabled.png" />
+    <MauiImage Include="Resources\Images\undo_48_mauiimage.png" />
+    <MauiImage Include="Resources\Images\undo_48_mauiimage_disabled.png" />
+  </ItemGroup>
+
+
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />

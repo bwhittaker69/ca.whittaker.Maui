@@ -47,6 +47,6 @@ public abstract class ButtonBase : Button
 
     private ImageSource SetImageSource(ButtonStateEnum buttonState)
     {
-        return ImageSource.FromFile($"{_baseButtonType}X{((int)ButtonSize).ToString()}{(buttonState.Equals(ButtonStateEnum.Disabled) ? "disabled" : "")}.png");
+        return ImageSource.FromFile($"{_baseButtonType}_{((int)ButtonSize).ToString()}_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? "_disabled" : "")}.png");
     }
 }
