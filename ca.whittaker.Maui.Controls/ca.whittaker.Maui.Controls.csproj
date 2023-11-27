@@ -25,6 +25,7 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>MAUI;MAUI form controls</PackageTags>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<Version>1.0.0-beta</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
