@@ -1,12 +1,13 @@
-# Custom MAUI Class Overview
+# MAUI Controls
 
-## Form Control Collection
+## Form Control Collection - ca.whittaker.Maui.Controls
 
-### Form
+### Forms : ca.whittaker.Maui.Controls.Forms
+
 - Incorporates TextBox and CheckBox.
 - Integrates Save and Cancel buttons automatically.
 
-### TextBox
+#### TextBox
 - **Types**:
   - Text
   - Email
@@ -22,12 +23,12 @@
   - Label for descriptions or titles.
   - Notification message area for displaying input-related messages.
 
-### CheckBox (Planned)
+#### CheckBox (Planned)
 - A future addition to enhance the Form control collection.
 
-## Button Controls
+### Buttons :  : ca.whittaker.Maui.Controls.Buttons
 
-### Type
+#### Type
 - CancelButton
 - EditButton
 - SaveButton
