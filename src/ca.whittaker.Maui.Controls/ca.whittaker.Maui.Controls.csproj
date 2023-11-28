@@ -18,14 +18,16 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-		<Title>Custom controls for .NET8 MAUI</Title>
+		<Title>Custom form controls for .NET8 MAUI</Title>
 		<Authors>Brett Whittaker</Authors>
 		<Description>form controls for .NET8 MAUI</Description>
-		<RepositoryUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</RepositoryUrl>
+		<RepositoryUrl>https://github.com/bwhittaker69/ca.whittaker.Maui/tree/master/src/ca.whittaker.Maui.Controls</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>MAUI;MAUI form controls</PackageTags>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <MyVersionPrefix>1.0.3</MyVersionPrefix>
+    <MyApplicationTitle>Whittaker Maui Controls</MyApplicationTitle>
+    <MyApplicationId>ca.whittaker.Maui.Controls</MyApplicationId>
+    <MyVersionPrefix>1.0.4</MyVersionPrefix>
     <MyVersion>1</MyVersion>
     <PackageProjectUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</PackageProjectUrl>
 		<PackageIcon>bwhittaker69.png</PackageIcon>
@@ -35,44 +37,60 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
-	  <ApplicationDisplayVersion>$(VersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(Version)</ApplicationVersion>
-	</PropertyGroup>
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-	  <ApplicationDisplayVersion>$(VersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(Version)</ApplicationVersion>
-	</PropertyGroup>
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
-	  <ApplicationDisplayVersion>$(VersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(Version)</ApplicationVersion>
-	</PropertyGroup>
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationDisplayVersion>$(VersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(Version)</ApplicationVersion>
-	</PropertyGroup>
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <ApplicationDisplayVersion>$(VersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(Version)</ApplicationVersion>
-	</PropertyGroup>
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
-	  <ApplicationDisplayVersion>$(VersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(Version)</ApplicationVersion>
-	</PropertyGroup>
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
-	  <ApplicationDisplayVersion>$(VersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(Version)</ApplicationVersion>
-	</PropertyGroup>
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationDisplayVersion>$(VersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(Version)</ApplicationVersion>
-	</PropertyGroup>
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+  </PropertyGroup>
 
 	<ItemGroup>
 	  <None Remove="Resources\Images\apple_24_disabled_mauiimage.png" />
@@ -111,7 +129,7 @@
     <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
