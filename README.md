@@ -40,12 +40,10 @@
 This comprehensive structure offers a detailed view of the enhanced functionalities and user interaction mechanisms in the custom MAUI application, focusing on form management and control interactions.
 
 ## Usage
-To integrate the Form class into your .NET MAUI application, follow these steps:
-Usage
 
 To integrate the Form class into your .NET MAUI application, follow these steps:
 
-1. Adding the Form to Your View
+Step 1. ***Adding the Form to Your View***
 
 Incorporate the Form class in your XAML where you need a form. Make sure to reference the namespace ca.whittaker.Maui.Controls.Forms.
 
@@ -59,7 +57,7 @@ XAML Example:
 </ContentPage>
 ```
 
-2. Configuring the Form
+Step 2. ***Configuring the Form***
 
 You can configure various aspects of the form directly in XAML. Set properties such as FormName, FormSaveButtonText, and FormCancelButtonText to customize the form's appearance and behavior.
 
@@ -72,7 +70,7 @@ Example of Setting Properties:
             FormCancelButtonText="Reset" />
 ```
 
-3. Binding Commands and Parameters
+Step 3. ***Binding Commands and Parameters***
 
 Bind commands and parameters to handle actions like saving data or canceling the form operation. Use the Command and CommandParameter properties for this purpose.
 
@@ -80,10 +78,10 @@ Example of Command Binding:
 ```xml
 <forms:Form x:Name="myForm"
             Command="{Binding SaveCommand}"
-            CommandParameter="{Binding FormData}" />
+            CommandParameter="" />
 ```
 
-4. Customizing Appearance
+Step 4. ***Customizing Appearance***
 
 Customize the appearance of the form by setting properties like FormNameTextColor and FormSize.
 
@@ -96,7 +94,7 @@ Example of Customizing Appearance:
 
 By following these steps, you can effectively incorporate and customize the Form class in your .NET MAUI application using XAML.
 
-5. Adding the Form to Your View
+Step 5. ***Adding the Form to Your View***
 
 Incorporate the Form class in your XAML where you need a form. Make sure to reference the namespace ca.whittaker.Maui.Controls.Forms.
 
@@ -110,7 +108,7 @@ Incorporate the Form class in your XAML where you need a form. Make sure to refe
 ```
 
 
-## Author
+# Author
 
 Brett Whittaker - brett@whittaker.ca
 
