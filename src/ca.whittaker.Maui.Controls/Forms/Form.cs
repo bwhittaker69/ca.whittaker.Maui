@@ -104,11 +104,13 @@ public class Form : StackLayout
         get => (ICommand)GetValue(CommandProperty);
         set => SetValue(CommandProperty, value);
     }
+
     public object CommandParameter
     {
         get => GetValue(CommandParameterProperty);
         set => SetValue(CommandParameterProperty, value);
     }
+
     public string FormCancelButtonText
     {
         get => (string)GetValue(FormCancelButtonTextProperty);
@@ -120,11 +122,13 @@ public class Form : StackLayout
         get => (string)GetValue(FormNameProperty);
         set => SetValue(FormNameProperty, value);
     }
+
     public Color FormNameTextColor
     {
         get => (Color)GetValue(FormNameTextColorProperty);
         set => SetValue(FormNameTextColorProperty, value);
     }
+
     public string FormSaveButtonText
     {
         get => (string)GetValue(FormSaveButtonTextProperty);
@@ -151,6 +155,7 @@ public class Form : StackLayout
         base.OnParentSet();
         WireUpControls();
     }
+
     private static void OnFormCancelButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (oldValue != newValue)
@@ -158,15 +163,16 @@ public class Form : StackLayout
             ((Form)bindable)._buttonCancel.SetButtonText((string)newValue);
         }
     }
+
     private static void OnFormNameChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (oldValue != newValue)
         {
             ((Form)bindable)._labelForm.Text = newValue == null ? "" : newValue.ToString();
             ((Form)bindable)._labelForm.IsVisible = newValue == null || newValue.ToString() == "" ? false : true;
-
         }
     }
+
     private static void OnFormSaveButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (oldValue != newValue)
@@ -174,6 +180,7 @@ public class Form : StackLayout
             ((Form)bindable)._buttonSave.SetButtonText((string)newValue);
         }
     }
+
     private static void OnFormNameTextColorChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (oldValue != newValue)
@@ -181,6 +188,7 @@ public class Form : StackLayout
             ((Form)bindable)._labelForm.TextColor = (Color)newValue;
         }
     }
+
     private static void OnFormStateChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (oldValue != newValue)
@@ -203,6 +211,7 @@ public class Form : StackLayout
             ((Form)bindable).UpdateFormControlStates();
         }
     }
+
     private void _buttonSave_Clicked(object? sender, EventArgs e)
     {
         if (Command != null && Command.CanExecute(CommandParameter))
@@ -215,6 +224,7 @@ public class Form : StackLayout
     {
         return ImageSource.FromFile($"cancel_24_mauiimage{(hasChanged ? "" : "_disabled")}.png");
     }
+
     private FormStateEnum CalcFormState()
     {
         if (!IsVisible)
@@ -314,6 +324,7 @@ public class Form : StackLayout
             TextColor = Colors.Red
         };
     }
+
     private void CustomTextBox_HasChanges(object? sender, HasChangesEventArgs e) => EvaluateForm();
 
     private void CustomTextBox_HasValidationChanges(object? sender, ValidationDataChangesEventArgs e) => EvaluateForm();
@@ -376,16 +387,19 @@ public class Form : StackLayout
                     }
                 }
                 break;
+
             case FormStateEnum.Disabled:
                 IsEnabled = false;
                 submitButton.SetButtonState(ButtonStateEnum.Hidden);
                 break;
+
             case FormStateEnum.Hidden:
                 IsVisible = false;
                 submitButton.SetButtonState(ButtonStateEnum.Hidden);
                 break;
         }
     }
+
     private void WireUpControls()
     {
         var controlCount = this.GetVisualTreeDescendants().Count;
