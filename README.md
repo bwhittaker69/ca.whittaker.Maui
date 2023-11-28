@@ -2,14 +2,14 @@
 
 ## form related controls - ca.whittaker.Maui.Controls.Forms
 
-### <Form>
+### **Form**
 
 - Incorporates TextBox and CheckBox.
 - Integrates Save and Cancel buttons automatically.
 
-### <TextBox>
+### **TextBox**
 
-- **Types**:
+- ***Types***:
   - Text
   - Email
   - Url
