@@ -5,6 +5,7 @@ VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD4B4101-9022-4EE7-AECC-CB962F2D879F}"
 	ProjectSection(SolutionItems) = preProject
+		bwhittaker69.png = bwhittaker69.png
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 	EndProjectSection
@@ -13,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DBBEAFEF-37E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ca.whittaker.Maui.Controls", "src\ca.whittaker.Maui.Controls\ca.whittaker.Maui.Controls.csproj", "{F1619FC8-2BCB-468A-849E-C7BFA3292B1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ca.whittaker.Maui.Controls.Demo", "ca.whittaker.Maui.Controls.Demo\ca.whittaker.Maui.Controls.Demo.csproj", "{48F194FC-49D8-4F5C-BE97-4F75DBCBA2C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ca.whittaker.Maui.Controls.Demo", "ca.whittaker.Maui.Controls.Demo\ca.whittaker.Maui.Controls.Demo.csproj", "{48F194FC-49D8-4F5C-BE97-4F75DBCBA2C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
