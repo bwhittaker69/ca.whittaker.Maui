@@ -4,8 +4,8 @@ public enum FieldTypeEnum { Text, Email, Url, Chat, Username }
 public enum ButtonStateEnum { Enabled, Disabled, Hidden }
 public enum ChangeStateEnum { Changed, NotChanged }
 public enum ValidationStateEnum { Valid, FormatError, RequiredFieldError }
-public enum FormStateEnum { Enabled, Disabled, Hidden, Reset }
-public enum ButtonSizeEnum { Normal = 24, Large = 48 }
+public enum FormStateEnum { Enabled, Disabled, Hidden, Undo, Saved, Clear }
+public enum SizeEnum { Normal = 24, Large = 48 }
 
 public class HasChangesEventArgs : EventArgs
 {

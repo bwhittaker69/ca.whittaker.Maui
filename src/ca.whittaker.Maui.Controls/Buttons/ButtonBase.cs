@@ -2,20 +2,19 @@
 
 public abstract class ButtonBase : Button
 {
-    public enum BaseButtonTypeEnum { Signin, Signout, Cancel, Save, Undo, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple }
 
     public static readonly BindableProperty ButtonSizeProperty = BindableProperty.Create(
         propertyName: nameof(ButtonSize),
-        returnType: typeof(ButtonSizeEnum),
+        returnType: typeof(SizeEnum),
         declaringType: typeof(ButtonBase),
-        defaultValue: ButtonSizeEnum.Normal,
+        defaultValue: SizeEnum.Normal,
         defaultBindingMode: BindingMode.OneWay);
 
     public BaseButtonTypeEnum _baseButtonType = BaseButtonTypeEnum.Save;
 
-    public ButtonSizeEnum ButtonSize
+    public SizeEnum ButtonSize
     {
-        get => (ButtonSizeEnum)GetValue(ButtonSizeProperty);
+        get => (SizeEnum)GetValue(ButtonSizeProperty);
         set => SetValue(ButtonSizeProperty, value);
     }
 
@@ -44,9 +43,10 @@ public abstract class ButtonBase : Button
                 break;
         }
     }
+    public enum BaseButtonTypeEnum { Signin, Signout, Save, Edit, Cancel, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple }
 
     private ImageSource SetImageSource(ButtonStateEnum buttonState)
     {
-        return ImageSource.FromFile($"{_baseButtonType}_{((int)ButtonSize).ToString()}_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? "_disabled" : "")}.png");
+        return ImageSource.FromFile($"{_baseButtonType.ToString().ToLower()}_{((int)ButtonSize).ToString()}_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? "_disabled" : "")}.png");
     }
 }

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ca.whittaker.Maui.Controls.Demo"
+             xmlns:Buttons="clr-namespace:ca.whittaker.Maui.Controls.Buttons;assembly=ca.whittaker.Maui.Controls"
+             xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
+             x:Class="ca.whittaker.Maui.Controls.Demo.Views.LoginLogoutPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="Login Logout Page">
+
+    <VerticalStackLayout>
+        <VerticalStackLayout Spacing="15"
+                             Padding="0"  Margin="20, 20, 20, 20"
+                             VerticalOptions="Start">
+            <Buttons:SigninButton Text="signin with apple"  SigninButtonType="Apple"
+                                    x:Name="SigninAppleButton"  ButtonSize="Normal"
+                                    SigninButtonState="{Binding LoginButtonState}" 
+                                    Command="{Binding LoginCommand}"  
+                                    CommandParameter="signinapple" 
+                                    Grid.Column="0" />
+            <Buttons:SigninButton Text="signin with google"   SigninButtonType="Google"
+                                    x:Name="SigninGoogleButton"  ButtonSize="Normal"
+                                    SigninButtonState="{Binding LoginButtonState}" 
+                                    Command="{Binding LoginCommand}"  
+                                    CommandParameter="signingoogle" 
+                                    Grid.Column="0" />
+            <Buttons:SigninButton Text="signin with facebook"   SigninButtonType="Facebook"
+                                    x:Name="SigninFacebookButton"  ButtonSize="Normal"
+                                    SigninButtonState="{Binding LoginButtonState}" 
+                                    Command="{Binding LoginCommand}"  
+                                    CommandParameter="signinfacebook" 
+                                    Grid.Column="0" />
+            <Buttons:SigninButton Text="signin with linkedin"    SigninButtonType="Linkedin"
+                                    x:Name="SigninLinkedinButton"  ButtonSize="Normal"
+                                    SigninButtonState="{Binding LoginButtonState}" 
+                                    Command="{Binding LoginCommand}"  
+                                    CommandParameter="signinlinkedin" 
+                                    Grid.Column="0" />
+            <Buttons:SigninButton Text="signin with tiktok"   SigninButtonType="Tiktok"
+                                    x:Name="SigninTikTokButton"  ButtonSize="Normal"
+                                    SigninButtonState="{Binding LoginButtonState}" 
+                                    Command="{Binding LoginCommand}"  
+                                    CommandParameter="signintiktok" 
+                                    Grid.Column="0" />
+            <Buttons:SignoutButton Text="signout" 
+                                    x:Name="LogoutButton"   ButtonSize="Normal"
+                                    SignoutButtonState="{Binding LogoutButtonState}" 
+                                    Command="{Binding LogoutCommand}"  
+                                    CommandParameter="" 
+                                    Grid.Column="0" />
+
+            <TableView x:Name="LoginDetailsTable" Margin="10,10,10,10" Intent="Settings" IsVisible="{Binding IsUserLoggedIn}" >
+                <TableRoot>
+                    <TableSection Title="login details">
+                        <TextCell Text="{Binding Lastlogin_device}" Detail="device info" />
+                        <TextCell Text="{Binding Lastlogin_date}" Detail="login date" />
+                        <TextCell Text="{Binding Lastlogin_ipaddress}" Detail="location" />
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+            
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

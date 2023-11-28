@@ -3,10 +3,10 @@ using ca.whittaker.Maui.Controls.Demo.ViewModels;
 
 namespace ca.whittaker.Maui.Controls.Demo.Views;
 
-public partial class UserProfilePage : ContentPage
+public partial class LoginLogoutPage : ContentPage
 {
 
-    public UserProfilePage(UserProfileViewModel viewModel)
+    public LoginLogoutPage(LoginLogoutViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;
@@ -15,7 +15,7 @@ public partial class UserProfilePage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        ((UserProfileViewModel)this.BindingContext).Initialize();
+        ((LoginLogoutViewModel)this.BindingContext).Initialize();
     }
 
 }

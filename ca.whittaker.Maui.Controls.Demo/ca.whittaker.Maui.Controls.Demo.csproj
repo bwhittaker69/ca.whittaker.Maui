@@ -100,12 +100,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\LoginLogoutPage.xaml.cs">
+	    <DependentUpon>LoginLogoutPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\UserProfilePage.xaml.cs">
 	    <DependentUpon>UserProfilePage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\LoginLogoutPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\UserProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

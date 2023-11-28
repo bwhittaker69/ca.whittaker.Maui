@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ca.whittaker.Maui.Controls.Demo.ViewModels;
+using ca.whittaker.Maui.Controls.Demo.Views;
+using Microsoft.Extensions.Logging;
 
 namespace ca.whittaker.Maui.Controls.Demo
 {
@@ -18,6 +20,11 @@ namespace ca.whittaker.Maui.Controls.Demo
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddTransient<UserProfileViewModel>();
+            builder.Services.AddTransient<UserProfilePage>();
+            builder.Services.AddSingleton<LoginLogoutViewModel>();
+            builder.Services.AddSingleton<LoginLogoutPage>();
 
             return builder.Build();
         }

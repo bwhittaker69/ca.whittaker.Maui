@@ -4,12 +4,33 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:ca.whittaker.Maui.Controls.Demo"
-    Shell.FlyoutBehavior="Disabled"
+    xmlns:views="clr-namespace:ca.whittaker.Maui.Controls.Demo.Views"
+    Shell.FlyoutBehavior="Flyout"
     Title="ca.whittaker.Maui.Controls.Demo">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <!-- Flyout (Hamburger Menu) Items -->
+    <FlyoutItem Route="LoggedOut" x:Name="LoggedOutLayout" FlyoutDisplayOptions="AsMultipleItems" IsVisible="True">
+            <ShellContent Title="Login" Route="LoggedOutPage" ContentTemplate="{DataTemplate views:LoginLogoutPage}" />
+    </FlyoutItem>
+    <!-- Flyout (Hamburger Menu) Items -->
+    <FlyoutItem Route="LoggedIn" x:Name="LoggedInLayout"  IsVisible="False"
+                FlyoutDisplayOptions="AsMultipleItems">
+        <Tab Title="Account"
+             Route="account">
+            <ShellContent Title="Login" Route="LoggedInPage" ContentTemplate="{DataTemplate views:LoginLogoutPage}" />
+            <ShellContent Title="Profile" Route="UserProfilePage" ContentTemplate="{DataTemplate views:UserProfilePage}" />
+        </Tab>
+        <ShellContent Route="monkeys"
+                      Title="Monkeys" />
+        <ShellContent Route="elephants"
+                      Title="Elephants" />
+        <ShellContent Route="bears"
+                      Title="Bears" />
+    </FlyoutItem>
+
+    <ShellContent Route="about"
+                  Title="About" />
+
+    <MenuItem Text="Help" />
 
 </Shell>

@@ -4,73 +4,43 @@
              xmlns:vm="clr-namespace:ca.whittaker.Maui.Controls.Demo"
              xmlns:Buttons="clr-namespace:ca.whittaker.Maui.Controls.Buttons;assembly=ca.whittaker.Maui.Controls"
              xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
-             x:Class="ca.whittaker.MobileApp2.Views.LoginPage"
+             x:Class="ca.whittaker.Maui.Controls.Demo.Views.UserProfilePage"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             Title="{x:Static strings:AppResources.Page_Login_Title}">
+             Title="User Profile Page">
 
     <VerticalStackLayout>
         <VerticalStackLayout Spacing="15"
                              Padding="0"  Margin="20, 20, 20, 20"
                              VerticalOptions="Start">
-            <Buttons:SigninButton Text="{x:Static strings:AppResources.Button_SignInWithApple}" 
-                                    x:Name="SigninAppleButton"  ButtonSize="Normal"
-                                    SigninButtonState="{Binding LoginButtonState}" 
-                                    Command="{Binding LoginCommand}"  
-                                    CommandParameter="signinapple" 
-                                    Grid.Column="0" />
-            <Buttons:SigninButton Text="{x:Static strings:AppResources.Button_SignInWithGoogle}" 
-                                    x:Name="SigninGoogleButton"  ButtonSize="Normal"
-                                    SigninButtonState="{Binding LoginButtonState}" 
-                                    Command="{Binding LoginCommand}"  
-                                    CommandParameter="signingoogle" 
-                                    Grid.Column="0" />
-            <Buttons:SigninButton Text="{x:Static strings:AppResources.Button_SignInWithFacebook}"
-                                    x:Name="SigninFacebookButton"  ButtonSize="Normal"
-                                    SigninButtonState="{Binding LoginButtonState}" 
-                                    Command="{Binding LoginCommand}"  
-                                    CommandParameter="signinfacebook" 
-                                    Grid.Column="0" />
-            <Buttons:SigninButton Text="{x:Static strings:AppResources.Button_SignInWithLinkedin}" 
-                                    x:Name="SigninLinkedinButton"  ButtonSize="Normal"
-                                    SigninButtonState="{Binding LoginButtonState}" 
-                                    Command="{Binding LoginCommand}"  
-                                    CommandParameter="signinlinkedin" 
-                                    Grid.Column="0" />
-            <Buttons:SigninButton Text="{x:Static strings:AppResources.Button_SignInWithTiktok}" 
-                                    x:Name="SigninTikTokButton"  ButtonSize="Normal"
-                                    SigninButtonState="{Binding LoginButtonState}" 
-                                    Command="{Binding LoginCommand}"  
-                                    CommandParameter="signintiktok" 
-                                    Grid.Column="0" />
-            <Buttons:SignoutButton Text="{x:Static strings:AppResources.Button_SignOut}" 
-                                    x:Name="LogoutButton"   ButtonSize="Normal"
-                                    SignoutButtonState="{Binding LogoutButtonState}" 
-                                    Command="{Binding LogoutCommand}"  
-                                    CommandParameter="" 
-                                    Grid.Column="0" />
-            <Forms:Form x:Name="UserProfileForm" FormState="{Binding FormState}">
+            <Forms:Form x:Name="UserProfileForm"
+                        FormName="User Profile"
+                        FormSaveButtonText=""
+                        FormCancelButtonText=""
+                        FormState="{Binding FormState}"
+                        Command="{Binding FormSaveCommand}" 
+                        CommandParameter=""> 
                 <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Start">
-                    <Label Text="{x:Static strings:AppResources.Form_UserProfile_Title}"></Label>
+                    <Label Text="user profile"></Label>
                     <Forms:TextBox 
                                         Text="{Binding Userprofile_nickname}"
-                                        Label="{x:Static strings:AppResources.Field_Name}"
+                                        Label="name"
                                         MaxLength="40"
-                                        Placeholder="{x:Static strings:AppResources.Field_Name_Placeholder}">
+                                        Placeholder="your name">
                     </Forms:TextBox>
                     <Forms:TextBox 
                                         Text="{Binding Userprofile_email}"
-                                        Label="{x:Static strings:AppResources.Field_Email}"
+                                        Label="email"
                                         Mandatory="False"
                                         MaxLength="40"
                                         FieldType="Email"
-                                        Placeholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
+                                        Placeholder="your email">
                     </Forms:TextBox>
                     <Forms:TextBox 
                                         Text="{Binding Userprofile_bio}"
                                         FieldType="Chat"
-                                        Label="{x:Static strings:AppResources.Field_Bio}"
+                                        Label="bio"
                                         MaxLength="50"
-                                        Placeholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
+                                        Placeholder="your biography">
                     </Forms:TextBox>
                     <!--<Controls:TextBox 
                                         Text="{Binding Userprofile_username}"
@@ -81,22 +51,8 @@
                                         MaxLength="50"
                                         Placeholder="{x:Static strings:AppResources.Field_Username_Placeholder}">
                     </Controls:TextBox>-->
-                    <Buttons:SaveButton 
-                        x:Name="SubmitButton"  ButtonSize="Normal"
-                        Text="{x:Static strings:AppResources.Button_SaveChanges}" 
-                        Command="{Binding UpdateCommand}" 
-                        CommandParameter=""></Buttons:SaveButton>
                 </VerticalStackLayout>
             </Forms:Form>
-            <TableView x:Name="LoginDetailsTable" Margin="10,10,10,10" Intent="Settings" IsVisible="{Binding LoginDetailsTableVisible}" >
-                <TableRoot>
-                    <TableSection Title="{x:Static strings:AppResources.Table_LoginDetails_Title}">
-                        <TextCell Text="{Binding Lastlogin_device}" Detail="{x:Static strings:AppResources.Field_DeviceBrand}" />
-                        <TextCell Text="{Binding Lastlogin_date}" Detail="{x:Static strings:AppResources.Field_LastLoginDate}" />
-                        <TextCell Text="{Binding Lastlogin_location}" Detail="{x:Static strings:AppResources.Field_Location}" />
-                    </TableSection>
-                </TableRoot>
-            </TableView>
         </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

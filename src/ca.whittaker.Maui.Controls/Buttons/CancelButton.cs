@@ -1,9 +1,10 @@
 ﻿namespace ca.whittaker.Maui.Controls.Buttons;
 
-public class CustomCancelButton : ButtonBase
+public class CancelButton : ButtonBase
 {
 
-    public CustomCancelButton() : base(BaseButtonTypeEnum.Cancel)
+    public CancelButton() : base(BaseButtonTypeEnum.Cancel)
     {
+
     }
 }

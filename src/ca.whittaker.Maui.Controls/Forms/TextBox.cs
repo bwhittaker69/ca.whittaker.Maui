@@ -1,5 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Text.RegularExpressions;
+using Entry = Microsoft.Maui.Controls.Entry;
+using Label = Microsoft.Maui.Controls.Label;
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
@@ -37,7 +39,7 @@ public class TextBox : ContentView
         defaultBindingMode: BindingMode.TwoWay);
 
     /// <summary>
-    /// Bindable property to set the keyboard type for the text box.
+    /// Bindable property to configure the keyboard type and input validators.
     /// </summary>
     public static readonly BindableProperty FieldTypeProperty = BindableProperty.Create(
         propertyName: nameof(FieldType),
@@ -45,6 +47,19 @@ public class TextBox : ContentView
         declaringType: typeof(TextBox),
         defaultValue: FieldTypeEnum.Text,
         propertyChanged: OnFieldTypeChanged);
+    private static void OnFieldTypeChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (TextBox)bindable;
+        var newType = (FieldTypeEnum)newValue;
+
+        control._entry.Keyboard = newType switch
+        {
+            FieldTypeEnum.Email => Keyboard.Email,
+            FieldTypeEnum.Url => Keyboard.Url,
+            FieldTypeEnum.Chat => Keyboard.Chat,
+            _ => Keyboard.Default,
+        };
+    }
 
     /// <summary>
     /// Bindable property for the label of the text box.
@@ -53,7 +68,17 @@ public class TextBox : ContentView
         propertyName: nameof(Label),
         returnType: typeof(string),
         declaringType: typeof(TextBox),
-        defaultValue: string.Empty);
+        defaultValue: string.Empty,
+        propertyChanged: OnLabelPropertyChanged);
+    private static void OnLabelPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (TextBox)bindable;
+        control.SetLabelText(newValue);
+    }
+    private void SetLabelText(object newValue)
+    {
+        _label.Text = (newValue == null ? "" : newValue.ToString());
+    }
 
     /// <summary>
     /// Bindable property to specify if the text box is mandatory.
@@ -62,7 +87,18 @@ public class TextBox : ContentView
         propertyName: nameof(Mandatory),
         returnType: typeof(bool),
         declaringType: typeof(TextBox),
-        defaultValue: false);
+        defaultValue: false,
+        propertyChanged: OnMandatoryPropertyChanged);
+    private static void OnMandatoryPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (TextBox)bindable;
+        control.SetMandatory(newValue);
+    }
+    private void SetMandatory(object newValue)
+    {
+        if (newValue != null)
+            _mandatory = (bool)newValue;
+    }
 
     /// <summary>
     /// Bindable property to set the maximum length of the text.
@@ -71,16 +107,37 @@ public class TextBox : ContentView
         propertyName: nameof(MaxLength),
         returnType: typeof(int),
         declaringType: typeof(TextBox),
-        defaultValue: 255);
+        defaultValue: 255,
+        propertyChanged: OnMaxLengthPropertyChanged);
+    private static void OnMaxLengthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (TextBox)bindable;
+        control.SetMaxLength(newValue);
+    }
+    private void SetMaxLength(object newValue)
+    {
+        if (newValue != null)
+            _entry.MaxLength =  (int)newValue;
+    }
 
     /// <summary>
-    /// Bindable property for the placeholder text in the text box.
+    /// sets the placeholder text of the textbox (value shown when no text is entered)
     /// </summary>
     public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(
         propertyName: nameof(Placeholder),
         returnType: typeof(string),
         declaringType: typeof(TextBox),
-        defaultValue: string.Empty);
+        defaultValue: string.Empty,
+        propertyChanged: OnPlaceholderPropertyChanged);
+    private static void OnPlaceholderPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (TextBox)bindable;
+        control.SetPlaceholderText(newValue);
+    }
+    private void SetPlaceholderText(object newValue)
+    {
+        _entry.Placeholder = newValue == null ? "" : (string)newValue;
+    }
 
     /// <summary>
     /// Bindable property for the main text of the text box.
@@ -94,6 +151,20 @@ public class TextBox : ContentView
         propertyChanged: OnTextChanged);
 
     /// <summary>
+    /// Called when the text property of the text box changes.
+    /// </summary>
+    /// <param name="bindable">The text box instance.</param>
+    /// <param name="oldValue">The old text value.</param>
+    /// <param name="newValue">The new text value.</param>
+    private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (TextBox)bindable;
+        control._entry.Text = (string)newValue;
+        control._labelDebug.Text = $"ChangeState: {control.ChangeState}  ValidationState: {control.ValidationState}";
+    }
+
+
+    /// <summary>
     /// Bindable property to indicate the validation state of the text box.
     /// </summary>
     public static readonly BindableProperty ValidationStateProperty = BindableProperty.Create(
@@ -103,26 +174,33 @@ public class TextBox : ContentView
         defaultValue: ValidationStateEnum.Valid,
         defaultBindingMode: BindingMode.TwoWay);
 
-    private readonly Label _debugLabel;
+    private readonly Label _labelDebug;
     private readonly Entry _entry;
+    private readonly Button _buttonUndo;
     private readonly Label _label;
-    private readonly Label _notificationLabel;
+    private readonly Label _labelNotification;
     private bool _isOriginalTextSet = false;
     private string _originalText = string.Empty;
     private bool _previousHasChangedState = false;
     private bool _previousInvalidDataState = false;
+    private bool _mandatory = false;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TextBox"/> class.
     /// </summary>
     public TextBox()
     {
+
         _entry = CreateEntry();
         _label = CreateLabel();
-        _debugLabel = CreateLabel();
-        _notificationLabel = CreateNotificationLabel();
+        _labelDebug = CreateLabel();
+        _labelNotification = CreateNotificationLabel();
+        _buttonUndo = CreateUndoButton();
+
+        _buttonUndo.Pressed += (s, e) => { Undo(); };
 
         var grid = CreateLayoutGrid();
+
         Content = grid;
 
         InitializeProperties();
@@ -155,7 +233,7 @@ public class TextBox : ContentView
     public ChangeStateEnum ChangeState { get => (ChangeStateEnum)GetValue(ChangeStateProperty); set => SetValue(ChangeStateProperty, value); }
 
     /// <summary>
-    /// Gets or sets the field type which determines the keyboard type for input.
+    /// Gets or sets the the keyboard type and validation rules for text input.
     /// </summary>
     public FieldTypeEnum FieldType { get => (FieldTypeEnum)GetValue(FieldTypeProperty); set => SetValue(FieldTypeProperty, value); }
 
@@ -203,7 +281,7 @@ public class TextBox : ContentView
     public ValidationStateEnum ValidationState { get => (ValidationStateEnum)GetValue(ValidationStateProperty); set => SetValue(ValidationStateProperty, value); }
 
     /// <summary>
-    /// Resets the change state to the current text value.
+    /// Clears the text box original and current text values.
     /// </summary>
     public void Clear()
     {
@@ -213,34 +291,23 @@ public class TextBox : ContentView
     }
 
     /// <summary>
-    /// Resets the change state to the current text value.
+    /// Text box has been saved, update original text to current text value.
     /// </summary>
-    public void ResetChangeState()
+    public void Saved()
     {
         _originalText = Text;
         UpdateValidationState();
     }
 
     /// <summary>
-    /// Method called when a property of the text box is changed.
+    /// Undo any changes, by restoring the text value to the original value.
     /// </summary>
-    /// <param name="propertyName">The name of the property that changed.</param>
-    protected override void OnPropertyChanged(string propertyName = "")
+    public void Undo()
     {
-        base.OnPropertyChanged(propertyName);
-        switch (propertyName)
-        {
-            case nameof(Label):
-                _label.Text = Label;
-                break;
-            case nameof(Placeholder):
-                _entry.Placeholder = Placeholder;
-                break;
-            case nameof(MaxLength):
-                _entry.MaxLength = MaxLength;
-                break;
-        }
+        Text = _originalText;
+        UpdateValidationState();
     }
+
 
     /// <summary>
     /// Validates an email address.
@@ -279,39 +346,6 @@ public class TextBox : ContentView
             return false;
 
         return Regex.IsMatch(uriResult.AbsoluteUri, @"^(http|https):\/\/[^\s$.?#].[^\s]*$");
-    }
-
-    /// <summary>
-    /// Called when the field type of the text box changes.
-    /// </summary>
-    /// <param name="bindable">The text box instance.</param>
-    /// <param name="oldValue">The old field type value.</param>
-    /// <param name="newValue">The new field type value.</param>
-    private static void OnFieldTypeChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var control = (TextBox)bindable;
-        var newType = (FieldTypeEnum)newValue;
-
-        control._entry.Keyboard = newType switch
-        {
-            FieldTypeEnum.Email => Keyboard.Email,
-            FieldTypeEnum.Url => Keyboard.Url,
-            FieldTypeEnum.Chat => Keyboard.Chat,
-            _ => Keyboard.Default,
-        };
-    }
-
-    /// <summary>
-    /// Called when the text property of the text box changes.
-    /// </summary>
-    /// <param name="bindable">The text box instance.</param>
-    /// <param name="oldValue">The old text value.</param>
-    /// <param name="newValue">The new text value.</param>
-    private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var control = (TextBox)bindable;
-        control._entry.Text = (string)newValue;
-        control._debugLabel.Text = $"ChangeState: {control.ChangeState}  ValidationState: {control.ValidationState}";
     }
 
     /// <summary>
@@ -387,7 +421,8 @@ public class TextBox : ContentView
             ColumnDefinitions =
                 {
                     new ColumnDefinition { Width = GridLength.Auto },
-                    new ColumnDefinition { Width = GridLength.Star }
+                    new ColumnDefinition { Width = GridLength.Star },
+                    new ColumnDefinition { Width = GridLength.Auto }
                 },
             RowDefinitions =
                 {
@@ -399,10 +434,11 @@ public class TextBox : ContentView
 
         grid.Add(_label, 0, 0);
         grid.Add(_entry, 1, 0);
-        grid.Add(_notificationLabel, 0, 1);
-        //grid.Add(_debugLabel, 0, 2);
-        Grid.SetColumnSpan(_notificationLabel, 2);
-        Grid.SetColumnSpan(_debugLabel, 2);
+        grid.Add(_buttonUndo, 2, 0);
+        grid.Add(_labelNotification, 0, 1);
+        //grid.Add(_labelDebug, 0, 2);
+        Grid.SetColumnSpan(_labelNotification, 3);
+        Grid.SetColumnSpan(_labelDebug, 3);
 
 
         return grid;
@@ -420,6 +456,16 @@ public class TextBox : ContentView
             VerticalOptions = LayoutOptions.Center,
             IsVisible = false,
             TextColor = Colors.Red
+        };
+    }
+    private Button CreateUndoButton()
+    {
+        return new Button
+        {
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            ImageSource = CalcUndoImage(false),
+            BackgroundColor = Colors.Transparent,
         };
     }
 
@@ -455,7 +501,10 @@ public class TextBox : ContentView
     {
         UpdateNotificationMessage(Text);
     }
-
+    private ImageSource CalcUndoImage(bool hasChanged)
+    {
+        return ImageSource.FromFile($"undo_12_mauiimage{(hasChanged ? "" : "_disabled")}.png");
+    }
     /// <summary>
     /// Evaluates and raises the HasChanges event if the text has been modified.
     /// </summary>
@@ -464,6 +513,7 @@ public class TextBox : ContentView
         bool hasChanged = _originalText != Text;
         if (_previousHasChangedState != hasChanged)
         {
+            _buttonUndo.ImageSource = CalcUndoImage(hasChanged);
             _previousHasChangedState = hasChanged;
             ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
             HasChanges?.Invoke(this, new HasChangesEventArgs(hasChanged));
@@ -590,8 +640,8 @@ public class TextBox : ContentView
                 break;
         }
 
-        _notificationLabel.Text = notificationMessage;
-        _notificationLabel.IsVisible = isNotificationVisible;
+        _labelNotification.Text = notificationMessage;
+        _labelNotification.IsVisible = isNotificationVisible;
 
         ValidationState = validationState; // Set the validation state based on calculated value
     }
