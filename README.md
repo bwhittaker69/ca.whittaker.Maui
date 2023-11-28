@@ -24,16 +24,16 @@
   - Label for descriptions or titles.
   - Notification message area for displaying input-related messages.
 
-#### <CheckBox> (Planned)
-- A future addition to enhance the Form control collection.
+#### **CheckBox** (Planned)
+> **Note:** A future addition to enhance the Form control collection.
 
 ## button related controls - ca.whittaker.Maui.Controls.Buttons
 
-### <CancelButton>
-### <EditButton>
-### <SaveButton>
-### <SigninButton>
-### <SignoutButton>
+### **CancelButton**
+### **EditButton**
+### **SaveButton**
+### **SigninButton**
+### **SignoutButton**
 
 > **Note:** Buttons include embedded graphic icons for specific purposes, with "enabled" and "disabled" state graphics to reflect the button's active state in relation to its environment.
 
