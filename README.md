@@ -1,13 +1,14 @@
 # MAUI Controls
 
-## Form Control Collection - ca.whittaker.Maui.Controls
+## form related controls - ca.whittaker.Maui.Controls.Forms
 
-### Forms : ca.whittaker.Maui.Controls.Forms
+### <Form>
 
 - Incorporates TextBox and CheckBox.
 - Integrates Save and Cancel buttons automatically.
 
-#### TextBox
+### <TextBox>
+
 - **Types**:
   - Text
   - Email
@@ -23,17 +24,16 @@
   - Label for descriptions or titles.
   - Notification message area for displaying input-related messages.
 
-#### CheckBox (Planned)
+#### <CheckBox> (Planned)
 - A future addition to enhance the Form control collection.
 
-### Buttons :  : ca.whittaker.Maui.Controls.Buttons
+## button related controls - ca.whittaker.Maui.Controls.Buttons
 
-#### Type
-- CancelButton
-- EditButton
-- SaveButton
-- SigninButton
-- SignoutButton
+### <CancelButton>
+### <EditButton>
+### <SaveButton>
+### <SigninButton>
+### <SignoutButton>
 
 > **Note:** Buttons include embedded graphic icons for specific purposes, with "enabled" and "disabled" state graphics to reflect the button's active state in relation to its environment.
 
