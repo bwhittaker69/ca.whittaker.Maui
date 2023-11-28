@@ -24,8 +24,8 @@
   - Label for descriptions or titles.
   - Notification message area for displaying input-related messages.
 
-#### **CheckBox** (Planned)
-> **Note:** A future addition to enhance the Form control collection.
+#### **CheckBox** ***(Planned)***
+> A future addition to enhance the Form control collection.
 
 ## button related controls - ca.whittaker.Maui.Controls.Buttons
 
