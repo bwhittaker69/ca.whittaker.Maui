@@ -29,13 +29,14 @@
 
 ## button related controls - ca.whittaker.Maui.Controls.Buttons
 
-### **CancelButton**
-### **EditButton**
-### **SaveButton**
-![alt text](/src/ca.whittaker.Maui.Controls/Resources/Images/save_24_mauiimage.png)
+| Button Type     | enabled | disabled |
+|-----------------|:-------:|:--------:|
+| CancelButton    | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/cancel_12_mauiimage.png) | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/cancel_12_mauiimage_disabled.png) |
+| UndoButton      | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/undo_12_mauiimage.png) | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/undo_12_mauiimage_disabled.png) |
+| SaveButton      | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/save_12_mauiimage.png) | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/save_12_mauiimage_disabled.png)  |
+| SigninButton    | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/generic_12_mauiimage.png) | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/generic_12_mauiimage_disabled.png) |
+| SignoutButton   | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/signout_12_mauiimage.png) | ![alt text](src/ca.whittaker.Maui.Controls/Resources/Images/signout_12_mauiimage_disabled.png) |
 
-### **SigninButton**
-### **SignoutButton**
 
 > **Note:** Buttons include embedded graphic icons for specific purposes, with "enabled" and "disabled" state graphics to reflect the button's active state in relation to its environment.
 
