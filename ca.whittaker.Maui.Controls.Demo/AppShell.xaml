@@ -15,22 +15,10 @@
     <!-- Flyout (Hamburger Menu) Items -->
     <FlyoutItem Route="LoggedIn" x:Name="LoggedInLayout"  IsVisible="False"
                 FlyoutDisplayOptions="AsMultipleItems">
-        <Tab Title="Account"
-             Route="account">
+        <Tab Title="Account">
             <ShellContent Title="Login" Route="LoggedInPage" ContentTemplate="{DataTemplate views:LoginLogoutPage}" />
             <ShellContent Title="Profile" Route="UserProfilePage" ContentTemplate="{DataTemplate views:UserProfilePage}" />
         </Tab>
-        <ShellContent Route="monkeys"
-                      Title="Monkeys" />
-        <ShellContent Route="elephants"
-                      Title="Elephants" />
-        <ShellContent Route="bears"
-                      Title="Bears" />
     </FlyoutItem>
-
-    <ShellContent Route="about"
-                  Title="About" />
-
-    <MenuItem Text="Help" />
 
 </Shell>

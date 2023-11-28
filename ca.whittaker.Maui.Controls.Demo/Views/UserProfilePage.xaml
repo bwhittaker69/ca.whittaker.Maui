@@ -14,13 +14,12 @@
                              VerticalOptions="Start">
             <Forms:Form x:Name="UserProfileForm"
                         FormName="User Profile"
-                        FormSaveButtonText=""
-                        FormCancelButtonText=""
+                        FormSaveButtonText="save"
+                        FormCancelButtonText="cancel"
                         FormState="{Binding FormState}"
                         Command="{Binding FormSaveCommand}" 
                         CommandParameter=""> 
                 <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Start">
-                    <Label Text="user profile"></Label>
                     <Forms:TextBox 
                                         Text="{Binding Userprofile_nickname}"
                                         Label="name"

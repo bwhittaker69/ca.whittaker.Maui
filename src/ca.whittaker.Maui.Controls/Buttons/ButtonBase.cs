@@ -11,7 +11,7 @@ public abstract class ButtonBase : Button
         defaultBindingMode: BindingMode.OneWay);
 
     public BaseButtonTypeEnum _baseButtonType = BaseButtonTypeEnum.Save;
-
+    public string ButtonText { get; set; } = string.Empty;
     public SizeEnum ButtonSize
     {
         get => (SizeEnum)GetValue(ButtonSizeProperty);
@@ -22,7 +22,12 @@ public abstract class ButtonBase : Button
     {
         _baseButtonType = baseButtonType;
     }
-   
+
+    public void SetButtonText(string text)
+    {
+        ButtonText = text;
+        base.Text = ButtonText;
+    }
     public void SetButtonState(ButtonStateEnum buttonState = ButtonStateEnum.Enabled)
     {
         switch (buttonState)
@@ -34,7 +39,7 @@ public abstract class ButtonBase : Button
                 break;
             case ButtonStateEnum.Disabled:
                 IsVisible = true;
-                IsEnabled = false;
+                IsEnabled = true;
                 ImageSource = SetImageSource(buttonState);
                 break;
             case ButtonStateEnum.Hidden:

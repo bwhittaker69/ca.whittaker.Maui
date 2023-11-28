@@ -9,14 +9,14 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
         private FormStateEnum formState;
 
         [ObservableProperty]
-        private string userprofile_username, userprofile_email, userprofile_nickname, userprofile_website, userprofile_phonenumber, userprofile_bio;
+        private string userprofile_username, userprofile_email, userprofile_nickname, userprofile_website, userprofile_phonenumber, userprofile_bio = String.Empty;
 
-        private string? currentUser_username = null;
-        private string? currentUser_nickname = null;
-        private string? currentUser_website = null;
-        private string? currentUser_phonenumber = null;
-        private string? currentUser_bio = null;
-        private string? currentUser_email = null;
+        private string currentUser_username = "";
+        private string currentUser_nickname = "";
+        private string currentUser_website = "";
+        private string currentUser_phonenumber = "";
+        private string currentUser_bio = "";
+        private string currentUser_email = "";
 
         public UserProfileViewModel()
         {
@@ -27,43 +27,23 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
 
         public void Initialize()
         {
-            ConfigureUserProfileForm();
+            ResetUserProfileForm();
         }
 
 
         private void Save()
         {
-            if (currentUser_username == null) return;
             if (true) // savedSuccess
                 FormState = FormStateEnum.Saved;
-            else
-                FormState = FormStateEnum.Undo;
         }
 
         #region USER PROFILE FORM
-        private void ConfigureUserProfileForm()
+        private void ResetUserProfileForm()
         {
-            if (currentUser_username == null)
-            {
-                ClearUserProfileForm();
-                FormState = FormStateEnum.Enabled;
-            }
-            else
-            {
-                PopulateUserProfileForm(currentUser_username);
-                FormState = FormStateEnum.Undo;
-            }
+            ClearUserProfileForm();
+            FormState = FormStateEnum.Enabled;
         }
 
-        private void PopulateUserProfileForm(string? currentUser_username)
-        {
-            Userprofile_nickname = "";
-            Userprofile_username = currentUser_username;
-            Userprofile_bio = "";
-            Userprofile_website = "";
-            Userprofile_email = "";
-            Userprofile_phonenumber = "";
-        }
         private void ClearUserProfileForm()
         {
             Userprofile_nickname = Userprofile_username = Userprofile_website = Userprofile_phonenumber = Userprofile_bio = string.Empty;
