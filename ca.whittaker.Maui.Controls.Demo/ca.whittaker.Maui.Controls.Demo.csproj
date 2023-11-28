@@ -70,6 +70,12 @@
 	  <ApplicationId>ca.whittaker.Maui.Controls.Demo</ApplicationId>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios'">
+	  <ProvisioningType>manual</ProvisioningType>
+	  <CodesignKey>Apple Distribution: Brett Whittaker (8564V2XTQR)</CodesignKey>
+	  <CodesignProvision>PP-ADHOC-CONTROLSDEMO</CodesignProvision>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />

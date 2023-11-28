@@ -21,11 +21,11 @@
 		<Title>Custom controls for .NET8 MAUI</Title>
 		<Authors>Brett Whittaker</Authors>
 		<Description>form controls for .NET8 MAUI</Description>
-		<RepositoryUrl>https://github.com/bwhittaker69/ca.whittaker.Maui/tree/master/ca.whittaker.Maui.Controls</RepositoryUrl>
+		<RepositoryUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>MAUI;MAUI form controls</PackageTags>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -147,10 +147,12 @@
     <None Include="..\..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

@@ -1,30 +1,42 @@
-# MAUI Form Controls
+# Custom MAUI Class Overview
 
-## Overview
-The `Form` class is a sophisticated component designed for .NET MAUI applications, extending the `StackLayout` to provide an enhanced form management experience. This class is tailored to facilitate various aspects of form handling, including state management, validation, and dynamic user interface adjustments. Key features include:
+## Form Control Collection
 
-- **Bindable Properties**: Incorporates a range of bindable properties such as `Command`, `CommandParameter`, `FormCancelButtonText`, `FormName`, and more. These properties enable seamless interaction and integration with other parts of a MAUI application.
+### Form
+- Incorporates TextBox and CheckBox.
+- Integrates Save and Cancel buttons automatically.
 
-- **User Interface Elements**: Features essential UI components like save and cancel buttons, a form label, and a notification label, which collectively enhance the user interaction experience.
+### TextBox
+- **Types**:
+  - Text
+  - Email
+  - Url
+  - Chat
+  - Username
+- **Filtering Options**:
+  - AllLowerCase
+  - AllowWhiteSpace
+  - Mandatory
+- **Built-in Functionalities**:
+  - "Undo" button for reverting text entries.
+  - Label for descriptions or titles.
+  - Notification message area for displaying input-related messages.
 
-- **Event Handling and State Management**: Efficiently handles user interactions (e.g., button clicks) and internal state changes. It ensures the form's state (enabled, disabled, hidden) is managed effectively, reflecting the current context of the application.
+### CheckBox (Planned)
+- A future addition to enhance the Form control collection.
 
-- **Validation and Change Detection**: Employs mechanisms to track changes and validate the input in text boxes. It intelligently enables or disables buttons based on the validity of the changes made to the form.
+## Button Controls
 
-- **Dynamic UI Updates**: Capable of updating UI elements dynamically in response to property changes, ensuring a responsive and interactive user experience.
+### Type
+- CancelButton
+- EditButton
+- SaveButton
+- SigninButton
+- SignoutButton
 
-- **Initialization and Setup**: Utilizes the `OnParentSet` method to initialize and configure form controls, ensuring a robust setup.
+> **Note:** Buttons include embedded graphic icons for specific purposes, with "enabled" and "disabled" state graphics to reflect the button's active state in relation to its environment.
 
-- **Error Handling and Event Wiring**: Includes methods for wiring up custom text box events and handling potential errors, such as missing controls, thereby enhancing reliability and stability.
-
-This `Form` class is an all-encompassing solution for creating and managing forms within .NET MAUI applications, offering a wide array of features for comprehensive state management, validation, and UI responsiveness.
-
-## Features
-- **Abstract ButtonBase Class**: Extends the standard `Button` from `Microsoft.Maui.Controls`. Manages image sources and state-based configurations.
-- **Derived Button Classes**: Customized button implementations (`CustomCancelButton`, `LoginButton`, `LogoutButton`, `SubmitButton`) inheriting from `ButtonBase`.
-- **Dynamic State Management**: Utilizes `ButtonStateEnum` to handle different button states (`Enabled`, `Disabled`, `Hidden`).
-- **Bindable Properties**: Support for data binding in button state management.
-- **Image Source Handling**: Dynamic image source path construction based on button state.
+This comprehensive structure offers a detailed view of the enhanced functionalities and user interaction mechanisms in the custom MAUI application, focusing on form management and control interactions.
 
 ## Usage
 To integrate the Form class into your .NET MAUI application, follow these steps:
@@ -83,12 +95,24 @@ Example of Customizing Appearance:
 
 By following these steps, you can effectively incorporate and customize the Form class in your .NET MAUI application using XAML.
 
-1. Adding the Form to Your View
+5. Adding the Form to Your View
+
 Incorporate the Form class in your XAML where you need a form. Make sure to reference the namespace ca.whittaker.Maui.Controls.Forms.
 
+```xml
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:forms="ca.whittaker.Maui.Controls.Forms"
              x:Class="YourNamespace.YourPage">
     <forms:Form x:Name="myForm"/>
 </ContentPage>
+```
+
+
+## Author
+
+Brett Whittaker - brett@whittaker.ca
+
+- https://github.com/bwhittaker69
+- https://tiktok.com/@cowboycanadian
+- https://www.linkedin.com/in/brettdouglaswhittaker
