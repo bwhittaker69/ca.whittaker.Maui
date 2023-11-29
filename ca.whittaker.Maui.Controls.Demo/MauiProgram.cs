@@ -21,8 +21,8 @@ namespace ca.whittaker.Maui.Controls.Demo
     		builder.Logging.AddDebug();
 #endif
 
-            builder.Services.AddTransient<UserProfileViewModel>();
-            builder.Services.AddTransient<UserProfilePage>();
+            builder.Services.AddSingleton<UserProfileViewModel>();
+            builder.Services.AddSingleton<UserProfilePage>();
             builder.Services.AddSingleton<LoginLogoutViewModel>();
             builder.Services.AddSingleton<LoginLogoutPage>();
 

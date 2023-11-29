@@ -411,21 +411,4 @@ public class Form : StackLayout
         }
         return;
     }
-    private void FixWidthFirstColumn()
-    {
-        var controlCount = this.GetVisualTreeDescendants().Count;
-        if (controlCount == 0) throw new InvalidOperationException("Form missing controls");
-
-        int iMaxWidth = 0;
-        foreach (var customTextBox in this.GetVisualTreeDescendants().OfType<TextBox>())
-        {
-            if (customTextBox._label.Width > iMaxWidth) iMaxWidth = (int)customTextBox._label.Width;
-        }
-        foreach (var customTextBox in this.GetVisualTreeDescendants().OfType<TextBox>())
-        {
-            customTextBox._label.WidthRequest = iMaxWidth;
-        }
-        return;
-    }
-
 }

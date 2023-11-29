@@ -8,17 +8,4 @@
     Shell.FlyoutBehavior="Flyout"
     Title="ca.whittaker.Maui.Controls.Demo">
 
-    <!-- Flyout (Hamburger Menu) Items -->
-    <FlyoutItem Route="LoggedOut" x:Name="LoggedOutLayout" FlyoutDisplayOptions="AsMultipleItems" IsVisible="True">
-            <ShellContent Title="Login" Route="LoggedOutPage" ContentTemplate="{DataTemplate views:LoginLogoutPage}" />
-    </FlyoutItem>
-    <!-- Flyout (Hamburger Menu) Items -->
-    <FlyoutItem Route="LoggedIn" x:Name="LoggedInLayout"  IsVisible="False"
-                FlyoutDisplayOptions="AsMultipleItems">
-        <Tab Title="Account">
-            <ShellContent Title="Login" Route="LoggedInPage" ContentTemplate="{DataTemplate views:LoginLogoutPage}" />
-            <ShellContent Title="Profile" Route="UserProfilePage" ContentTemplate="{DataTemplate views:UserProfilePage}" />
-        </Tab>
-    </FlyoutItem>
-
 </Shell>
