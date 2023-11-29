@@ -12,7 +12,7 @@
         <VerticalStackLayout Spacing="15"
                              Padding="0"  Margin="20, 20, 20, 20"
                              VerticalOptions="Start">
-            <Forms:Form x:Name="UserProfileForm"
+            <Forms:Form x:Name="UserProfileForm" 
                         FormName="User Profile"
                         FormSaveButtonText="save"
                         FormCancelButtonText="cancel"

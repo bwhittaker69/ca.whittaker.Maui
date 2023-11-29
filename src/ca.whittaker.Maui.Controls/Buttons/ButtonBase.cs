@@ -26,32 +26,85 @@ public abstract class ButtonBase : Button
     public void SetButtonText(string text)
     {
         ButtonText = text;
-        base.Text = ButtonText;
+
+        void UpdateUI()
+        {
+            base.Text = ButtonText;
+        }
+        // Check if on the main thread and update UI accordingly
+        if (MainThread.IsMainThread)
+        {
+            UpdateUI();
+        }
+        else
+        {
+            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+        }
     }
     public void SetButtonState(ButtonStateEnum buttonState = ButtonStateEnum.Enabled)
     {
-        switch (buttonState)
+        void UpdateUI()
         {
-            case ButtonStateEnum.Enabled:
-                IsVisible = true;
-                IsEnabled = true;
-                ImageSource = SetImageSource(buttonState);
-                break;
-            case ButtonStateEnum.Disabled:
-                IsVisible = true;
-                IsEnabled = true;
-                ImageSource = SetImageSource(buttonState);
-                break;
-            case ButtonStateEnum.Hidden:
-                IsEnabled = false;
-                IsVisible = false;
-                break;
+            switch (buttonState)
+            {
+                case ButtonStateEnum.Enabled:
+                    base.IsVisible = true;
+                    base.IsEnabled = true;
+                    base.ImageSource = GetImageSource(buttonState);
+                    break;
+                case ButtonStateEnum.Disabled:
+                    base.IsVisible = true;
+                    base.IsEnabled = true;
+                    base.ImageSource = GetImageSource(buttonState);
+                    break;
+                case ButtonStateEnum.Hidden:
+                    base.IsEnabled = false;
+                    base.IsVisible = false;
+                    break;
+            }
+        }
+
+        // Check if on the main thread and update UI accordingly
+        if (MainThread.IsMainThread)
+        {
+            UpdateUI();
+        }
+        else
+        {
+            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
         }
     }
+
     public enum BaseButtonTypeEnum { Signin, Signout, Save, Edit, Cancel, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple }
 
-    private ImageSource SetImageSource(ButtonStateEnum buttonState)
+    private ImageSource GetImageSource(ButtonStateEnum buttonState)
     {
-        return ImageSource.FromFile($"{_baseButtonType.ToString().ToLower()}_{((int)ButtonSize).ToString()}_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? "_disabled" : "")}.png");
+        var assembly = this.GetType().Assembly;
+        string? assemblyName = assembly.GetName().Name;
+        AppTheme? currentTheme = Application.Current.RequestedTheme;
+        string lightThemeEnabled = "";
+        string lightThemeDisabled = "_disabled";
+        string darkThemeEnabled = "_disabled";
+        string darkThemeDisabled = "";
+        string enabled = "";
+        string disabled = "";
+        if (currentTheme == AppTheme.Dark)
+        {
+            enabled = darkThemeEnabled;
+            disabled = darkThemeDisabled;
+        }
+        else if (currentTheme == AppTheme.Light)
+        {
+            enabled = lightThemeEnabled;
+            disabled = lightThemeDisabled;
+        }
+        else
+        {
+            enabled = lightThemeEnabled;
+            disabled = lightThemeDisabled;
+        }
+
+        string resourceName = $"{assemblyName}.Resources.Images.{_baseButtonType.ToString().ToLower()}_{((int)ButtonSize).ToString()}_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? disabled : enabled)}.png";
+        return ImageSource.FromResource(resourceName, assembly);
     }
 }

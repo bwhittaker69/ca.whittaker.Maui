@@ -25,13 +25,6 @@ public class Form : StackLayout
         defaultValue: "cancel",
         propertyChanged: OnFormCancelButtonTextChanged);
 
-    public static readonly BindableProperty FormNameTextColorProperty = BindableProperty.Create(
-        propertyName: nameof(FormNameTextColor),
-        returnType: typeof(Color),
-        declaringType: typeof(Form),
-        defaultValue: Colors.Black,
-        propertyChanged: OnFormNameTextColorChanged);
-
     public static readonly BindableProperty FormNameProperty = BindableProperty.Create(
         propertyName: nameof(FormName),
         returnType: typeof(string),
@@ -61,13 +54,13 @@ public class Form : StackLayout
         defaultBindingMode: BindingMode.TwoWay,
         propertyChanged: OnFormStateChanged);
 
-    private readonly CancelButton _buttonCancel;
+    public Button _buttonCancel;
 
-    private readonly SaveButton _buttonSave;
+    public Button _buttonSave;
 
-    private readonly Label _labelForm;
+    public Label _labelForm;
 
-    private readonly Label _labelNotification;
+    public Label _labelNotification;
 
     private bool HasNoChanges = false;
 
@@ -75,28 +68,7 @@ public class Form : StackLayout
 
     public Form()
     {
-        _buttonSave = new SaveButton
-        {
-            BackgroundColor = Colors.Transparent,
-            HorizontalOptions = LayoutOptions.Center,
-            TextColor = Colors.Black,
-            Text = FormSaveButtonText
-        };
-        _buttonSave.SetButtonText(FormSaveButtonText);
-        _buttonSave.Clicked += _buttonSave_Clicked;
-        _buttonCancel = new CancelButton
-        {
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            TextColor = Colors.Black,
-            BackgroundColor = Colors.Transparent,
-            Text = FormCancelButtonText
-        };
-        _buttonCancel.SetButtonText(FormCancelButtonText);
-        _buttonCancel.Clicked += (sender, e) => CancelForm();
-        _labelNotification = CreateNotificationLabel();
-        _labelForm = CreateFormLabel();
-        Add(CreateFormLayoutGrid());
+
     }
 
     public ICommand Command
@@ -123,12 +95,6 @@ public class Form : StackLayout
         set => SetValue(FormNameProperty, value);
     }
 
-    public Color FormNameTextColor
-    {
-        get => (Color)GetValue(FormNameTextColorProperty);
-        set => SetValue(FormNameTextColorProperty, value);
-    }
-
     public string FormSaveButtonText
     {
         get => (string)GetValue(FormSaveButtonTextProperty);
@@ -153,14 +119,39 @@ public class Form : StackLayout
     protected override void OnParentSet()
     {
         base.OnParentSet();
+
+        _buttonSave = new Button
+        {
+            BackgroundColor = Colors.Transparent,
+            VerticalOptions = LayoutOptions.FillAndExpand,
+            HorizontalOptions = LayoutOptions.FillAndExpand,
+            Text = FormSaveButtonText
+        };
+        //_buttonSave.SetButtonText(FormSaveButtonText);
+        _buttonSave.Clicked += _buttonSave_Clicked;
+        _buttonCancel = new Button
+        {
+            HorizontalOptions = LayoutOptions.FillAndExpand,
+            VerticalOptions = LayoutOptions.FillAndExpand,
+            BackgroundColor = Colors.Transparent,
+            Text = FormCancelButtonText
+        };
+        //_buttonCancel.SetButtonText(FormCancelButtonText);
+        _buttonCancel.Clicked += (sender, e) => CancelForm();
+        _labelNotification = CreateNotificationLabel();
+        _labelForm = CreateFormLabel();
+
+        Insert(0, CreateFormLayoutGrid());
+
         WireUpControls();
+
     }
 
     private static void OnFormCancelButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (oldValue != newValue)
         {
-            ((Form)bindable)._buttonCancel.SetButtonText((string)newValue);
+            ((Form)bindable)._buttonCancel.Text = (string)newValue;
         }
     }
 
@@ -177,15 +168,7 @@ public class Form : StackLayout
     {
         if (oldValue != newValue)
         {
-            ((Form)bindable)._buttonSave.SetButtonText((string)newValue);
-        }
-    }
-
-    private static void OnFormNameTextColorChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (oldValue != newValue)
-        {
-            ((Form)bindable)._labelForm.TextColor = (Color)newValue;
+            ((Form)bindable)._buttonSave.Text = (string)newValue;
         }
     }
 
@@ -268,7 +251,6 @@ public class Form : StackLayout
             Text = FormName,
             HorizontalOptions = LayoutOptions.Start,
             VerticalOptions = LayoutOptions.Center,
-            TextColor = Colors.Black,
             IsVisible = FormName == null || FormName == "" ? false : true
         };
     }
@@ -299,9 +281,9 @@ public class Form : StackLayout
             }
         };
 
-        grid.Add(_buttonSave, 0, 0);
-        grid.Add(_buttonCancel, 1, 0);
-        grid.Add(_labelForm, 0, 1);
+        grid.Add(_labelForm, 0, 0);
+        grid.Add(_buttonSave, 0, 1);
+        grid.Add(_buttonCancel, 1, 1);
         grid.Add(_labelNotification, 0, 2);
 
         Grid.SetColumnSpan(_labelForm, 2);
@@ -361,8 +343,7 @@ public class Form : StackLayout
 
     private void UpdateFormControlStates()
     {
-        var submitButton = _buttonSave;
-        var cancelButton = _buttonCancel;
+
         switch (FormState)
         {
             case FormStateEnum.Enabled:
@@ -370,36 +351,98 @@ public class Form : StackLayout
                 IsVisible = true;
                 if (HasNoChanges)
                 {
-                    submitButton.SetButtonState(ButtonStateEnum.Disabled);
-                    cancelButton.SetButtonState(ButtonStateEnum.Disabled);
+                    _buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Disabled);
+                    _buttonCancel.ImageSource = GetCancelButtonImageSource(ButtonStateEnum.Disabled);
                 }
                 else
                 {
                     if (HasNoErrors)
                     {
-                        submitButton.SetButtonState(ButtonStateEnum.Enabled);
-                        cancelButton.SetButtonState(ButtonStateEnum.Enabled);
+                        _buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Enabled);
+                        _buttonCancel.ImageSource = GetCancelButtonImageSource(ButtonStateEnum.Enabled);
                     }
                     else
                     {
-                        submitButton.SetButtonState(ButtonStateEnum.Disabled);
-                        cancelButton.SetButtonState(ButtonStateEnum.Enabled);
+                        _buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Disabled);
+                        _buttonCancel.ImageSource = GetCancelButtonImageSource(ButtonStateEnum.Enabled);
                     }
                 }
                 break;
 
             case FormStateEnum.Disabled:
                 IsEnabled = false;
-                submitButton.SetButtonState(ButtonStateEnum.Hidden);
+                _buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Disabled);
                 break;
 
             case FormStateEnum.Hidden:
                 IsVisible = false;
-                submitButton.SetButtonState(ButtonStateEnum.Hidden);
+                //_buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Hidden);
                 break;
         }
     }
 
+
+    private ImageSource GetSaveButtonImageSource(ButtonStateEnum buttonState)
+    {
+        var assembly = this.GetType().Assembly;
+        string? assemblyName = assembly.GetName().Name;
+        AppTheme? currentTheme = Application.Current.RequestedTheme;
+        string lightThemeEnabled = "";
+        string lightThemeDisabled = "_disabled";
+        string darkThemeEnabled = "_disabled";
+        string darkThemeDisabled = "";
+        string enabled = "";
+        string disabled = "";
+        if (currentTheme == AppTheme.Dark)
+        {
+            enabled = darkThemeEnabled;
+            disabled = darkThemeDisabled;
+        }
+        else if (currentTheme == AppTheme.Light)
+        {
+            enabled = lightThemeEnabled;
+            disabled = lightThemeDisabled;
+        }
+        else
+        {
+            enabled = lightThemeEnabled;
+            disabled = lightThemeDisabled;
+        }
+
+        string resourceName = $"{assemblyName}.Resources.Images.save_12_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? disabled : enabled)}.png";
+        return ImageSource.FromResource(resourceName, assembly);
+    }
+
+    private ImageSource GetCancelButtonImageSource(ButtonStateEnum buttonState)
+    {
+        var assembly = this.GetType().Assembly;
+        string? assemblyName = assembly.GetName().Name;
+        AppTheme? currentTheme = Application.Current.RequestedTheme;
+        string lightThemeEnabled = "";
+        string lightThemeDisabled = "_disabled";
+        string darkThemeEnabled = "_disabled";
+        string darkThemeDisabled = "";
+        string enabled = "";
+        string disabled = "";
+        if (currentTheme == AppTheme.Dark)
+        {
+            enabled = darkThemeEnabled;
+            disabled = darkThemeDisabled;
+        }
+        else if (currentTheme == AppTheme.Light)
+        {
+            enabled = lightThemeEnabled;
+            disabled = lightThemeDisabled;
+        }
+        else
+        {
+            enabled = lightThemeEnabled;
+            disabled = lightThemeDisabled;
+        }
+
+        string resourceName = $"{assemblyName}.Resources.Images.cancel_12_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? disabled : enabled)}.png";
+        return ImageSource.FromResource(resourceName, assembly);
+    }
     private void WireUpControls()
     {
         var controlCount = this.GetVisualTreeDescendants().Count;
@@ -412,4 +455,21 @@ public class Form : StackLayout
         }
         return;
     }
+    private void FixWidthFirstColumn()
+    {
+        var controlCount = this.GetVisualTreeDescendants().Count;
+        if (controlCount == 0) throw new InvalidOperationException("Form missing controls");
+
+        int iMaxWidth = 0;
+        foreach (var customTextBox in this.GetVisualTreeDescendants().OfType<TextBox>())
+        {
+            if (customTextBox._label.Width > iMaxWidth) iMaxWidth = (int)customTextBox._label.Width;
+        }
+        foreach (var customTextBox in this.GetVisualTreeDescendants().OfType<TextBox>())
+        {
+            customTextBox._label.WidthRequest = iMaxWidth;
+        }
+        return;
+    }
+
 }

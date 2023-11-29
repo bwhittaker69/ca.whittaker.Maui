@@ -177,7 +177,7 @@ public class TextBox : ContentView
     private readonly Label _labelDebug;
     private readonly Entry _entry;
     private readonly Button _buttonUndo;
-    private readonly Label _label;
+    public readonly Label _label;
     private readonly Label _labelNotification;
     private bool _isOriginalTextSet = false;
     private string _originalText = string.Empty;
@@ -386,7 +386,7 @@ public class TextBox : ContentView
         var entry = new Entry
         {
             Placeholder = Placeholder,
-            HorizontalOptions = LayoutOptions.Fill,
+            HorizontalOptions = LayoutOptions.FillAndExpand,
             VerticalOptions = LayoutOptions.Center
         };
         entry.TextChanged += Entry_TextChanged;
@@ -420,9 +420,9 @@ public class TextBox : ContentView
         {
             ColumnDefinitions =
                 {
-                    new ColumnDefinition { Width = GridLength.Auto },
-                    new ColumnDefinition { Width = GridLength.Star },
-                    new ColumnDefinition { Width = GridLength.Auto }
+                    new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) },
+                    new ColumnDefinition { Width = new GridLength(7, GridUnitType.Star)  },
+                    new ColumnDefinition { Width = 24 }
                 },
             RowDefinitions =
                 {
@@ -466,6 +466,11 @@ public class TextBox : ContentView
             VerticalOptions = LayoutOptions.Center,
             ImageSource = CalcUndoImage(false),
             BackgroundColor = Colors.Transparent,
+            WidthRequest = 20,
+            HeightRequest = 20,
+            BorderWidth = 0,
+            Margin = new Thickness(0, 0, 0, 0),
+            Padding = new Thickness(5, 0, 0, 0) 
         };
     }
 
@@ -501,10 +506,39 @@ public class TextBox : ContentView
     {
         UpdateNotificationMessage(Text);
     }
+
+
     private ImageSource CalcUndoImage(bool hasChanged)
     {
-        return ImageSource.FromFile($"undo_12_mauiimage{(hasChanged ? "" : "_disabled")}.png");
+        var assembly = this.GetType().Assembly;
+        string? assemblyName = assembly.GetName().Name;
+        AppTheme? currentTheme = Application.Current.RequestedTheme;
+        string lightThemeEnabled = "";
+        string lightThemeDisabled = "_disabled";
+        string darkThemeEnabled = "_disabled";
+        string darkThemeDisabled = "";
+        string enabled = "";
+        string disabled = "";
+        if (currentTheme == AppTheme.Dark)
+        {
+            enabled = darkThemeEnabled;
+            disabled = darkThemeDisabled;
+        }
+        else if (currentTheme == AppTheme.Light)
+        {
+            enabled = lightThemeEnabled;
+            disabled = lightThemeDisabled;
+        }
+        else
+        {
+            enabled = lightThemeEnabled;
+            disabled = lightThemeDisabled;
+        }
+
+        string resourceName = $"{assemblyName}.Resources.Images.undo_12_mauiimage{(hasChanged ? disabled : enabled)}.png";
+        return ImageSource.FromResource(resourceName, assembly);
     }
+
     /// <summary>
     /// Evaluates and raises the HasChanges event if the text has been modified.
     /// </summary>
