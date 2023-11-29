@@ -513,10 +513,10 @@ public class TextBox : ContentView
         var assembly = this.GetType().Assembly;
         string? assemblyName = assembly.GetName().Name;
         AppTheme? currentTheme = Application.Current.RequestedTheme;
-        string lightThemeEnabled = "";
-        string lightThemeDisabled = "_disabled";
-        string darkThemeEnabled = "_disabled";
-        string darkThemeDisabled = "";
+        string lightThemeEnabled = "_disabled";
+        string lightThemeDisabled = "";
+        string darkThemeEnabled = "";
+        string darkThemeDisabled = "_disabled";
         string enabled = "";
         string disabled = "";
         if (currentTheme == AppTheme.Dark)

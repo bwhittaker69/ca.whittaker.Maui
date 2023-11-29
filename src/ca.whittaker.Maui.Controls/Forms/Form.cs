@@ -124,19 +124,17 @@ public class Form : StackLayout
         {
             BackgroundColor = Colors.Transparent,
             VerticalOptions = LayoutOptions.FillAndExpand,
-            HorizontalOptions = LayoutOptions.FillAndExpand,
-            Text = FormSaveButtonText
+            HorizontalOptions = LayoutOptions.FillAndExpand
         };
-        //_buttonSave.SetButtonText(FormSaveButtonText);
+        _buttonSave.Text = FormSaveButtonText;
         _buttonSave.Clicked += _buttonSave_Clicked;
         _buttonCancel = new Button
         {
             HorizontalOptions = LayoutOptions.FillAndExpand,
             VerticalOptions = LayoutOptions.FillAndExpand,
-            BackgroundColor = Colors.Transparent,
-            Text = FormCancelButtonText
+            BackgroundColor = Colors.Transparent
         };
-        //_buttonCancel.SetButtonText(FormCancelButtonText);
+        _buttonCancel.Text = FormCancelButtonText;
         _buttonCancel.Clicked += (sender, e) => CancelForm();
         _labelNotification = CreateNotificationLabel();
         _labelForm = CreateFormLabel();
@@ -386,29 +384,8 @@ public class Form : StackLayout
     {
         var assembly = this.GetType().Assembly;
         string? assemblyName = assembly.GetName().Name;
-        AppTheme? currentTheme = Application.Current.RequestedTheme;
-        string lightThemeEnabled = "";
-        string lightThemeDisabled = "_disabled";
-        string darkThemeEnabled = "_disabled";
-        string darkThemeDisabled = "";
         string enabled = "";
-        string disabled = "";
-        if (currentTheme == AppTheme.Dark)
-        {
-            enabled = darkThemeEnabled;
-            disabled = darkThemeDisabled;
-        }
-        else if (currentTheme == AppTheme.Light)
-        {
-            enabled = lightThemeEnabled;
-            disabled = lightThemeDisabled;
-        }
-        else
-        {
-            enabled = lightThemeEnabled;
-            disabled = lightThemeDisabled;
-        }
-
+        string disabled = "_disabled";
         string resourceName = $"{assemblyName}.Resources.Images.save_12_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? disabled : enabled)}.png";
         return ImageSource.FromResource(resourceName, assembly);
     }
@@ -417,29 +394,8 @@ public class Form : StackLayout
     {
         var assembly = this.GetType().Assembly;
         string? assemblyName = assembly.GetName().Name;
-        AppTheme? currentTheme = Application.Current.RequestedTheme;
-        string lightThemeEnabled = "";
-        string lightThemeDisabled = "_disabled";
-        string darkThemeEnabled = "_disabled";
-        string darkThemeDisabled = "";
         string enabled = "";
-        string disabled = "";
-        if (currentTheme == AppTheme.Dark)
-        {
-            enabled = darkThemeEnabled;
-            disabled = darkThemeDisabled;
-        }
-        else if (currentTheme == AppTheme.Light)
-        {
-            enabled = lightThemeEnabled;
-            disabled = lightThemeDisabled;
-        }
-        else
-        {
-            enabled = lightThemeEnabled;
-            disabled = lightThemeDisabled;
-        }
-
+        string disabled = "_disabled";
         string resourceName = $"{assemblyName}.Resources.Images.cancel_12_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? disabled : enabled)}.png";
         return ImageSource.FromResource(resourceName, assembly);
     }
