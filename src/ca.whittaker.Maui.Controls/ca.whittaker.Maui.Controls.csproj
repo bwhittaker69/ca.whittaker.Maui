@@ -27,13 +27,14 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <MyApplicationTitle>Whittaker Maui Controls</MyApplicationTitle>
     <MyApplicationId>ca.whittaker.Maui.Controls</MyApplicationId>
-    <MyVersionPrefix>1.0.4</MyVersionPrefix>
+    <MyVersionPrefix>1.0.5</MyVersionPrefix>
     <MyVersion>1</MyVersion>
     <PackageProjectUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</PackageProjectUrl>
 		<PackageIcon>bwhittaker69.png</PackageIcon>
 		<AssemblyVersion>$(MyVersionPrefix)</AssemblyVersion>
 		<FileVersion>$(MyVersion)</FileVersion>
 		<Version>$(MyVersionPrefix)</Version>
+		<IncludeSymbols>True</IncludeSymbols>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
