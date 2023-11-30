@@ -42,6 +42,7 @@
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
     <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
@@ -49,6 +50,9 @@
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
     <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
+    <MtouchDebug>True</MtouchDebug>
+    <MtouchProfiling>True</MtouchProfiling>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
@@ -56,6 +60,7 @@
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
     <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
@@ -63,6 +68,7 @@
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
     <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618</NoWarn>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
@@ -70,6 +76,7 @@
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
     <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
@@ -77,6 +84,9 @@
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
     <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
+    <MtouchDebug>True</MtouchDebug>
+    <MtouchProfiling>True</MtouchProfiling>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
@@ -84,6 +94,7 @@
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
     <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
@@ -91,6 +102,7 @@
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
     <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618</NoWarn>
   </PropertyGroup>
 
 	<ItemGroup>

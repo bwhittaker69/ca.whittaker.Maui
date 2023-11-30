@@ -1,4 +1,6 @@
-﻿namespace ca.whittaker.Maui.Controls.Buttons;
+﻿using System;
+
+namespace ca.whittaker.Maui.Controls.Buttons;
 
 public class SaveButton : ButtonBase
 {
@@ -12,11 +14,14 @@ public class SaveButton : ButtonBase
 
     private static void OnPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (oldValue != newValue)
-            if (bindable is ButtonBase buttonBase)
+        if (bindable is ButtonBase buttonBase && newValue is ButtonStateEnum newState)
+        {
+            // Check if the new value is different from the old value
+            if (!Equals(oldValue, newValue))
             {
-                buttonBase.SetButtonState((ButtonStateEnum)newValue);
+                buttonBase.SetButtonState(newState);
             }
+        }
     }
 
     public ButtonStateEnum SaveButtonState
@@ -27,17 +32,31 @@ public class SaveButton : ButtonBase
 
     private void ParentForm_HasChanges(object? sender, HasFormChangesEventArgs e)
     {
-        switch (e.FormState)
+        if (e == null)
         {
-            case FormStateEnum.Enabled:
-                SetButtonState(ButtonStateEnum.Enabled);
-                break;
-            case FormStateEnum.Disabled:
-                SetButtonState(ButtonStateEnum.Disabled);
-                break;
-            case FormStateEnum.Hidden:
-                SaveButtonState = ButtonStateEnum.Hidden;
-                break;
+            // Handle null argument appropriately
+            return;
+        }
+
+        try
+        {
+            switch (e.FormState)
+            {
+                case FormStateEnum.Enabled:
+                    SetButtonState(ButtonStateEnum.Enabled);
+                    break;
+                case FormStateEnum.Disabled:
+                    SetButtonState(ButtonStateEnum.Disabled);
+                    break;
+                case FormStateEnum.Hidden:
+                    SaveButtonState = ButtonStateEnum.Hidden;
+                    break;
+            }
+        }
+        catch
+        {
+            // Handle exceptions
+            // Log the exception or take appropriate actions
         }
     }
 

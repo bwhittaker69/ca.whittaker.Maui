@@ -1,30 +1,5 @@
 # MAUI Controls
 
-## ThreadHelper for .NET MAUI
-
-### Overview
-
-The `ThreadHelper` class in the `ca.whittaker.Maui.ThreadHelper` namespace provides a utility method to ensure that a given action is executed on the main UI thread in a .NET MAUI application. This is crucial for performing UI updates or any operation that requires execution on the main thread.
-
-### Usage
-
-To use `ThreadHelper`, simply call the static method `ExecuteOnMainThread` with the action you wish to perform. This method checks if the current thread is the main thread and executes the action directly. If the current thread is not the main thread, it schedules the action to be executed on the main thread.
-
-### Example
-
-```csharp
-using ca.whittaker.Maui.ThreadHelper;
-
-// ...
-
-ThreadHelper.ExecuteOnMainThread(() =>
-{
-    // Code to run on the main thread, like UI updates
-});
-```
-
-
-
 ## form related controls - ca.whittaker.Maui.Controls.Forms
 
 ### **Form**

@@ -11,13 +11,6 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
         [ObservableProperty]
         private string userprofile_username, userprofile_email, userprofile_nickname, userprofile_website, userprofile_phonenumber, userprofile_bio = String.Empty;
 
-        private string currentUser_username = "";
-        private string currentUser_nickname = "";
-        private string currentUser_website = "";
-        private string currentUser_phonenumber = "";
-        private string currentUser_bio = "";
-        private string currentUser_email = "";
-
         public UserProfileViewModel()
         {
             FormSaveCommand = new Command(Save);

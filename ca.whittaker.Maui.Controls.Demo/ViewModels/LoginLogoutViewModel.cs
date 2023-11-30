@@ -43,25 +43,50 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
             ConfigureLoginDetails(isUserLoggedIn);
         }
 
-        private async void Login(string loginscheme)
+        private void Login(string loginscheme)
         {
             IsUserLoggedIn = true;
-            ConfigureLoginLogoutButtons(true);
-            ConfigureLoginDetails(true);
 
-            // After login success
-            (App.Current.MainPage as AppShell)?.OnLogin();
+            void UpdateUI()
+            {
+                ConfigureLoginLogoutButtons(true);
+                ConfigureLoginDetails(true);
+                if (App.Current != null && App.Current.MainPage is AppShell appShell) appShell.OnLogin();
+            }
+
+            // Check if on the main thread and update UI accordingly
+            if (MainThread.IsMainThread)
+            {
+                UpdateUI();
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+            }
 
         }
 
         private void Logout(string loginscheme)
         {
             IsUserLoggedIn = false;
-            ConfigureLoginLogoutButtons(false);
-            ConfigureLoginDetails(false);
+            void UpdateUI()
+            {
+                ConfigureLoginLogoutButtons(false);
+                ConfigureLoginDetails(false);
+                if (App.Current != null && App.Current.MainPage is AppShell appShell) appShell.OnLogout();
+            }
 
-            // After login success
-            (App.Current.MainPage as AppShell)?.OnLogout();
+            // Check if on the main thread and update UI accordingly
+            if (MainThread.IsMainThread)
+            {
+                UpdateUI();
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+            }
+
+
         }
 
         #region LOGIN LOGOUT BUTTONS
@@ -116,10 +141,10 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
                 var ip = host.GetIPProperties().UnicastAddresses
                     .FirstOrDefault(ip => ip.Address.AddressFamily == AddressFamily.InterNetwork);
 
-                return ip?.Address.ToString();
+                if (ip != null) return ip.Address.ToString();
             }
 
-            return null;
+            return String.Empty;
 
         }
         #endregion

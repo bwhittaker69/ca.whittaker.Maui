@@ -20,38 +20,48 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>bwhittaker69.png</PackageIcon>
+		<RepositoryUrl>https://github.com/bwhittaker69/ca.whittaker.Maui/tree/master/src/ca.whittaker.Maui.ThreadHelper</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</PackageProjectUrl>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
 	  <ApplicationTitle>Maui ThreadHelper</ApplicationTitle>
+	  <ApplicationId>ca.whittaker.Maui.ThreadHelper</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
 	  <ApplicationTitle>Maui ThreadHelper</ApplicationTitle>
+	  <ApplicationId>ca.whittaker.Maui.ThreadHelper</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
 	  <ApplicationTitle>Maui ThreadHelper</ApplicationTitle>
+	  <ApplicationId>ca.whittaker.Maui.ThreadHelper</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
 	  <ApplicationTitle>Maui ThreadHelper</ApplicationTitle>
+	  <ApplicationId>ca.whittaker.Maui.ThreadHelper</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
 	  <ApplicationTitle>Maui ThreadHelper</ApplicationTitle>
+	  <ApplicationId>ca.whittaker.Maui.ThreadHelper</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
 	  <ApplicationTitle>Maui ThreadHelper</ApplicationTitle>
+	  <ApplicationId>ca.whittaker.Maui.ThreadHelper</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
 	  <ApplicationTitle>Maui ThreadHelper</ApplicationTitle>
+	  <ApplicationId>ca.whittaker.Maui.ThreadHelper</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
 	  <ApplicationTitle>Maui ThreadHelper</ApplicationTitle>
+	  <ApplicationId>ca.whittaker.Maui.ThreadHelper</ApplicationId>
 	</PropertyGroup>
 
 	<ItemGroup>

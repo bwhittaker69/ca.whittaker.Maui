@@ -6,7 +6,7 @@ namespace ca.whittaker.Maui.Controls.Demo;
 
 public partial class AppShell : Shell
 {
-    private Dictionary<string, ShellItem> shellItems = new();
+    private readonly Dictionary<string, ShellItem> shellItems = new();
     public AppShell()
     {
         InitializeComponent();
@@ -47,15 +47,13 @@ public partial class AppShell : Shell
 
     public void SetShellContentVisibility(string contentRoute, bool isVisible)
     {
-        var shellContent = FindShellContent(contentRoute) as ShellContent;
-
-        if (shellContent != null)
+        if (FindShellContent(contentRoute) is ShellContent shellContent)
         {
             shellContent.IsVisible = isVisible;
         }
     }
 
-    public ShellContent FindShellContent(string itemName)
+    public ShellContent? FindShellContent(string itemName)
     {
         foreach (var shellItem in Items)
         {

@@ -1,4 +1,5 @@
 ﻿using ca.whittaker.Maui.Controls.Buttons;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -54,16 +55,12 @@ public class Form : StackLayout
         defaultBindingMode: BindingMode.TwoWay,
         propertyChanged: OnFormStateChanged);
 
-    public Button _buttonCancel;
-
-    public Button _buttonSave;
-
-    public Label _labelForm;
-
-    public Label _labelNotification;
+    private Button _buttonCancel;
+    private Button _buttonSave;
+    private Label _labelForm;
+    private Label _labelNotification;
 
     private bool HasNoChanges = false;
-
     private bool HasNoErrors = false;
 
     public Form()
@@ -120,91 +117,183 @@ public class Form : StackLayout
     {
         base.OnParentSet();
 
-        _buttonSave = new Button
-        {
-            BackgroundColor = Colors.Transparent,
-            VerticalOptions = LayoutOptions.FillAndExpand,
-            HorizontalOptions = LayoutOptions.FillAndExpand
-        };
-        _buttonSave.Text = FormSaveButtonText;
-        _buttonSave.Clicked += _buttonSave_Clicked;
-        _buttonCancel = new Button
-        {
-            HorizontalOptions = LayoutOptions.FillAndExpand,
-            VerticalOptions = LayoutOptions.FillAndExpand,
-            BackgroundColor = Colors.Transparent
-        };
-        _buttonCancel.Text = FormCancelButtonText;
-        _buttonCancel.Clicked += (sender, e) => CancelForm();
-        _labelNotification = CreateNotificationLabel();
-        _labelForm = CreateFormLabel();
 
-        Insert(0, CreateFormLayoutGrid());
+        try
+        {
+            InitializeFormControls();
+            WireUpControls();
+        }
+        catch 
+        {
+            // Handle exception, log error or display a message
+            //Console.WriteLine($"Error initializing form: {ex.Message}");
+        }
 
+    }
+    private void InitializeFormControls()
+    {
+        void UpdateUI()
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            _buttonSave = new()
+            {
+                BackgroundColor = Colors.Transparent,
+                VerticalOptions = LayoutOptions.FillAndExpand,
+                HorizontalOptions = LayoutOptions.FillAndExpand
+            };
+#pragma warning restore CS0618 // Type or member is obsolete
+            _buttonSave.Text = FormSaveButtonText;
+            _buttonSave.Clicked += ButtonSave_Clicked;
+#pragma warning disable CS0618 // Type or member is obsolete
+            _buttonCancel = new()
+            {
+                HorizontalOptions = LayoutOptions.FillAndExpand,
+                VerticalOptions = LayoutOptions.FillAndExpand,
+                BackgroundColor = Colors.Transparent
+            };
+#pragma warning restore CS0618 // Type or member is obsolete
+            _buttonCancel.Text = FormCancelButtonText;
+            _buttonCancel.Clicked += (sender, e) => CancelForm();
+            _labelNotification = CreateNotificationLabel();
+            _labelForm = CreateFormLabel();
+
+            Insert(0, CreateFormLayoutGrid());
+        }
+
+        // Check if on the main thread and update UI accordingly
+        if (MainThread.IsMainThread)
+        {
+            UpdateUI();
+        }
+        else
+        {
+            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+        }
         WireUpControls();
-
+    }
+    private void ButtonSave_Clicked(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (Command?.CanExecute(CommandParameter) == true)
+            {
+                Command.Execute(CommandParameter);
+            }
+        }
+        catch
+        {
+            // Handle exception, log error or display a message
+            //Console.WriteLine($"Error executing save command: {ex.Message}");
+        }
     }
 
     private static void OnFormCancelButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (oldValue != newValue)
+        if (bindable is Form form && newValue is string newText)
         {
-            ((Form)bindable)._buttonCancel.Text = (string)newValue;
+            void UpdateUI()
+            {
+                form._buttonCancel.Text = newText;
+            }
+
+            // Check if on the main thread and update UI accordingly
+            if (MainThread.IsMainThread)
+            {
+                UpdateUI();
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+            }
         }
     }
 
     private static void OnFormNameChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (oldValue != newValue)
+        if (bindable is Form form && newValue is string newName)
         {
-            ((Form)bindable)._labelForm.Text = newValue == null ? "" : newValue.ToString();
-            ((Form)bindable)._labelForm.IsVisible = newValue == null || newValue.ToString() == "" ? false : true;
+            void UpdateUI()
+            {
+                form._labelForm.Text = newName;
+                form._labelForm.IsVisible = !string.IsNullOrEmpty(newName);
+            }
+
+            // Check if on the main thread and update UI accordingly
+            if (MainThread.IsMainThread)
+            {
+                UpdateUI();
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+            }
         }
     }
 
     private static void OnFormSaveButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (oldValue != newValue)
+        if (bindable is Form form && newValue is string newText)
         {
-            ((Form)bindable)._buttonSave.Text = (string)newValue;
+            void UpdateUI()
+            {
+                form._buttonSave.Text = newText;
+            }
+
+            // Check if on the main thread and update UI accordingly
+            if (MainThread.IsMainThread)
+            {
+                UpdateUI();
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+            }
         }
+
     }
 
     private static void OnFormStateChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (oldValue != newValue)
+        if (bindable is Form form && newValue is FormStateEnum newState)
         {
-            if ((FormStateEnum)newValue == FormStateEnum.Undo)
+            void UpdateUI()
             {
-                ((Form)bindable).CancelForm();
-                ((Form)bindable).FormState = FormStateEnum.Enabled;
+                if (oldValue != newValue)
+                {
+                    if (newState == FormStateEnum.Undo)
+                    {
+                        form.CancelForm();
+                        form.FormState = FormStateEnum.Enabled;
+                    }
+                    else if (newState == FormStateEnum.Saved)
+                    {
+                        form.SavedForm();
+                        form.FormState = FormStateEnum.Enabled;
+                    }
+                    else if (newState == FormStateEnum.Clear)
+                    {
+                        form.ClearForm();
+                        form.FormState = FormStateEnum.Enabled;
+                    }
+
+                    form.UpdateFormControlStates();
+                }
             }
-            if ((FormStateEnum)newValue == FormStateEnum.Saved)
+
+            // Check if on the main thread and update UI accordingly
+            if (MainThread.IsMainThread)
             {
-                ((Form)bindable).SavedForm();
-                ((Form)bindable).FormState = FormStateEnum.Enabled;
+                UpdateUI();
             }
-            if ((FormStateEnum)newValue == FormStateEnum.Clear)
+            else
             {
-                ((Form)bindable).ClearForm();
-                ((Form)bindable).FormState = FormStateEnum.Enabled;
+                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
             }
-            ((Form)bindable).UpdateFormControlStates();
         }
     }
 
-    private void _buttonSave_Clicked(object? sender, EventArgs e)
-    {
-        if (Command != null && Command.CanExecute(CommandParameter))
-        {
-            Command.Execute(CommandParameter);
-        }
-    }
 
-    private ImageSource CalcCancelImage(bool hasChanged)
-    {
-        return ImageSource.FromFile($"cancel_24_mauiimage{(hasChanged ? "" : "_disabled")}.png");
-    }
+
 
     private FormStateEnum CalcFormState()
     {
@@ -249,7 +338,7 @@ public class Form : StackLayout
             Text = FormName,
             HorizontalOptions = LayoutOptions.Start,
             VerticalOptions = LayoutOptions.Center,
-            IsVisible = FormName == null || FormName == "" ? false : true
+            IsVisible = !string.IsNullOrEmpty(FormName)
         };
     }
 
@@ -294,7 +383,7 @@ public class Form : StackLayout
     /// Creates the notification label for the text box.
     /// </summary>
     /// <returns>The created notification label.</returns>
-    private Label CreateNotificationLabel()
+    private static Label CreateNotificationLabel()
     {
         return new Label
         {
@@ -341,74 +430,62 @@ public class Form : StackLayout
 
     private void UpdateFormControlStates()
     {
-
-        switch (FormState)
+        using (ResourceHelper resourceHelper = new())
         {
-            case FormStateEnum.Enabled:
-                IsEnabled = true;
-                IsVisible = true;
-                if (HasNoChanges)
-                {
-                    _buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Disabled);
-                    _buttonCancel.ImageSource = GetCancelButtonImageSource(ButtonStateEnum.Disabled);
-                }
-                else
-                {
-                    if (HasNoErrors)
-                    {
-                        _buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Enabled);
-                        _buttonCancel.ImageSource = GetCancelButtonImageSource(ButtonStateEnum.Enabled);
-                    }
-                    else
-                    {
-                        _buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Disabled);
-                        _buttonCancel.ImageSource = GetCancelButtonImageSource(ButtonStateEnum.Enabled);
-                    }
-                }
-                break;
+            switch (FormState)
+            {
+                case FormStateEnum.Enabled:
+                    IsEnabled = true;
+                    IsVisible = true;
+                    SetButtonImages(resourceHelper, HasNoChanges, HasNoErrors);
+                    break;
 
-            case FormStateEnum.Disabled:
-                IsEnabled = false;
-                _buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Disabled);
-                break;
+                case FormStateEnum.Disabled:
+                    IsEnabled = false;
+                    IsVisible = true; // Assuming visibility should be true here as well
+                    SetButtonImages(resourceHelper, HasNoChanges, HasNoErrors);
+                    break;
 
-            case FormStateEnum.Hidden:
-                IsVisible = false;
-                //_buttonSave.ImageSource = GetSaveButtonImageSource(ButtonStateEnum.Hidden);
-                break;
+                case FormStateEnum.Hidden:
+                    IsVisible = false;
+                    break;
+            }
         }
+
+        void SetButtonImages(ResourceHelper resourceHelper, bool noChanges, bool noErrors)
+        {
+            if (noChanges)
+            {
+                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Save, FormSize, true);
+                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Cancel, FormSize, true);
+            }
+            else if (noErrors)
+            {
+                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Save, FormSize, true);
+                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Cancel, FormSize, true);
+            }
+            else
+            {
+                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Save, FormSize, true);
+                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Cancel, FormSize, true);
+            }
+        }
+
     }
 
 
-    private ImageSource GetSaveButtonImageSource(ButtonStateEnum buttonState)
-    {
-        var assembly = this.GetType().Assembly;
-        string? assemblyName = assembly.GetName().Name;
-        string enabled = "";
-        string disabled = "_disabled";
-        string resourceName = $"{assemblyName}.Resources.Images.save_12_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? disabled : enabled)}.png";
-        return ImageSource.FromResource(resourceName, assembly);
-    }
-
-    private ImageSource GetCancelButtonImageSource(ButtonStateEnum buttonState)
-    {
-        var assembly = this.GetType().Assembly;
-        string? assemblyName = assembly.GetName().Name;
-        string enabled = "";
-        string disabled = "_disabled";
-        string resourceName = $"{assemblyName}.Resources.Images.cancel_12_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? disabled : enabled)}.png";
-        return ImageSource.FromResource(resourceName, assembly);
-    }
     private void WireUpControls()
     {
-        var controlCount = this.GetVisualTreeDescendants().Count;
-        if (controlCount == 0) throw new InvalidOperationException("Form missing controls");
+        var textBoxes = this.GetVisualTreeDescendants().OfType<TextBox>();
 
-        foreach (var customTextBox in this.GetVisualTreeDescendants().OfType<TextBox>())
+        if (!textBoxes.Any())
+            throw new InvalidOperationException("Form missing TextBox controls");
+
+        foreach (var textBox in textBoxes)
         {
-            customTextBox.HasChanges += CustomTextBox_HasChanges;
-            customTextBox.HasValidationChanges += CustomTextBox_HasValidationChanges;
+            textBox.HasChanges += CustomTextBox_HasChanges;
+            textBox.HasValidationChanges += CustomTextBox_HasValidationChanges;
         }
-        return;
     }
+
 }

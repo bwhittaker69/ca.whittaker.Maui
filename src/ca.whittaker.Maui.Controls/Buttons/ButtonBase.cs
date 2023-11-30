@@ -48,20 +48,19 @@ public abstract class ButtonBase : Button
             switch (buttonState)
             {
                 case ButtonStateEnum.Enabled:
-                    base.IsVisible = true;
-                    base.IsEnabled = true;
-                    base.ImageSource = GetImageSource(buttonState);
-                    break;
                 case ButtonStateEnum.Disabled:
                     base.IsVisible = true;
                     base.IsEnabled = true;
-                    base.ImageSource = GetImageSource(buttonState);
                     break;
                 case ButtonStateEnum.Hidden:
-                    base.IsEnabled = false;
                     base.IsVisible = false;
+                    base.IsEnabled = false;
                     break;
             }
+
+            base.ImageSource = new ResourceHelper().GetImageSource(buttonState, _baseButtonType, ButtonSize, false);
+
+
         }
 
         // Check if on the main thread and update UI accordingly
@@ -75,36 +74,4 @@ public abstract class ButtonBase : Button
         }
     }
 
-    public enum BaseButtonTypeEnum { Signin, Signout, Save, Edit, Cancel, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple }
-
-    private ImageSource GetImageSource(ButtonStateEnum buttonState)
-    {
-        var assembly = this.GetType().Assembly;
-        string? assemblyName = assembly.GetName().Name;
-        AppTheme? currentTheme = Application.Current.RequestedTheme;
-        string lightThemeEnabled = "";
-        string lightThemeDisabled = "_disabled";
-        string darkThemeEnabled = "_disabled";
-        string darkThemeDisabled = "";
-        string enabled = "";
-        string disabled = "";
-        if (currentTheme == AppTheme.Dark)
-        {
-            enabled = darkThemeEnabled;
-            disabled = darkThemeDisabled;
-        }
-        else if (currentTheme == AppTheme.Light)
-        {
-            enabled = lightThemeEnabled;
-            disabled = lightThemeDisabled;
-        }
-        else
-        {
-            enabled = lightThemeEnabled;
-            disabled = lightThemeDisabled;
-        }
-
-        string resourceName = $"{assemblyName}.Resources.Images.{_baseButtonType.ToString().ToLower()}_{((int)ButtonSize).ToString()}_mauiimage{(buttonState.Equals(ButtonStateEnum.Disabled) ? disabled : enabled)}.png";
-        return ImageSource.FromResource(resourceName, assembly);
-    }
 }
