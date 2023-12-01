@@ -19,7 +19,7 @@ public class SaveButton : ButtonBase
             // Check if the new value is different from the old value
             if (!Equals(oldValue, newValue))
             {
-                buttonBase.SetButtonState(newState);
+                buttonBase.ButtonState = newState;
             }
         }
     }
@@ -43,13 +43,13 @@ public class SaveButton : ButtonBase
             switch (e.FormState)
             {
                 case FormStateEnum.Enabled:
-                    SetButtonState(ButtonStateEnum.Enabled);
+                    ButtonState = ButtonStateEnum.Enabled;
                     break;
                 case FormStateEnum.Disabled:
-                    SetButtonState(ButtonStateEnum.Disabled);
+                    ButtonState = ButtonStateEnum.Disabled;
                     break;
                 case FormStateEnum.Hidden:
-                    SaveButtonState = ButtonStateEnum.Hidden;
+                    ButtonState = ButtonStateEnum.Hidden;
                     break;
             }
         }
