@@ -4,54 +4,63 @@ using System.Net;
 using System.Linq;
 using System.Net.Sockets;
 
+
 namespace ca.whittaker.Maui.Controls.Demo.ViewModels
 {
     public partial class LoginLogoutViewModel : ObservableObject
     {
 
         [ObservableProperty]
+        private string loginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignIn;
+
+        [ObservableProperty]
         private FormStateEnum formState;
+
+        [ObservableProperty]
+        private bool isVisible = false;
 
         [ObservableProperty]
         private string lastlogin_device, lastlogin_ipaddress, lastlogin_date = "";
 
         [ObservableProperty]
-        private ButtonStateEnum loginButtonState, logoutButtonState = ButtonStateEnum.Disabled;
+        private ButtonStateEnum loginButtonState, logoutButtonState;
 
         [ObservableProperty]
-        private bool isUserLoggedIn;
+        private string userprofile_username, userprofile_email, userprofile_nickname, userprofile_website, userprofile_phonenumber, userprofile_bio = String.Empty;
+
 
         public LoginLogoutViewModel()
         {
-            IsUserLoggedIn = false;
+
+            IsVisible = false;
+
             LoginCommand = new Command<string>(Login);
             LogoutCommand = new Command<string>(Logout);
+            FormSaveCommand = new Command(Save);
+
+            
+
         }
 
+        public Command FormSaveCommand { get; }
+
         public Command<string> LoginCommand { get; }
+
         public Command<string> LogoutCommand { get; }
 
         public void Initialize()
         {
-            ConfigurePage(IsUserLoggedIn);
+            ResetUserProfileForm();
         }
-
-
-        private void ConfigurePage(bool isUserLoggedIn)
-        {
-            ConfigureLoginLogoutButtons(isUserLoggedIn);
-            ConfigureLoginDetails(isUserLoggedIn);
-        }
-
         private void Login(string loginscheme)
         {
-            IsUserLoggedIn = true;
+            IsVisible = true;
+
+            LoginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignOut;
 
             void UpdateUI()
             {
-                ConfigureLoginLogoutButtons(true);
-                ConfigureLoginDetails(true);
-                if (App.Current != null && App.Current.MainPage is AppShell appShell) appShell.OnLogin();
+                ProcessLoginLogout(true);
             }
 
             // Check if on the main thread and update UI accordingly
@@ -68,12 +77,14 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
 
         private void Logout(string loginscheme)
         {
-            IsUserLoggedIn = false;
+
+            IsVisible = false;
+
+            LoginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignIn;
+
             void UpdateUI()
             {
-                ConfigureLoginLogoutButtons(false);
-                ConfigureLoginDetails(false);
-                if (App.Current != null && App.Current.MainPage is AppShell appShell) appShell.OnLogout();
+                ProcessLoginLogout(false);
             }
 
             // Check if on the main thread and update UI accordingly
@@ -89,28 +100,41 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
 
         }
 
+        private void Save()
+        {
+            if (true) // savedSuccess
+                FormState = FormStateEnum.Saved;
+        }
+
+        #region USER PROFILE FORM
+        private void ClearUserProfileForm()
+        {
+            Userprofile_nickname = Userprofile_username = Userprofile_website = Userprofile_phonenumber = Userprofile_bio = string.Empty;
+        }
+
+        private void ResetUserProfileForm()
+        {
+            ClearUserProfileForm();
+            FormState = FormStateEnum.Enabled;
+        }
+        #endregion
         #region LOGIN LOGOUT BUTTONS
-        private void ConfigureLoginLogoutButtons(bool isUserLoggedIn)
+        private void ProcessLoginLogout(bool isUserLoggedIn)
         {
             if (isUserLoggedIn)
             {
                 // we are logged in, show logout button
                 LoginButtonState = ButtonStateEnum.Hidden;
                 LogoutButtonState = ButtonStateEnum.Enabled;
+                FormState = FormStateEnum.Enabled;
             }
             else
             {
                 // we are logged out, show all login buttons
                 LoginButtonState = ButtonStateEnum.Enabled;
                 LogoutButtonState = ButtonStateEnum.Hidden;
+                FormState = FormStateEnum.Hidden;
             }
-        }
-        #endregion
-
-
-        #region LOGIN DETAILS TABLE
-        private void ConfigureLoginDetails(bool isUserLoggedIn)
-        {
             if (isUserLoggedIn)
             {
                 PopulateLoginDetails();
@@ -120,16 +144,9 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
                 ClearLoginDetails();
             }
         }
-        private void PopulateLoginDetails()
-        {
-            Lastlogin_device = DeviceInfo.Platform.ToString(); 
-            Lastlogin_ipaddress = GetLocalIPAddress();
-            Lastlogin_date = DateTime.Now.ToString();
-        }
-        private void ClearLoginDetails()
-        {
-            Lastlogin_device = Lastlogin_ipaddress = Lastlogin_date = string.Empty;
-        }
+        #endregion
+
+        #region LOGIN DETAILS TABLE
         public static string GetLocalIPAddress()
         {
             var host = NetworkInterface.GetAllNetworkInterfaces()
@@ -146,6 +163,18 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
 
             return String.Empty;
 
+        }
+
+        private void ClearLoginDetails()
+        {
+            Lastlogin_device = Lastlogin_ipaddress = Lastlogin_date = string.Empty;
+        }
+
+        private void PopulateLoginDetails()
+        {
+            Lastlogin_device = DeviceInfo.Platform.ToString(); 
+            Lastlogin_ipaddress = GetLocalIPAddress();
+            Lastlogin_date = DateTime.Now.ToString();
         }
         #endregion
     }

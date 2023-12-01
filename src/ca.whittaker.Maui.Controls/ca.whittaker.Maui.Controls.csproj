@@ -27,7 +27,7 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <MyApplicationTitle>Whittaker Maui Controls</MyApplicationTitle>
     <MyApplicationId>ca.whittaker.Maui.Controls</MyApplicationId>
-    <MyVersionPrefix>1.0.6</MyVersionPrefix>
+    <MyVersionPrefix>1.0.7</MyVersionPrefix>
     <MyVersion>1</MyVersion>
     <PackageProjectUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</PackageProjectUrl>
 		<PackageIcon>bwhittaker69.png</PackageIcon>
@@ -123,11 +123,7 @@
 	  <None Remove="Resources\Images\facebook_24_disabled_mauiimage.png" />
 	  <None Remove="Resources\Images\facebook_24_mauiimage.png" />
 	  <None Remove="Resources\Images\facebook_24_mauiimage_disabled.png" />
-	  <None Remove="Resources\Images\generic_12_mauiimage.png" />
-	  <None Remove="Resources\Images\generic_12_mauiimage_disabled.png" />
 	  <None Remove="Resources\Images\generic_24_disabled_mauiimage.png" />
-	  <None Remove="Resources\Images\generic_24_mauiimage.png" />
-	  <None Remove="Resources\Images\generic_24_mauiimage_disabled.png" />
 	  <None Remove="Resources\Images\generic_48_disabled_mauiimage.png" />
 	  <None Remove="Resources\Images\google_12_mauiimage.png" />
 	  <None Remove="Resources\Images\google_12_mauiimage_disabled.png" />
@@ -153,6 +149,10 @@
 	  <None Remove="Resources\Images\save_24_mauiimage.png" />
 	  <None Remove="Resources\Images\save_24_mauiimage_disabled.png" />
 	  <None Remove="Resources\Images\save_48_disabled_mauiimage.png" />
+	  <None Remove="Resources\Images\signin_12_mauiimage.png" />
+	  <None Remove="Resources\Images\signin_12_mauiimage_disabled.png" />
+	  <None Remove="Resources\Images\signin_24_mauiimage.png" />
+	  <None Remove="Resources\Images\signin_24_mauiimage_disabled.png" />
 	  <None Remove="Resources\Images\signout_12_mauiimage.png" />
 	  <None Remove="Resources\Images\signout_12_mauiimage_disabled.png" />
 	  <None Remove="Resources\Images\signout_24_disabled_mauiimage.png" />
@@ -186,10 +186,10 @@
 	  <EmbeddedResource Include="Resources\Images\facebook_12_mauiimage_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\facebook_24_mauiimage.png" />
 	  <EmbeddedResource Include="Resources\Images\facebook_24_mauiimage_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\generic_12_mauiimage.png" />
-	  <EmbeddedResource Include="Resources\Images\generic_12_mauiimage_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\generic_24_mauiimage.png" />
-	  <EmbeddedResource Include="Resources\Images\generic_24_mauiimage_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_12_mauiimage.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_12_mauiimage_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_24_mauiimage.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_24_mauiimage_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\google_12_mauiimage.png" />
 	  <EmbeddedResource Include="Resources\Images\google_12_mauiimage_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\google_24_mauiimage.png" />

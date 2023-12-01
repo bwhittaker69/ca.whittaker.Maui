@@ -193,7 +193,8 @@ public class Form : StackLayout
         {
             void UpdateUI()
             {
-                form._buttonCancel.Text = newText;
+                if (form._buttonCancel != null)
+                    form._buttonCancel.Text = newText;
             }
 
             // Check if on the main thread and update UI accordingly
@@ -214,8 +215,11 @@ public class Form : StackLayout
         {
             void UpdateUI()
             {
-                form._labelForm.Text = newName;
-                form._labelForm.IsVisible = !string.IsNullOrEmpty(newName);
+                if (form._labelForm != null)
+                {
+                    form._labelForm.Text = newName;
+                    form._labelForm.IsVisible = !string.IsNullOrEmpty(newName);
+                }
             }
 
             // Check if on the main thread and update UI accordingly
@@ -263,19 +267,26 @@ public class Form : StackLayout
                     if (newState == FormStateEnum.Undo)
                     {
                         form.CancelForm();
+                        form.IsVisible = true;
                         form.FormState = FormStateEnum.Enabled;
                     }
                     else if (newState == FormStateEnum.Saved)
                     {
                         form.SavedForm();
+                        form.IsVisible = true;
                         form.FormState = FormStateEnum.Enabled;
                     }
                     else if (newState == FormStateEnum.Clear)
                     {
                         form.ClearForm();
+                        form.IsVisible = true;
                         form.FormState = FormStateEnum.Enabled;
                     }
-
+                    else if (newState == FormStateEnum.Hidden)
+                    {
+                        form.IsVisible = false;
+                        form.FormState = FormStateEnum.Hidden;
+                    }
                     form.UpdateFormControlStates();
                 }
             }

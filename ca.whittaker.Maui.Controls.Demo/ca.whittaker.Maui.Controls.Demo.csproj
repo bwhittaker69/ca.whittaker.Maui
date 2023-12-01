@@ -46,6 +46,7 @@
 	  <ApplicationId>ca.whittaker.Maui.Controls.Demo</ApplicationId>
 	  <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
 	  <NoWarn>1701;1702;CS8618</NoWarn>
+	  <ApplicationVersion>2</ApplicationVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
@@ -55,12 +56,14 @@
 	  <MtouchDebug>True</MtouchDebug>
 	  <MtouchProfiling>True</MtouchProfiling>
 	  <NoWarn>1701;1702;CS8618</NoWarn>
+	  <ApplicationVersion>2</ApplicationVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
 	  <ApplicationId>ca.whittaker.Maui.Controls.Demo</ApplicationId>
 	  <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
 	  <NoWarn>1701;1702;CS8618</NoWarn>
+	  <ApplicationVersion>2</ApplicationVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
@@ -72,6 +75,7 @@
 	  <ApplicationId>ca.whittaker.Maui.Controls.Demo</ApplicationId>
 	  <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
 	  <NoWarn>1701;1702;CS8618</NoWarn>
+	  <ApplicationVersion>2</ApplicationVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
@@ -81,12 +85,14 @@
 	  <MtouchDebug>True</MtouchDebug>
 	  <MtouchProfiling>True</MtouchProfiling>
 	  <NoWarn>1701;1702;CS8618</NoWarn>
+	  <ApplicationVersion>2</ApplicationVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
 	  <ApplicationId>ca.whittaker.Maui.Controls.Demo</ApplicationId>
 	  <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
 	  <NoWarn>1701;1702;CS8618</NoWarn>
+	  <ApplicationVersion>2</ApplicationVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
@@ -130,12 +136,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Resources\Strings\AppResources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>AppResources.resx</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\LoginLogoutPage.xaml.cs">
 	    <DependentUpon>LoginLogoutPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\UserProfilePage.xaml.cs">
 	    <DependentUpon>UserProfilePage.xaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Strings\AppResources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>

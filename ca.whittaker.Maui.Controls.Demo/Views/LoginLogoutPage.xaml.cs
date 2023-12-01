@@ -12,10 +12,4 @@ public partial class LoginLogoutPage : ContentPage
         BindingContext = viewModel;
     }
 
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        ((LoginLogoutViewModel)this.BindingContext).Initialize();
-    }
-
 }
