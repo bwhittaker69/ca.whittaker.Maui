@@ -18,7 +18,7 @@ public class ResourceHelper : IDisposable
     // Method to get an ImageSource based on button state and theme
     public ImageSource? GetImageSource(ButtonStateEnum buttonState, BaseButtonTypeEnum baseButtonType, SizeEnum size, bool useDeviceTheming = false)
     {
-        Console.Write("GetImageSource: ");
+        //Console.Write("GetImageSource: ");
         try
         {
             var assembly = GetType().Assembly;
@@ -27,19 +27,19 @@ public class ResourceHelper : IDisposable
 
             string resourceName = $"{assemblyName}.Resources.Images.{baseButtonType.ToString().ToLower()}_{(int)size}_mauiimage{suffix}.png";
 
-            Console.Write(resourceName);
+            //Console.Write(resourceName);
 
             if (ResourceExists(resourceName))
             {
-                Console.WriteLine(" - FOUND");
+                //Console.WriteLine(" - FOUND");
                 return ImageSource.FromResource(resourceName, assembly);
             }
-            Console.WriteLine(" - NOT FOUND");
+            //Console.WriteLine(" - NOT FOUND");
             return null; // Return null if resource does not exist
         }
         catch
         {
-            Console.WriteLine(" - ERROR");
+            //Console.WriteLine(" - ERROR");
             return null; // Return null if fails
         }
     }

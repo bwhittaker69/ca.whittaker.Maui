@@ -1,6 +1,6 @@
 ﻿namespace ca.whittaker.Maui.Controls.Buttons;
 
-public class SigninButton : ButtonBase2
+public class SigninButton : ButtonBase
 {
 
     public static readonly BindableProperty SigninButtonTypeProperty = BindableProperty.Create(

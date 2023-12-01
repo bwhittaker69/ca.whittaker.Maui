@@ -421,7 +421,7 @@ public class Form : StackLayout
     {
         foreach (TextBox t in this.GetVisualTreeDescendants().OfType<TextBox>())
         {
-            Console.WriteLine(t.ChangeState.ToString());
+            //Console.WriteLine(t.ChangeState.ToString());
             if (t.ChangeState == ChangeStateEnum.Changed)
                 return false;
         }

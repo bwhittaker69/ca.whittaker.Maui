@@ -1,48 +1,163 @@
-﻿using Microsoft.Maui.Controls.PlatformConfiguration.TizenSpecific;
+﻿namespace ca.whittaker.Maui.Controls.Buttons;
 
-namespace ca.whittaker.Maui.Controls.Buttons;
-
-public abstract class ButtonBase : Button
+public abstract class ButtonBase : Button, IButton
 {
+
     public static readonly BindableProperty ButtonSizeProperty = BindableProperty.Create(
         propertyName: nameof(ButtonSize),
-        returnType: typeof(SizeEnum),
+        returnType: typeof(SizeEnum?),
         declaringType: typeof(ButtonBase),
-        defaultValue: SizeEnum.Normal,
+        defaultValue: null,
         defaultBindingMode: BindingMode.OneWay);
 
-    public BaseButtonTypeEnum _baseButtonType = BaseButtonTypeEnum.Save;
-    public ButtonBase(BaseButtonTypeEnum baseButtonType) : base()
+    public SizeEnum? ButtonSize
     {
-        _baseButtonType = baseButtonType;
-        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, baseButtonType, ButtonSize, false);
-    }
-
-    public SizeEnum ButtonSize
-    {
-        get => (SizeEnum)GetValue(ButtonSizeProperty);
+        get => (SizeEnum?)GetValue(ButtonSizeProperty);
         set => SetValue(ButtonSizeProperty, value);
     }
 
-    public string ButtonText { get; set; } = string.Empty;
-    public void SetButtonState(ButtonStateEnum buttonState = ButtonStateEnum.Enabled)
+    public static readonly BindableProperty ButtonStateProperty = BindableProperty.Create(
+        propertyName: nameof(ButtonState),
+        returnType: typeof(ButtonStateEnum?),
+        declaringType: typeof(ButtonBase),
+        defaultValue: null,
+        defaultBindingMode: BindingMode.OneWay);
+
+    public ButtonStateEnum? ButtonState
+    {
+        get => (ButtonStateEnum?)GetValue(ButtonStateProperty);
+        set => SetValue(ButtonStateProperty, value);
+    }
+
+    public static readonly BindableProperty ButtonTypeProperty = BindableProperty.Create(
+        propertyName: nameof(ButtonType),
+        returnType: typeof(BaseButtonTypeEnum?),
+        declaringType: typeof(ButtonBase),
+        defaultValue: null,
+        defaultBindingMode: BindingMode.OneWay);
+
+    public BaseButtonTypeEnum? ButtonType
+    {
+        get => (BaseButtonTypeEnum?)GetValue(ButtonTypeProperty);
+        set => SetValue(ButtonTypeProperty, value);
+    }
+
+    public new static readonly BindableProperty TextProperty = BindableProperty.Create(
+        propertyName: nameof(Text),
+        returnType: typeof(string),
+        declaringType: typeof(ButtonBase),
+        defaultValue: "",
+        defaultBindingMode: BindingMode.OneWay);
+
+    public new string Text
+    {
+        get => (string)GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
+    }
+
+    public static readonly BindableProperty DisabledTextProperty = BindableProperty.Create(
+        propertyName: nameof(DisabledText),
+        returnType: typeof(string),
+        declaringType: typeof(ButtonBase),
+        defaultValue: "",
+        defaultBindingMode: BindingMode.OneWay);
+
+    public string DisabledText
+    {
+        get => (string)GetValue(DisabledTextProperty);
+        set => SetValue(DisabledTextProperty, value);
+    }
+
+    public static readonly BindableProperty PressedTextProperty = BindableProperty.Create(
+        propertyName: nameof(PressedText),
+        returnType: typeof(string),
+        declaringType: typeof(ButtonBase),
+        defaultValue: "",
+        defaultBindingMode: BindingMode.OneWay);
+
+    public string PressedText
+    {
+        get => (string)GetValue(PressedTextProperty);
+        set => SetValue(PressedTextProperty, value);
+    }
+
+    private bool _baseUseDeviceTheme;
+
+    public ButtonBase(BaseButtonTypeEnum buttonType) : base()
+    {
+
+        base.BorderWidth = 0;
+        base.Margin = 0;
+        base.Padding = 0;
+
+        ButtonType = buttonType;
+
+        _baseUseDeviceTheme = false;
+
+        base.PropertyChanged += Button_PropertyChanged;
+
+        base.Pressed += ButtonBase_Pressed;
+        base.Released += ButtonBase_Released;
+
+    }
+
+    private void Button_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if ((e.PropertyName == nameof(ButtonState))
+            || (e.PropertyName == nameof(ButtonType))
+            || (e.PropertyName == nameof(ButtonSize))
+            || (e.PropertyName == nameof(Text)))
+            ConfigureButton();
+    }
+    private bool IsPressed = false;
+    private void ButtonBase_Released(object? sender, EventArgs e)
+    {
+        IsPressed = false;
+    }
+
+    private void ButtonBase_Pressed(object? sender, EventArgs e)
+    {
+        IsPressed = true;
+    }
+
+    public void ConfigureButton()
     {
         void UpdateUI()
         {
-            switch (buttonState)
+
+            if ((ButtonState != null)
+                && (ButtonType != null)
+                && (ButtonSize != null))
             {
-                case ButtonStateEnum.Enabled:
-                case ButtonStateEnum.Disabled:
-                    base.IsVisible = true;
-                    break;
-                case ButtonStateEnum.Hidden:
-                    base.IsVisible = false;
-                    break;
+                base.BatchBegin();
+                switch (ButtonState)
+                {
+                    case ButtonStateEnum.Enabled:
+                        base.IsVisible = true;
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize, _baseUseDeviceTheme);
+                        base.Text = (Text == null ? "" : Text);
+                        break;
+                    case ButtonStateEnum.Disabled:
+                        base.IsVisible = true;
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize, _baseUseDeviceTheme);
+                        base.Text = (DisabledText != null && DisabledText != "" ? DisabledText : Text);
+                        break;
+                    case ButtonStateEnum.Pressed:
+                        base.IsVisible = true;
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize, _baseUseDeviceTheme);
+                        base.Text = (PressedText != null && PressedText != "" ? PressedText : Text);
+                        break;
+                    case ButtonStateEnum.Hidden:
+                        base.IsVisible = false;
+                        break;
+                }
+                base.BatchCommit();
             }
-
-            base.ImageSource = new ResourceHelper().GetImageSource(buttonState, _baseButtonType, ButtonSize, false);
-
-
+            else
+            {
+                // hide button if not configured
+                base.IsVisible = false;
+            }
         }
 
         // Check if on the main thread and update UI accordingly
@@ -56,22 +171,4 @@ public abstract class ButtonBase : Button
         }
     }
 
-    public void SetButtonText(string text)
-    {
-        ButtonText = text;
-
-        void UpdateUI()
-        {
-            base.Text = ButtonText;
-        }
-        // Check if on the main thread and update UI accordingly
-        if (MainThread.IsMainThread)
-        {
-            UpdateUI();
-        }
-        else
-        {
-            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
-        }
-    }
 }
