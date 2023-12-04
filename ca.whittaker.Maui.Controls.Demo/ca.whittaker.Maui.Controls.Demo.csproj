@@ -102,8 +102,8 @@
 
 	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios'">
 	  <ProvisioningType>manual</ProvisioningType>
-	  <CodesignKey>iPhone Developer</CodesignKey>
-	  <CodesignProvision></CodesignProvision>
+	  <CodesignKey>Apple Distribution: Brett Whittaker (8564V2XTQR)</CodesignKey>
+	  <CodesignProvision>PP-ADHOC-ca.whittaker.Maui.Controls.Demo</CodesignProvision>
 	</PropertyGroup>
 
 	<ItemGroup>

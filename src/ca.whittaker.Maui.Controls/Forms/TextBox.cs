@@ -304,9 +304,9 @@ public class TextBox : ContentView
         {
             ColumnDefinitions =
                 {
-                    new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) },
-                    new ColumnDefinition { Width = new GridLength(7, GridUnitType.Star)  },
-                    new ColumnDefinition { Width = 24 }
+                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                    new ColumnDefinition { Width = new GridLength(8, GridUnitType.Star)  },
+                    new ColumnDefinition { Width = 50 }
                 },
             RowDefinitions =
                 {
@@ -342,10 +342,10 @@ public class TextBox : ContentView
         {
             HorizontalOptions = LayoutOptions.Center,
             VerticalOptions = LayoutOptions.Center,
-            ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo, SizeEnum.Normal, true),
+            ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo),
             BackgroundColor = Colors.Transparent,
-            WidthRequest = 20,
-            HeightRequest = 20,
+            WidthRequest = -1,
+            HeightRequest = -1,
             BorderWidth = 0,
             Margin = new Thickness(0),
             Padding = new Thickness(5, 0, 0, 0)
@@ -377,7 +377,7 @@ public class TextBox : ContentView
             {
                 using (ResourceHelper resourceHelper = new ())
                 {
-                    _buttonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo, SizeEnum.Normal, true);
+                    _buttonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo);
                 }
                 _previousHasChangedState = hasChanged;
                 ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;

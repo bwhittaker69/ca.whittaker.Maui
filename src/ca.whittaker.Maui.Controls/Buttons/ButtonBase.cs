@@ -81,7 +81,6 @@ public abstract class ButtonBase : Button, IButton
         set => SetValue(PressedTextProperty, value);
     }
 
-    private bool _baseUseDeviceTheme;
 
     public ButtonBase(BaseButtonTypeEnum buttonType) : base()
     {
@@ -92,12 +91,9 @@ public abstract class ButtonBase : Button, IButton
 
         ButtonType = buttonType;
 
-        _baseUseDeviceTheme = false;
 
         base.PropertyChanged += Button_PropertyChanged;
 
-        base.Pressed += ButtonBase_Pressed;
-        base.Released += ButtonBase_Released;
 
     }
 
@@ -109,16 +105,7 @@ public abstract class ButtonBase : Button, IButton
             || (e.PropertyName == nameof(Text)))
             ConfigureButton();
     }
-    private bool IsPressed = false;
-    private void ButtonBase_Released(object? sender, EventArgs e)
-    {
-        IsPressed = false;
-    }
 
-    private void ButtonBase_Pressed(object? sender, EventArgs e)
-    {
-        IsPressed = true;
-    }
 
     public void ConfigureButton()
     {
@@ -134,17 +121,17 @@ public abstract class ButtonBase : Button, IButton
                 {
                     case ButtonStateEnum.Enabled:
                         base.IsVisible = true;
-                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize, _baseUseDeviceTheme);
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (BaseButtonTypeEnum)ButtonType);
                         base.Text = (Text == null ? "" : Text);
                         break;
                     case ButtonStateEnum.Disabled:
                         base.IsVisible = true;
-                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize, _baseUseDeviceTheme);
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType);
                         base.Text = (DisabledText != null && DisabledText != "" ? DisabledText : Text);
                         break;
                     case ButtonStateEnum.Pressed:
                         base.IsVisible = true;
-                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize, _baseUseDeviceTheme);
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType);
                         base.Text = (PressedText != null && PressedText != "" ? PressedText : Text);
                         break;
                     case ButtonStateEnum.Hidden:

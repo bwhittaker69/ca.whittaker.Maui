@@ -1,5 +1,8 @@
 ﻿using ca.whittaker.Maui.Controls.Buttons;
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Input;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -7,8 +10,9 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// <summary>
 /// Represents a form control within a Maui application, providing state management and validation capabilities.
 /// </summary>
-public class Form : StackLayout
+public class Form : ContentView
 {
+
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
         typeof(object),
@@ -38,7 +42,8 @@ public class Form : StackLayout
         returnType: typeof(string),
         declaringType: typeof(Form),
         defaultValue: "save",
-        propertyChanged: OnFormSaveButtonTextChanged);
+        propertyChanged: OnFormSaveButtonTextChanged,
+        defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly BindableProperty FormSizeProperty = BindableProperty.Create(
         propertyName: nameof(FormSize),
@@ -65,7 +70,6 @@ public class Form : StackLayout
 
     public Form()
     {
-
     }
 
     public ICommand Command
@@ -117,47 +121,93 @@ public class Form : StackLayout
     {
         base.OnParentSet();
 
-
         try
         {
             InitializeFormControls();
             WireUpControls();
         }
-        catch 
+        catch
         {
             // Handle exception, log error or display a message
             //Console.WriteLine($"Error initializing form: {ex.Message}");
         }
-
     }
+
+    private StackLayout _stackedLayout;
+
+
     private void InitializeFormControls()
     {
         void UpdateUI()
         {
-#pragma warning disable CS0618 // Type or member is obsolete
+
+            _stackedLayout = new()
+            {
+                Orientation = StackOrientation.Vertical,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            };
             _buttonSave = new()
             {
                 BackgroundColor = Colors.Transparent,
-                VerticalOptions = LayoutOptions.FillAndExpand,
-                HorizontalOptions = LayoutOptions.FillAndExpand
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Center,
+                HeightRequest = -1,
+                WidthRequest = -1,
+                Margin = new Thickness(0, 0, 0, 0),
+                Padding = new Thickness(0, 0, 0, 0),
+                BorderWidth = 0
             };
-#pragma warning restore CS0618 // Type or member is obsolete
             _buttonSave.Text = FormSaveButtonText;
             _buttonSave.Clicked += ButtonSave_Clicked;
-#pragma warning disable CS0618 // Type or member is obsolete
             _buttonCancel = new()
             {
-                HorizontalOptions = LayoutOptions.FillAndExpand,
-                VerticalOptions = LayoutOptions.FillAndExpand,
-                BackgroundColor = Colors.Transparent
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                BackgroundColor = Colors.Transparent,
+                HeightRequest = -1,
+                WidthRequest = -1,
+                Margin = new Thickness(0, 0, 0, 0),
+                Padding = new Thickness(0, 0, 0, 0),
+                BorderWidth = 0
             };
-#pragma warning restore CS0618 // Type or member is obsolete
             _buttonCancel.Text = FormCancelButtonText;
             _buttonCancel.Clicked += (sender, e) => CancelForm();
             _labelNotification = CreateNotificationLabel();
             _labelForm = CreateFormLabel();
 
-            Insert(0, CreateFormLayoutGrid());
+            _stackedLayout.Children.Add(CreateFormLayoutGrid());
+
+            if (this.Content is Layout existingLayout)
+            {
+                // Check if the existing content is a layout (e.g., Grid, StackLayout)
+                if (existingLayout.Children.Count > 0)
+                {
+                    // If there are existing children, insert the new element as the first child
+                    existingLayout.Children.Insert(0, _stackedLayout);
+                }
+                else
+                {
+                    // If there are no existing children, just add the new element to the layout
+                    existingLayout.Children.Add(_stackedLayout);
+                }
+            }
+            else if (this.Content is View existingElement)
+            {
+                // If the existing content is a single element, create a new container (e.g., StackLayout)
+                // and add both the existing element and the new element to it
+                StackLayout containerLayout = new StackLayout();
+                containerLayout.Children.Add(existingElement);
+                containerLayout.Children.Add(_stackedLayout);
+                this.Content = containerLayout;
+            }
+            else
+            {
+                // If there's no existing content, set the new element as the content
+                this.Content = _stackedLayout;
+            }
+
+
         }
 
         // Check if on the main thread and update UI accordingly
@@ -171,6 +221,7 @@ public class Form : StackLayout
         }
         WireUpControls();
     }
+
     private void ButtonSave_Clicked(object? sender, EventArgs e)
     {
         try
@@ -236,7 +287,7 @@ public class Form : StackLayout
 
     private static void OnFormSaveButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is Form form && newValue is string newText)
+        if (bindable is Form form && newValue is string newText && form._buttonSave != null)
         {
             void UpdateUI()
             {
@@ -253,7 +304,6 @@ public class Form : StackLayout
                 MainThread.BeginInvokeOnMainThread(() => UpdateUI());
             }
         }
-
     }
 
     private static void OnFormStateChanged(BindableObject bindable, object oldValue, object newValue)
@@ -302,9 +352,6 @@ public class Form : StackLayout
             }
         }
     }
-
-
-
 
     private FormStateEnum CalcFormState()
     {
@@ -446,44 +493,45 @@ public class Form : StackLayout
             switch (FormState)
             {
                 case FormStateEnum.Enabled:
+                    Show();
                     IsEnabled = true;
                     IsVisible = true;
-                    SetButtonImages(resourceHelper, HasNoChanges, HasNoErrors);
+                    SetButtonImages(resourceHelper, HasNoChanges, HasNoErrors, SizeEnum.Large);
                     break;
 
                 case FormStateEnum.Disabled:
+                    Show();
                     IsEnabled = false;
                     IsVisible = true; // Assuming visibility should be true here as well
-                    SetButtonImages(resourceHelper, HasNoChanges, HasNoErrors);
+                    SetButtonImages(resourceHelper, HasNoChanges, HasNoErrors, SizeEnum.Large);
                     break;
 
                 case FormStateEnum.Hidden:
                     IsVisible = false;
+                    Hide();
                     break;
             }
         }
 
-        void SetButtonImages(ResourceHelper resourceHelper, bool noChanges, bool noErrors)
+        void SetButtonImages(ResourceHelper resourceHelper, bool noChanges, bool noErrors, SizeEnum size)
         {
             if (noChanges)
             {
-                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Save, FormSize, true);
-                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Cancel, FormSize, true);
+                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Save);
+                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Cancel);
             }
             else if (noErrors)
             {
-                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Save, FormSize, true);
-                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Cancel, FormSize, true);
+                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Save);
+                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Cancel);
             }
             else
             {
-                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Save, FormSize, true);
-                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Cancel, FormSize, true);
+                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Save);
+                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Cancel);
             }
         }
-
     }
-
 
     private void WireUpControls()
     {
@@ -496,6 +544,31 @@ public class Form : StackLayout
         {
             textBox.HasChanges += CustomTextBox_HasChanges;
             textBox.HasValidationChanges += CustomTextBox_HasValidationChanges;
+        }
+    }
+
+    private void Show()
+    {
+        Console.WriteLine("show");
+        var descendants = this.GetVisualTreeDescendants().OfType<VisualElement>();
+
+        foreach (var element in descendants)
+        {
+            Console.WriteLine($"{nameof(element)}.IsVisible = true");
+            element.IsVisible = true;
+        }
+    }
+
+
+    private void Hide()
+    {
+        Console.WriteLine("hide");
+        var descendants = this.GetVisualTreeDescendants().OfType<VisualElement>();
+
+        foreach (var element in descendants)
+        {
+            Console.WriteLine($"{nameof(element)}.IsVisible = false");
+            element.IsVisible = false;
         }
     }
 
