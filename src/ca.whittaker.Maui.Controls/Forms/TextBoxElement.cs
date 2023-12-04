@@ -8,7 +8,7 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// <summary>
 /// Represents a customizable text box control with various properties for text manipulation and validation.
 /// </summary>
-public class TextBoxElement : ContentView
+public class TextBoxElement : BaseFormElement
 {
     public static readonly BindableProperty AllLowerCaseProperty = BindableProperty.Create(
         propertyName: nameof(AllLowerCase),
@@ -22,13 +22,6 @@ public class TextBoxElement : ContentView
         declaringType: typeof(TextBoxElement),
         defaultValue: true);
 
-    public static readonly BindableProperty ChangeStateProperty = BindableProperty.Create(
-        propertyName: nameof(ChangeState),
-        returnType: typeof(ChangeStateEnum),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: ChangeStateEnum.NotChanged,
-        defaultBindingMode: BindingMode.TwoWay);
-
     public static readonly BindableProperty FieldTypeProperty = BindableProperty.Create(
         propertyName: nameof(FieldType),
         returnType: typeof(FieldTypeEnum),
@@ -37,16 +30,6 @@ public class TextBoxElement : ContentView
         propertyChanged: (bindable, oldValue, newValue) =>
         {
             ((TextBoxElement)bindable).OnFieldTypeChanged(newValue);
-        });
-
-    public static readonly BindableProperty LabelProperty = BindableProperty.Create(
-        propertyName: nameof(Label),
-        returnType: typeof(string),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: string.Empty,
-        propertyChanged: (bindable, oldValue, newValue) =>
-        {
-            ((TextBoxElement)bindable).OnLabelPropertyChanged(newValue);
         });
 
     public static readonly BindableProperty MandatoryProperty = BindableProperty.Create(
@@ -86,29 +69,8 @@ public class TextBoxElement : ContentView
             ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue);
         });
 
-    public static readonly BindableProperty LabelWidthProperty = BindableProperty.Create(
-        propertyName: nameof(LabelWidth),
-        returnType: typeof(double?),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: (double)100,
-        defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: (bindable, oldValue, newValue) =>
-        {
-            ((TextBoxElement)bindable).OnLabelWidthPropertyChanged(newValue);
-        });
-
-    public static readonly BindableProperty ValidationStateProperty = BindableProperty.Create(
-        propertyName: nameof(ValidationState),
-        returnType: typeof(ValidationStateEnum),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: ValidationStateEnum.Valid,
-        defaultBindingMode: BindingMode.TwoWay);
-
     // Fields, constants, and regex
-    public UndoButton _buttonUndo;
     public Entry _entry;
-    public Label _label;
-    public Label _labelNotification;
     private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
     private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
     private bool _isOriginalTextSet = false;
@@ -130,17 +92,12 @@ public class TextBoxElement : ContentView
         _buttonUndo.Pressed += (s, e) => Undo();
     }
 
-    public event EventHandler<HasChangesEventArgs>? HasChanges;
-    public event EventHandler<ValidationDataChangesEventArgs>? HasValidationChanges;
     public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
     public bool AllowWhiteSpace { get => (bool)GetValue(AllowWhiteSpaceProperty); set => SetValue(AllowWhiteSpaceProperty, value); }
-    public ChangeStateEnum ChangeState { get => (ChangeStateEnum)GetValue(ChangeStateProperty); set => SetValue(ChangeStateProperty, value); }
     public FieldTypeEnum FieldType { get => (FieldTypeEnum)GetValue(FieldTypeProperty); set => SetValue(FieldTypeProperty, value); }
-    public string Label { get => (string)GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
     public bool Mandatory { get => (bool)GetValue(MandatoryProperty); set => SetValue(MandatoryProperty, value); }
     public int MaxLength { get => (int)GetValue(MaxLengthProperty); set => SetValue(MaxLengthProperty, value); }
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
-    public double LabelWidth { get => (double)GetValue(LabelWidthProperty); set => SetValue(LabelWidthProperty, value); }
 
     public string TextBoxSource
     {
@@ -151,8 +108,6 @@ public class TextBoxElement : ContentView
             SetOriginalText(value);
         }
     }
-
-    public ValidationStateEnum ValidationState { get => (ValidationStateEnum)GetValue(ValidationStateProperty); set => SetValue(ValidationStateProperty, value); }
 
     public void Clear()
     {
@@ -179,34 +134,6 @@ public class TextBoxElement : ContentView
         UpdateValidationState();
     }
 
-    private static Label CreateNotificationLabel()
-    {
-        return new Label
-        {
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            IsVisible = false,
-            TextColor = Colors.Red
-        };
-    }
-
-    private static UndoButton CreateUndoButton()
-    {
-        return new UndoButton
-        {
-            Text = "",
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            BackgroundColor = Colors.Transparent,
-            ButtonSize = cUndoButtonSize,
-            WidthRequest = -1,
-            ButtonState = ButtonStateEnum.Disabled,
-            ButtonType = BaseButtonTypeEnum.Undo,
-            BorderWidth = 0,
-            Margin = new Thickness(0),
-            Padding = new Thickness(5, 0, 0, 0)
-        };
-    }
 
     private static bool IsValidEmail(string email)
     {
@@ -226,7 +153,6 @@ public class TextBoxElement : ContentView
 
         return uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps;
     }
-
     private void OnFieldTypeChanged(object newValue)
     {
         _entry.Keyboard = GetKeyboardForFieldType((FieldTypeEnum)newValue);
@@ -243,11 +169,6 @@ public class TextBoxElement : ContentView
         };
     }
 
-    private void OnLabelPropertyChanged(object newValue)
-    {
-        _label.Text = newValue?.ToString() ?? "";
-    }
-
     private void OnMaxLengthPropertyChanged(object newValue)
     {
         _entry.MaxLength = (int)newValue;
@@ -262,15 +183,6 @@ public class TextBoxElement : ContentView
     {
         _entry.Text = (string)newValue;
     }
-
-    private void OnLabelWidthPropertyChanged(object newValue)
-    {
-        if (Content is Grid grid)
-        {
-            grid.ColumnDefinitions[0].Width = new GridLength((double)newValue, GridUnitType.Absolute);
-        }
-    }
-
     private ValidationStateEnum CalculateValidationState(string text)
     {
         // mandatory field, so its not valid
@@ -309,18 +221,6 @@ public class TextBoxElement : ContentView
 
         return entry;
     }
-
-    private Label CreateLabel()
-    {
-        return new Label
-        {
-            Text = Label,
-            HorizontalOptions = LayoutOptions.Start,
-            VerticalOptions = LayoutOptions.Center
-        };
-    }
-
-    //private Grid CreateLayoutGrid(double fieldLabelWidth)
     private Grid CreateLayoutGrid()
     {
         var grid = new Grid
@@ -376,7 +276,7 @@ public class TextBoxElement : ContentView
                 }
                 _previousHasChangedState = hasChanged;
                 ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
-                HasChanges?.Invoke(this, new HasChangesEventArgs(hasChanged));
+                RaiseHasChanges(hasChanged);
             }
 
             // Check if on the main thread and update UI accordingly
@@ -400,7 +300,7 @@ public class TextBoxElement : ContentView
             {
                 _previousInvalidDataState = isValid;
                 ValidationState = isValid ? ValidationStateEnum.Valid : ValidationStateEnum.FormatError;
-                HasValidationChanges?.Invoke(this, new ValidationDataChangesEventArgs(!isValid));
+                RaiseValidationChanges(isValid);
             }
 
             // Check if on the main thread and update UI accordingly
@@ -414,11 +314,6 @@ public class TextBoxElement : ContentView
             }
         }
     }
-
-    //private void InitializeTextBox()
-    //{
-    //    _originalText = Text;
-    //}
 
     private bool IsValidData(string text)
     {
@@ -466,10 +361,6 @@ public class TextBoxElement : ContentView
         return FieldType == FieldTypeEnum.Username ? Regex.Replace(text, @"[^a-zA-Z0-9_]", "") : text;
     }
 
-    private void SetLabelText(object newValue)
-    {
-        _label.Text = newValue == null ? "" : newValue.ToString();
-    }
     private void SetMaxLength(object newValue)
     {
         if (newValue != null)

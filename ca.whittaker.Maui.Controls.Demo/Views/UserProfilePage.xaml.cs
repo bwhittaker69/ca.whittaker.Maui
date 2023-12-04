@@ -11,5 +11,9 @@ public partial class UserProfilePage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
- 
+
+    private void ContentPage_Disappearing(object sender, EventArgs e)
+    {
+        UserProfileForm.CancelForm();
+    }
 }

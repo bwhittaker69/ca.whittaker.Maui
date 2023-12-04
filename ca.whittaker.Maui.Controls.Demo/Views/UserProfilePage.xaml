@@ -7,7 +7,7 @@
              xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="ca.whittaker.Maui.Controls.Demo.Views.UserProfilePage"
-             IsVisible="{Binding IsVisible}"
+             IsVisible="{Binding IsVisible}" Disappearing="ContentPage_Disappearing"
              Title="{x:Static strings:AppResources.Page_UserProfile_Title}">
     
     <VerticalStackLayout>
@@ -23,27 +23,27 @@
                         Command="{Binding FormSaveCommand}" 
                         CommandParameter=""> 
                 <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Start">
-                    <Forms:TextBox    LabelWidth="70"
+                    <Forms:TextBoxElement    LabelWidth="70"
                                         TextBoxSource="{Binding Userprofile_nickname}"
                                         Label="{x:Static strings:AppResources.Field_Name}"
                                         MaxLength="40"
                                         Placeholder="{x:Static strings:AppResources.Field_Name_Placeholder}">
-                    </Forms:TextBox>
-                    <Forms:TextBox      LabelWidth="70"
+                    </Forms:TextBoxElement>
+                    <Forms:TextBoxElement LabelWidth="70"
                                         TextBoxSource="{Binding Userprofile_email}"
                                         Label="{x:Static strings:AppResources.Field_Email}"
                                         Mandatory="False"
                                         MaxLength="40"
                                         FieldType="Email"
                                         Placeholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
-                    </Forms:TextBox>
-                    <Forms:TextBox LabelWidth="70"
+                    </Forms:TextBoxElement>
+                    <Forms:TextBoxElement LabelWidth="70"
                                         TextBoxSource="{Binding Userprofile_bio}"
                                         FieldType="Chat"
                                         Label="{x:Static strings:AppResources.Field_Bio}"
                                         MaxLength="50"
                                         Placeholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
-                    </Forms:TextBox>
+                    </Forms:TextBoxElement>
                     <Forms:CheckBoxElement LabelWidth="70"
                                         CheckBoxSource="{Binding Userprofile_ispublic}"
                                         Label="{x:Static strings:AppResources.Field_IsPublic}">

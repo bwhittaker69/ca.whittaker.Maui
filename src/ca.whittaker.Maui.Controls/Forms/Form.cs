@@ -99,6 +99,7 @@ public class Form : ContentView
         set => SetValue(FormStateProperty, value);
     }
 
+
     /// <summary>
     /// Called when the parent of the form is set. This method is responsible for initializing and wiring up controls within the form.
     /// </summary>
@@ -382,27 +383,23 @@ public class Form : ContentView
         }
     }
 
-    private void CancelForm()
+    // called when user clicks cancel button 
+    // also should be called when the page form is OnDissapearing
+    public void CancelForm()
     {
-        foreach (TextBoxElement t in this.GetVisualTreeDescendants().OfType<TextBoxElement>())
+        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
         {
-            t.Undo();
-        }
-        foreach (CheckBoxElement cb in this.GetVisualTreeDescendants().OfType<CheckBoxElement>())
-        {
-            cb.Undo();
+            if (t is TextBoxElement tbe) tbe.Undo();
+            if (t is CheckBoxElement cbe) cbe.Undo();
         }
     }
 
     private void ClearForm()
     {
-        foreach (TextBoxElement t in this.GetVisualTreeDescendants().OfType<TextBoxElement>())
+        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
         {
-            t.Clear();
-        }
-        foreach (CheckBoxElement cb in this.GetVisualTreeDescendants().OfType<CheckBoxElement>())
-        {
-            cb.Clear();
+            if (t is TextBoxElement tbe) tbe.Clear();
+            if (t is CheckBoxElement cbe) cbe.Clear();
         }
     }
 
@@ -461,7 +458,7 @@ public class Form : ContentView
 
     private bool HasFormNotChanged()
     {
-        foreach (TextBoxElement t in this.GetVisualTreeDescendants().OfType<TextBoxElement>())
+        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
         {
             //Console.WriteLine(t.ChangeState.ToString());
             if (t.ChangeState == ChangeStateEnum.Changed)
@@ -475,9 +472,10 @@ public class Form : ContentView
 
     private void SavedForm()
     {
-        foreach (TextBoxElement t in this.GetVisualTreeDescendants().OfType<TextBoxElement>())
+        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
         {
-            t.Saved();
+            if (t is TextBoxElement tbe) tbe.Saved();
+            if (t is CheckBoxElement cbe) cbe.Saved();
         }
     }
 
@@ -530,22 +528,22 @@ public class Form : ContentView
 
     private void WireUpControls()
     {
-        var textBoxes = this.GetVisualTreeDescendants().OfType<TextBoxElement>();
+        var elements = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
 
-        if (!textBoxes.Any())
-            throw new InvalidOperationException("Form missing TextBox controls");
+        if (!elements.Any())
+            throw new InvalidOperationException("Form missing controls");
 
-        foreach (var textBox in textBoxes)
+        foreach (var element in elements)
         {
-            textBox.HasChanges += CustomTextBox_HasChanges;
-            textBox.HasValidationChanges += CustomTextBox_HasValidationChanges;
+            element.HasChanges += CustomTextBox_HasChanges;
+            element.HasValidationChanges += CustomTextBox_HasValidationChanges;
         }
     }
 
     private void Show()
     {
         Console.WriteLine("show");
-        var descendants = this.GetVisualTreeDescendants().OfType<VisualElement>();
+        var descendants = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
 
         foreach (var element in descendants)
         {
@@ -558,7 +556,7 @@ public class Form : ContentView
     private void Hide()
     {
         Console.WriteLine("hide");
-        var descendants = this.GetVisualTreeDescendants().OfType<VisualElement>();
+        var descendants = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
 
         foreach (var element in descendants)
         {

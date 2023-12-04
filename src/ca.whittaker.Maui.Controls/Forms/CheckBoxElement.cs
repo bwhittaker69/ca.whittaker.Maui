@@ -8,24 +8,8 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// <summary>
 /// Represents a customizable text box control with various properties for text manipulation and validation.
 /// </summary>
-public class CheckBoxElement : ContentView
+public class CheckBoxElement : BaseFormElement
 {
-    public static readonly BindableProperty ChangeStateProperty = BindableProperty.Create(
-        propertyName: nameof(ChangeState),
-        returnType: typeof(ChangeStateEnum),
-        declaringType: typeof(CheckBoxElement),
-        defaultValue: ChangeStateEnum.NotChanged,
-        defaultBindingMode: BindingMode.TwoWay);
-
-    public static readonly BindableProperty LabelProperty = BindableProperty.Create(
-        propertyName: nameof(Label),
-        returnType: typeof(string),
-        declaringType: typeof(CheckBoxElement),
-        defaultValue: string.Empty,
-        propertyChanged: (bindable, oldValue, newValue) =>
-        {
-            ((CheckBoxElement)bindable).OnLabelPropertyChanged(newValue);
-        });
 
     public static readonly BindableProperty MandatoryProperty = BindableProperty.Create(
         propertyName: nameof(Mandatory),
@@ -44,31 +28,11 @@ public class CheckBoxElement : ContentView
             ((CheckBoxElement)bindable).OnCheckBoxSourcePropertyChanged(newValue);
         });
 
-    public static readonly BindableProperty LabelWidthProperty = BindableProperty.Create(
-        propertyName: nameof(LabelWidth),
-        returnType: typeof(double?),
-        declaringType: typeof(CheckBoxElement),
-        defaultValue: (double)100,
-        defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: (bindable, oldValue, newValue) =>
-        {
-            ((CheckBoxElement)bindable).OnLabelWidthPropertyChanged(newValue);
-        });
-
-    public static readonly BindableProperty ValidationStateProperty = BindableProperty.Create(
-        propertyName: nameof(ValidationState),
-        returnType: typeof(ValidationStateEnum),
-        declaringType: typeof(CheckBoxElement),
-        defaultValue: ValidationStateEnum.Valid,
-        defaultBindingMode: BindingMode.TwoWay);
-
     // Fields, constants, and regex
-    public UndoButton _buttonUndo;
     public Microsoft.Maui.Controls.CheckBox _checkBox;
-    public Label _label;
-    public Label _labelNotification;
     private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
-    private bool _isOriginalTextSet = false;
+
+    private bool _isOriginalValueSet = false;
     private bool _originalValue = false;
     private bool _previousHasChangedState = false;
     private bool _previousInvalidDataState = false;
@@ -87,12 +51,7 @@ public class CheckBoxElement : ContentView
         _buttonUndo.Pressed += (s, e) => Undo();
     }
 
-    public event EventHandler<HasChangesEventArgs>? HasChanges;
-    public event EventHandler<ValidationDataChangesEventArgs>? HasValidationChanges;
-    public ChangeStateEnum ChangeState { get => (ChangeStateEnum)GetValue(ChangeStateProperty); set => SetValue(ChangeStateProperty, value); }
-    public string Label { get => (string)GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
     public bool Mandatory { get => (bool)GetValue(MandatoryProperty); set => SetValue(MandatoryProperty, value); }
-    public double LabelWidth { get => (double)GetValue(LabelWidthProperty); set => SetValue(LabelWidthProperty, value); }
 
     public bool CheckBoxSource
     {
@@ -104,16 +63,16 @@ public class CheckBoxElement : ContentView
         }
     }
 
-    public ValidationStateEnum ValidationState { get => (ValidationStateEnum)GetValue(ValidationStateProperty); set => SetValue(ValidationStateProperty, value); }
-
     public void Clear()
     {
         SetOriginalValue(false);
+        UpdateValidationState();
     }
 
     public void Saved()
     {
         SetOriginalValue(_checkBox.IsChecked);
+        UpdateValidationState();
     }
 
     public void SetOriginalValue(bool originalValue)
@@ -125,54 +84,15 @@ public class CheckBoxElement : ContentView
     public void Undo()
     {
         _checkBox.IsChecked = _originalValue;
+        UpdateValidationState();
     }
 
-    private static Label CreateNotificationLabel()
-    {
-        return new Label
-        {
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            IsVisible = false,
-            TextColor = Colors.Red
-        };
-    }
-
-    private static UndoButton CreateUndoButton()
-    {
-        return new UndoButton
-        {
-            Text = "",
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            BackgroundColor = Colors.Transparent,
-            ButtonSize = cUndoButtonSize,
-            WidthRequest = -1,
-            ButtonState = ButtonStateEnum.Disabled,
-            ButtonType = BaseButtonTypeEnum.Undo,
-            BorderWidth = 0,
-            Margin = new Thickness(0),
-            Padding = new Thickness(5, 0, 0, 0)
-        };
-    }
-
-    private void OnLabelPropertyChanged(object newValue)
-    {
-        _label.Text = newValue?.ToString() ?? "";
-    }
 
     private void OnCheckBoxSourcePropertyChanged(object newValue)
     {
         _checkBox.IsChecked = (bool)newValue;
     }
 
-    private void OnLabelWidthPropertyChanged(object newValue)
-    {
-        if (Content is Grid grid)
-        {
-            grid.ColumnDefinitions[0].Width = new GridLength((double)newValue, GridUnitType.Absolute);
-        }
-    }
 
     private Microsoft.Maui.Controls.CheckBox CreateCheckBox()
     {
@@ -185,17 +105,6 @@ public class CheckBoxElement : ContentView
         return box;
     }
 
-    private Label CreateLabel()
-    {
-        return new Label
-        {
-            Text = Label,
-            HorizontalOptions = LayoutOptions.Start,
-            VerticalOptions = LayoutOptions.Center
-        };
-    }
-
-    //private Grid CreateLayoutGrid(double fieldLabelWidth)
     private Grid CreateLayoutGrid()
     {
         var grid = new Grid
@@ -226,6 +135,7 @@ public class CheckBoxElement : ContentView
     private void CheckBox_ValueChanged(object? sender, CheckedChangedEventArgs e)
     {
         ProcessAndSetValue(e.Value);
+        UpdateValidationState();
     }
 
     private void EvaluateToRaiseHasChangesEvent()
@@ -241,7 +151,7 @@ public class CheckBoxElement : ContentView
                 }
                 _previousHasChangedState = hasChanged;
                 ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
-                HasChanges?.Invoke(this, new HasChangesEventArgs(hasChanged));
+                RaiseHasChanges(hasChanged);
             }
 
             // Check if on the main thread and update UI accordingly
@@ -262,9 +172,9 @@ public class CheckBoxElement : ContentView
         _checkBox.IsChecked = value;
     }
 
-    private void SetLabelText(object newValue)
-    {
-        _label.Text = newValue == null ? "" : newValue.ToString();
-    }
 
+    private void UpdateValidationState()
+    {
+        EvaluateToRaiseHasChangesEvent();
+    }
 }
