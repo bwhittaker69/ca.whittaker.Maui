@@ -23,27 +23,31 @@
                         Command="{Binding FormSaveCommand}" 
                         CommandParameter=""> 
                 <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Start">
-                    <Forms:TextBox 
-                                        Text="{Binding Userprofile_nickname}"
+                    <Forms:TextBox    LabelWidth="70"
+                                        TextBoxSource="{Binding Userprofile_nickname}"
                                         Label="{x:Static strings:AppResources.Field_Name}"
                                         MaxLength="40"
                                         Placeholder="{x:Static strings:AppResources.Field_Name_Placeholder}">
                     </Forms:TextBox>
-                    <Forms:TextBox 
-                                        Text="{Binding Userprofile_email}"
+                    <Forms:TextBox      LabelWidth="70"
+                                        TextBoxSource="{Binding Userprofile_email}"
                                         Label="{x:Static strings:AppResources.Field_Email}"
                                         Mandatory="False"
                                         MaxLength="40"
                                         FieldType="Email"
                                         Placeholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
                     </Forms:TextBox>
-                    <Forms:TextBox 
-                                        Text="{Binding Userprofile_bio}"
+                    <Forms:TextBox LabelWidth="70"
+                                        TextBoxSource="{Binding Userprofile_bio}"
                                         FieldType="Chat"
                                         Label="{x:Static strings:AppResources.Field_Bio}"
                                         MaxLength="50"
                                         Placeholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
                     </Forms:TextBox>
+                    <Forms:CheckBoxElement LabelWidth="70"
+                                        CheckBoxSource="{Binding Userprofile_ispublic}"
+                                        Label="{x:Static strings:AppResources.Field_IsPublic}">
+                    </Forms:CheckBoxElement>
                 </VerticalStackLayout>
             </Forms:Form>
         </VerticalStackLayout>

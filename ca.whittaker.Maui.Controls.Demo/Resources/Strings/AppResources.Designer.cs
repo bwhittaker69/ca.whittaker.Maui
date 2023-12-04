@@ -151,6 +151,15 @@ namespace ca.whittaker.Maui.Controls.Demo.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to public profile?.
+        /// </summary>
+        internal static string Field_IsPublic {
+            get {
+                return ResourceManager.GetString("Field_IsPublic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to name.
         /// </summary>
         internal static string Field_Name {

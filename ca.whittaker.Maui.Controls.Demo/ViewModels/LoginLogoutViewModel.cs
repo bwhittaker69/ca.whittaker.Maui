@@ -28,6 +28,8 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
         [ObservableProperty]
         private string userprofile_username, userprofile_email, userprofile_nickname, userprofile_website, userprofile_phonenumber, userprofile_bio = String.Empty;
 
+        [ObservableProperty]
+        private bool userprofile_ispublic = false;
 
         public LoginLogoutViewModel()
         {
@@ -36,9 +38,12 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
 
             LoginCommand = new Command<string>(Login);
             LogoutCommand = new Command<string>(Logout);
+
             FormSaveCommand = new Command(Save);
 
-            
+            LoginButtonState = ButtonStateEnum.Enabled;
+            LogoutButtonState = ButtonStateEnum.Hidden;
+
 
         }
 
@@ -48,10 +53,6 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
 
         public Command<string> LogoutCommand { get; }
 
-        public void Initialize()
-        {
-            ResetUserProfileForm();
-        }
         private void Login(string loginscheme)
         {
             IsVisible = true;
@@ -112,12 +113,13 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
             Userprofile_nickname = Userprofile_username = Userprofile_website = Userprofile_phonenumber = Userprofile_bio = string.Empty;
         }
 
-        private void ResetUserProfileForm()
+        public void InitializeForm()
         {
             ClearUserProfileForm();
             FormState = FormStateEnum.Enabled;
         }
         #endregion
+
         #region LOGIN LOGOUT BUTTONS
         private void ProcessLoginLogout(bool isUserLoggedIn)
         {

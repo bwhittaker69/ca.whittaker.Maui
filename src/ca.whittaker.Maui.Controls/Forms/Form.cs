@@ -1,8 +1,4 @@
 ﻿using ca.whittaker.Maui.Controls.Buttons;
-using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows.Input;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -19,7 +15,7 @@ public class Form : ContentView
         typeof(Form));
 
     public static readonly BindableProperty CommandProperty = BindableProperty.Create(
-            nameof(Command),
+        nameof(Command),
         typeof(ICommand),
         typeof(Form));
 
@@ -45,23 +41,17 @@ public class Form : ContentView
         propertyChanged: OnFormSaveButtonTextChanged,
         defaultBindingMode: BindingMode.TwoWay);
 
-    public static readonly BindableProperty FormSizeProperty = BindableProperty.Create(
-        propertyName: nameof(FormSize),
-        returnType: typeof(SizeEnum),
-        declaringType: typeof(Form),
-        defaultValue: SizeEnum.Normal,
-        defaultBindingMode: BindingMode.TwoWay);
-
     public static readonly BindableProperty FormStateProperty = BindableProperty.Create(
         propertyName: nameof(FormState),
         returnType: typeof(FormStateEnum),
         declaringType: typeof(Form),
-        defaultValue: FormStateEnum.Disabled,
+        defaultValue: FormStateEnum.Enabled,
         defaultBindingMode: BindingMode.TwoWay,
         propertyChanged: OnFormStateChanged);
 
-    private Button _buttonCancel;
-    private Button _buttonSave;
+
+    private SaveButton _buttonCancel;
+    private CancelButton _buttonSave;
     private Label _labelForm;
     private Label _labelNotification;
 
@@ -102,11 +92,6 @@ public class Form : ContentView
         set => SetValue(FormSaveButtonTextProperty, value);
     }
 
-    public SizeEnum FormSize
-    {
-        get => (SizeEnum)GetValue(FormSizeProperty);
-        set => SetValue(FormSizeProperty, value);
-    }
 
     public FormStateEnum FormState
     {
@@ -125,6 +110,7 @@ public class Form : ContentView
         {
             InitializeFormControls();
             WireUpControls();
+            EvaluateForm();
         }
         catch
         {
@@ -135,48 +121,83 @@ public class Form : ContentView
 
     private StackLayout _stackedLayout;
 
+    private SizeEnum cButtonSize = SizeEnum.XXSmall;
 
     private void InitializeFormControls()
     {
         void UpdateUI()
         {
 
-            _stackedLayout = new()
-            {
-                Orientation = StackOrientation.Vertical,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center
-            };
             _buttonSave = new()
             {
+                Text = FormSaveButtonText,
+                ButtonSize = cButtonSize,
                 BackgroundColor = Colors.Transparent,
                 VerticalOptions = LayoutOptions.Center,
                 HorizontalOptions = LayoutOptions.Center,
-                HeightRequest = -1,
-                WidthRequest = -1,
-                Margin = new Thickness(0, 0, 0, 0),
-                Padding = new Thickness(0, 0, 0, 0),
-                BorderWidth = 0
+                ButtonState = ButtonStateEnum.Enabled,
+                ButtonType = BaseButtonTypeEnum.Save,
             };
-            _buttonSave.Text = FormSaveButtonText;
             _buttonSave.Clicked += ButtonSave_Clicked;
+            _buttonSave.ConfigureButton();
             _buttonCancel = new()
             {
+                Text = FormCancelButtonText,
+                ButtonSize = cButtonSize,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 BackgroundColor = Colors.Transparent,
-                HeightRequest = -1,
-                WidthRequest = -1,
-                Margin = new Thickness(0, 0, 0, 0),
-                Padding = new Thickness(0, 0, 0, 0),
-                BorderWidth = 0
+                ButtonState = ButtonStateEnum.Enabled,
+                ButtonType = BaseButtonTypeEnum.Cancel,
             };
-            _buttonCancel.Text = FormCancelButtonText;
             _buttonCancel.Clicked += (sender, e) => CancelForm();
-            _labelNotification = CreateNotificationLabel();
-            _labelForm = CreateFormLabel();
+            _buttonCancel.ConfigureButton();
+            _labelNotification = new Label
+            {
+                Text = "",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                IsVisible = false,
+                TextColor = Colors.Red
+            };
+            _labelForm = new Label
+            {
+                Text = FormName,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                IsVisible = !string.IsNullOrEmpty(FormName)
+            };
 
-            _stackedLayout.Children.Add(CreateFormLayoutGrid());
+            var gridLayout = new Grid
+            {
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Fill,
+
+                // Define rows
+                RowDefinitions =
+                        {
+                            new RowDefinition { Height = GridLength.Auto }, // Row for _labelForm
+                            new RowDefinition { Height = GridLength.Auto }, // Row for Buttons
+                            new RowDefinition { Height = GridLength.Auto }  // Row for _labelNotification
+                        },
+
+                // Define columns for the buttons
+                ColumnDefinitions =
+                        {
+                            new ColumnDefinition { Width = GridLength.Star }, // Column for _buttonSave
+                            new ColumnDefinition { Width = GridLength.Star }  // Column for _buttonCancel
+                        }
+            };
+
+            // Add controls to the grid
+            gridLayout.Add(_labelForm, 0, 0); // Column 0, Row 0
+            gridLayout.Add(_buttonSave, 0, 1); // Column 0, Row 1
+            gridLayout.Add(_buttonCancel, 1, 1); // Column 1, Row 1
+            gridLayout.Add(_labelNotification, 0, 2); // Column 0, Row 2
+            Grid.SetColumnSpan(_labelForm, 2); // Span _labelForm across both columns
+            Grid.SetColumnSpan(_labelNotification, 2); // Span _labelNotification across both columns
+
+
 
             if (this.Content is Layout existingLayout)
             {
@@ -184,12 +205,12 @@ public class Form : ContentView
                 if (existingLayout.Children.Count > 0)
                 {
                     // If there are existing children, insert the new element as the first child
-                    existingLayout.Children.Insert(0, _stackedLayout);
+                    existingLayout.Children.Insert(0, gridLayout);
                 }
                 else
                 {
                     // If there are no existing children, just add the new element to the layout
-                    existingLayout.Children.Add(_stackedLayout);
+                    existingLayout.Children.Add(gridLayout);
                 }
             }
             else if (this.Content is View existingElement)
@@ -198,13 +219,13 @@ public class Form : ContentView
                 // and add both the existing element and the new element to it
                 StackLayout containerLayout = new StackLayout();
                 containerLayout.Children.Add(existingElement);
-                containerLayout.Children.Add(_stackedLayout);
+                containerLayout.Children.Add(gridLayout);
                 this.Content = containerLayout;
             }
             else
             {
                 // If there's no existing content, set the new element as the content
-                this.Content = _stackedLayout;
+                this.Content = gridLayout;
             }
 
 
@@ -224,17 +245,9 @@ public class Form : ContentView
 
     private void ButtonSave_Clicked(object? sender, EventArgs e)
     {
-        try
+        if (Command?.CanExecute(CommandParameter) == true)
         {
-            if (Command?.CanExecute(CommandParameter) == true)
-            {
-                Command.Execute(CommandParameter);
-            }
-        }
-        catch
-        {
-            // Handle exception, log error or display a message
-            //Console.WriteLine($"Error executing save command: {ex.Message}");
+            Command.Execute(CommandParameter);
         }
     }
 
@@ -371,33 +384,26 @@ public class Form : ContentView
 
     private void CancelForm()
     {
-        foreach (TextBox t in this.GetVisualTreeDescendants().OfType<TextBox>())
+        foreach (TextBoxElement t in this.GetVisualTreeDescendants().OfType<TextBoxElement>())
         {
             t.Undo();
+        }
+        foreach (CheckBoxElement cb in this.GetVisualTreeDescendants().OfType<CheckBoxElement>())
+        {
+            cb.Undo();
         }
     }
 
     private void ClearForm()
     {
-        foreach (TextBox t in this.GetVisualTreeDescendants().OfType<TextBox>())
+        foreach (TextBoxElement t in this.GetVisualTreeDescendants().OfType<TextBoxElement>())
         {
             t.Clear();
         }
-    }
-
-    /// <summary>
-    /// Creates a form label control.
-    /// </summary>
-    /// <returns>The created form label control.</returns>
-    private Label CreateFormLabel()
-    {
-        return new Label
+        foreach (CheckBoxElement cb in this.GetVisualTreeDescendants().OfType<CheckBoxElement>())
         {
-            Text = FormName,
-            HorizontalOptions = LayoutOptions.Start,
-            VerticalOptions = LayoutOptions.Center,
-            IsVisible = !string.IsNullOrEmpty(FormName)
-        };
+            cb.Clear();
+        }
     }
 
     /// <summary>
@@ -410,8 +416,10 @@ public class Form : ContentView
         _labelForm.HorizontalOptions = LayoutOptions.Center;
         _buttonSave.HorizontalOptions = LayoutOptions.Center;
         _buttonCancel.HorizontalOptions = LayoutOptions.Center;
+
         var grid = new Grid
         {
+            Margin = new Thickness(5, 5, 5, 5),
             ColumnDefinitions =
             {
                 new ColumnDefinition { Width = GridLength.Star },
@@ -427,30 +435,17 @@ public class Form : ContentView
         };
 
         grid.Add(_labelForm, 0, 0);
+        Grid.SetColumnSpan(_labelForm, 2);
+
         grid.Add(_buttonSave, 0, 1);
         grid.Add(_buttonCancel, 1, 1);
-        grid.Add(_labelNotification, 0, 2);
 
-        Grid.SetColumnSpan(_labelForm, 2);
+        grid.Add(_labelNotification, 0, 2);
         Grid.SetColumnSpan(_labelNotification, 2);
 
         return grid;
     }
 
-    /// <summary>
-    /// Creates the notification label for the text box.
-    /// </summary>
-    /// <returns>The created notification label.</returns>
-    private static Label CreateNotificationLabel()
-    {
-        return new Label
-        {
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            IsVisible = false,
-            TextColor = Colors.Red
-        };
-    }
 
     private void CustomTextBox_HasChanges(object? sender, HasChangesEventArgs e) => EvaluateForm();
 
@@ -466,7 +461,7 @@ public class Form : ContentView
 
     private bool HasFormNotChanged()
     {
-        foreach (TextBox t in this.GetVisualTreeDescendants().OfType<TextBox>())
+        foreach (TextBoxElement t in this.GetVisualTreeDescendants().OfType<TextBoxElement>())
         {
             //Console.WriteLine(t.ChangeState.ToString());
             if (t.ChangeState == ChangeStateEnum.Changed)
@@ -476,11 +471,11 @@ public class Form : ContentView
     }
 
     private bool IsFormDataValid() =>
-        this.GetVisualTreeDescendants().OfType<TextBox>().All(ctb => ctb.ValidationState == ValidationStateEnum.Valid);
+        this.GetVisualTreeDescendants().OfType<TextBoxElement>().All(ctb => ctb.ValidationState == ValidationStateEnum.Valid);
 
     private void SavedForm()
     {
-        foreach (TextBox t in this.GetVisualTreeDescendants().OfType<TextBox>())
+        foreach (TextBoxElement t in this.GetVisualTreeDescendants().OfType<TextBoxElement>())
         {
             t.Saved();
         }
@@ -517,25 +512,25 @@ public class Form : ContentView
         {
             if (noChanges)
             {
-                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Save);
-                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Cancel);
+                _buttonSave.ButtonState = ButtonStateEnum.Disabled;
+                _buttonCancel.ButtonState = ButtonStateEnum.Disabled;
             }
             else if (noErrors)
             {
-                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Save);
-                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Cancel);
+                _buttonSave.ButtonState = ButtonStateEnum.Enabled;
+                _buttonCancel.ButtonState = ButtonStateEnum.Enabled;
             }
             else
             {
-                _buttonSave.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Save);
-                _buttonCancel.ImageSource = resourceHelper.GetImageSource(ButtonStateEnum.Enabled, BaseButtonTypeEnum.Cancel);
+                _buttonSave.ButtonState = ButtonStateEnum.Disabled;
+                _buttonCancel.ButtonState = ButtonStateEnum.Enabled;
             }
         }
     }
 
     private void WireUpControls()
     {
-        var textBoxes = this.GetVisualTreeDescendants().OfType<TextBox>();
+        var textBoxes = this.GetVisualTreeDescendants().OfType<TextBoxElement>();
 
         if (!textBoxes.Any())
             throw new InvalidOperationException("Form missing TextBox controls");

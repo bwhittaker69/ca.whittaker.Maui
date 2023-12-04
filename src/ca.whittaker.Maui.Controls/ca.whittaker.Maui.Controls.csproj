@@ -1484,4 +1484,9 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <Folder Include="CheckBox\" />
+	</ItemGroup>
+
 </Project>

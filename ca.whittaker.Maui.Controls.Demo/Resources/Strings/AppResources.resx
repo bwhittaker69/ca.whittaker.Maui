@@ -192,4 +192,7 @@
   <data name="Tab_UserProfile" xml:space="preserve">
     <value>profile</value>
   </data>
+  <data name="Field_IsPublic" xml:space="preserve">
+    <value>public profile?</value>
+  </data>
 </root>

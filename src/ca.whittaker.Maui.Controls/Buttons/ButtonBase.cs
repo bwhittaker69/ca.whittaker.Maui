@@ -7,7 +7,7 @@ public abstract class ButtonBase : Button, IButton
         propertyName: nameof(ButtonSize),
         returnType: typeof(SizeEnum?),
         declaringType: typeof(ButtonBase),
-        defaultValue: null,
+        defaultValue: SizeEnum.Normal,
         defaultBindingMode: BindingMode.OneWay);
 
     public SizeEnum? ButtonSize
@@ -84,17 +84,15 @@ public abstract class ButtonBase : Button, IButton
 
     public ButtonBase(BaseButtonTypeEnum buttonType) : base()
     {
-
-        base.BorderWidth = 0;
-        base.Margin = 0;
-        base.Padding = 0;
-
         ButtonType = buttonType;
-
-
         base.PropertyChanged += Button_PropertyChanged;
+    }
 
 
+    protected override void OnParentSet()
+    {
+        base.OnParentSet();
+        ConfigureButton();
     }
 
     private void Button_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -121,17 +119,23 @@ public abstract class ButtonBase : Button, IButton
                 {
                     case ButtonStateEnum.Enabled:
                         base.IsVisible = true;
-                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (BaseButtonTypeEnum)ButtonType);
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize);
+                        base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
+                        base.WidthRequest = -1;
                         base.Text = (Text == null ? "" : Text);
                         break;
                     case ButtonStateEnum.Disabled:
                         base.IsVisible = true;
-                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType);
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize);
+                        base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
+                        base.WidthRequest = -1;
                         base.Text = (DisabledText != null && DisabledText != "" ? DisabledText : Text);
                         break;
                     case ButtonStateEnum.Pressed:
                         base.IsVisible = true;
-                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType);
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize);
+                        base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
+                        base.WidthRequest = -1;
                         base.Text = (PressedText != null && PressedText != "" ? PressedText : Text);
                         break;
                     case ButtonStateEnum.Hidden:

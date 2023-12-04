@@ -1,206 +1,154 @@
-﻿using System.Net.Mail;
+﻿using ca.whittaker.Maui.Controls.Buttons;
 using System.Text.RegularExpressions;
 using Entry = Microsoft.Maui.Controls.Entry;
 using Label = Microsoft.Maui.Controls.Label;
-
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
 /// <summary>
 /// Represents a customizable text box control with various properties for text manipulation and validation.
 /// </summary>
-public class TextBox : ContentView
+public class TextBoxElement : ContentView
 {
     public static readonly BindableProperty AllLowerCaseProperty = BindableProperty.Create(
         propertyName: nameof(AllLowerCase),
         returnType: typeof(bool),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: false);
 
     public static readonly BindableProperty AllowWhiteSpaceProperty = BindableProperty.Create(
         propertyName: nameof(AllowWhiteSpace),
         returnType: typeof(bool),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: true);
 
     public static readonly BindableProperty ChangeStateProperty = BindableProperty.Create(
         propertyName: nameof(ChangeState),
         returnType: typeof(ChangeStateEnum),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: ChangeStateEnum.NotChanged,
         defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly BindableProperty FieldTypeProperty = BindableProperty.Create(
         propertyName: nameof(FieldType),
         returnType: typeof(FieldTypeEnum),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: FieldTypeEnum.Text,
-        propertyChanged: OnFieldTypeChanged);
-
-    private static void OnFieldTypeChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var control = (TextBox)bindable;
-        var newType = (FieldTypeEnum)newValue;
-
-        control._entry.Keyboard = newType switch
+        propertyChanged: (bindable, oldValue, newValue) =>
         {
-            FieldTypeEnum.Email => Keyboard.Email,
-            FieldTypeEnum.Url => Keyboard.Url,
-            FieldTypeEnum.Chat => Keyboard.Chat,
-            _ => Keyboard.Default,
-        };
-    }
+            ((TextBoxElement)bindable).OnFieldTypeChanged(newValue);
+        });
 
     public static readonly BindableProperty LabelProperty = BindableProperty.Create(
         propertyName: nameof(Label),
         returnType: typeof(string),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: string.Empty,
-        propertyChanged: OnLabelPropertyChanged);
-
-    private static void OnLabelPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var control = (TextBox)bindable;
-        control.SetLabelText(newValue);
-    }
-
-    private void SetLabelText(object newValue)
-    {
-        _label.Text = (newValue == null ? "" : newValue.ToString());
-    }
+        propertyChanged: (bindable, oldValue, newValue) =>
+        {
+            ((TextBoxElement)bindable).OnLabelPropertyChanged(newValue);
+        });
 
     public static readonly BindableProperty MandatoryProperty = BindableProperty.Create(
         propertyName: nameof(Mandatory),
         returnType: typeof(bool),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: false);
-
 
     public static readonly BindableProperty MaxLengthProperty = BindableProperty.Create(
         propertyName: nameof(MaxLength),
         returnType: typeof(int),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: 255,
-        propertyChanged: OnMaxLengthPropertyChanged);
-
-    private static void OnMaxLengthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var control = (TextBox)bindable;
-        control.SetMaxLength(newValue);
-    }
-
-    private void SetMaxLength(object newValue)
-    {
-        if (newValue != null)
-            _entry.MaxLength = (int)newValue;
-    }
+        propertyChanged: (bindable, oldValue, newValue) =>
+        {
+            ((TextBoxElement)bindable).OnMaxLengthPropertyChanged(newValue);
+        });
 
     public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(
         propertyName: nameof(Placeholder),
         returnType: typeof(string),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: string.Empty,
-        propertyChanged: OnPlaceholderPropertyChanged);
+        propertyChanged: (bindable, oldValue, newValue) =>
+        {
+            ((TextBoxElement)bindable).OnPlaceholderPropertyChanged(newValue);
+        });
 
-    private static void OnPlaceholderPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var control = (TextBox)bindable;
-        control.SetPlaceholderText(newValue);
-    }
-
-    private void SetPlaceholderText(object newValue)
-    {
-        _entry.Placeholder = newValue == null ? "" : (string)newValue;
-    }
-
-    public static readonly BindableProperty TextProperty = BindableProperty.Create(
-        propertyName: nameof(Text),
+    public static readonly BindableProperty TextBoxSourceProperty = BindableProperty.Create(
+        propertyName: nameof(TextBoxSource),
         returnType: typeof(string),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: string.Empty,
         defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: OnTextChanged);
+        propertyChanged: (bindable, oldValue, newValue) =>
+        {
+            ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue);
+        });
 
-    private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var control = (TextBox)bindable;
-        control._entry.Text = (string)newValue;
-    }
+    public static readonly BindableProperty LabelWidthProperty = BindableProperty.Create(
+        propertyName: nameof(LabelWidth),
+        returnType: typeof(double?),
+        declaringType: typeof(TextBoxElement),
+        defaultValue: (double)100,
+        defaultBindingMode: BindingMode.TwoWay,
+        propertyChanged: (bindable, oldValue, newValue) =>
+        {
+            ((TextBoxElement)bindable).OnLabelWidthPropertyChanged(newValue);
+        });
 
     public static readonly BindableProperty ValidationStateProperty = BindableProperty.Create(
         propertyName: nameof(ValidationState),
         returnType: typeof(ValidationStateEnum),
-        declaringType: typeof(TextBox),
+        declaringType: typeof(TextBoxElement),
         defaultValue: ValidationStateEnum.Valid,
         defaultBindingMode: BindingMode.TwoWay);
 
+    // Fields, constants, and regex
+    public UndoButton _buttonUndo;
     public Entry _entry;
-    public Button _buttonUndo;
     public Label _label;
     public Label _labelNotification;
+    private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
+    private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
     private bool _isOriginalTextSet = false;
     private string _originalText = string.Empty;
     private bool _previousHasChangedState = false;
     private bool _previousInvalidDataState = false;
 
-    public TextBox()
+    public TextBoxElement()
     {
-
-
-        void UpdateUI()
-        {
-            _entry = CreateEntry();
-            _label = CreateLabel();
-            _labelNotification = CreateNotificationLabel();
-            _buttonUndo = CreateUndoButton();
-            Content = CreateLayoutGrid(); 
-            _buttonUndo.Pressed += (s, e) => Undo();
-        }
-
-        // Check if on the main thread and update UI accordingly
-        if (MainThread.IsMainThread)
-        {
-            UpdateUI();
-        }
-        else
-        {
-            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
-        }
-        InitializeTextBox();
+        InitializeUI();
+    }
+    private void InitializeUI()
+    {
+        _entry = CreateEntry();
+        _label = CreateLabel();
+        _labelNotification = CreateNotificationLabel();
+        _buttonUndo = CreateUndoButton();
+        Content = CreateLayoutGrid();
+        _buttonUndo.Pressed += (s, e) => Undo();
     }
 
     public event EventHandler<HasChangesEventArgs>? HasChanges;
-
     public event EventHandler<ValidationDataChangesEventArgs>? HasValidationChanges;
-
     public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
-
     public bool AllowWhiteSpace { get => (bool)GetValue(AllowWhiteSpaceProperty); set => SetValue(AllowWhiteSpaceProperty, value); }
-
     public ChangeStateEnum ChangeState { get => (ChangeStateEnum)GetValue(ChangeStateProperty); set => SetValue(ChangeStateProperty, value); }
-
     public FieldTypeEnum FieldType { get => (FieldTypeEnum)GetValue(FieldTypeProperty); set => SetValue(FieldTypeProperty, value); }
-
     public string Label { get => (string)GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
-
     public bool Mandatory { get => (bool)GetValue(MandatoryProperty); set => SetValue(MandatoryProperty, value); }
-
     public int MaxLength { get => (int)GetValue(MaxLengthProperty); set => SetValue(MaxLengthProperty, value); }
-
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
+    public double LabelWidth { get => (double)GetValue(LabelWidthProperty); set => SetValue(LabelWidthProperty, value); }
 
-    public string Text
+    public string TextBoxSource
     {
-        get => (string)GetValue(TextProperty);
+        get => (string)GetValue(TextBoxSourceProperty);
         set
         {
-            SetValue(TextProperty, value);
-            if (!_isOriginalTextSet)
-            {
-                _originalText = value;
-                _isOriginalTextSet = true;
-                EvaluateToRaiseValidationChangesEvent(true);
-            }
+            SetValue(TextBoxSourceProperty, value);
+            SetOriginalText(value);
         }
     }
 
@@ -208,24 +156,57 @@ public class TextBox : ContentView
 
     public void Clear()
     {
-        _originalText = "";
-        Text = "";
+        SetOriginalText("");
         UpdateValidationState();
     }
 
     public void Saved()
     {
-        _originalText = Text;
+        SetOriginalText(_entry.Text);
         UpdateValidationState();
+    }
+
+    public void SetOriginalText(string originalText)
+    {
+        _originalText = originalText;
+        _entry.Text = originalText;
+        EvaluateToRaiseValidationChangesEvent();
     }
 
     public void Undo()
     {
-        Text = _originalText;
+        _entry.Text = _originalText;
         UpdateValidationState();
     }
 
-    private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+    private static Label CreateNotificationLabel()
+    {
+        return new Label
+        {
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            IsVisible = false,
+            TextColor = Colors.Red
+        };
+    }
+
+    private static UndoButton CreateUndoButton()
+    {
+        return new UndoButton
+        {
+            Text = "",
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            BackgroundColor = Colors.Transparent,
+            ButtonSize = cUndoButtonSize,
+            WidthRequest = -1,
+            ButtonState = ButtonStateEnum.Disabled,
+            ButtonType = BaseButtonTypeEnum.Undo,
+            BorderWidth = 0,
+            Margin = new Thickness(0),
+            Padding = new Thickness(5, 0, 0, 0)
+        };
+    }
 
     private static bool IsValidEmail(string email)
     {
@@ -234,7 +215,6 @@ public class TextBox : ContentView
 
         return emailRegex.IsMatch(email);
     }
-
 
     private static bool IsValidUrl(string urlString)
     {
@@ -245,6 +225,50 @@ public class TextBox : ContentView
             return false;
 
         return uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps;
+    }
+
+    private void OnFieldTypeChanged(object newValue)
+    {
+        _entry.Keyboard = GetKeyboardForFieldType((FieldTypeEnum)newValue);
+    }
+
+    private Keyboard GetKeyboardForFieldType(FieldTypeEnum fieldType)
+    {
+        return fieldType switch
+        {
+            FieldTypeEnum.Email => Keyboard.Email,
+            FieldTypeEnum.Url => Keyboard.Url,
+            FieldTypeEnum.Chat => Keyboard.Chat,
+            _ => Keyboard.Default,
+        };
+    }
+
+    private void OnLabelPropertyChanged(object newValue)
+    {
+        _label.Text = newValue?.ToString() ?? "";
+    }
+
+    private void OnMaxLengthPropertyChanged(object newValue)
+    {
+        _entry.MaxLength = (int)newValue;
+    }
+
+    private void OnPlaceholderPropertyChanged(object newValue)
+    {
+        _entry.Placeholder = newValue?.ToString() ?? "";
+    }
+
+    private void OnTextBoxSourcePropertyChanged(object newValue)
+    {
+        _entry.Text = (string)newValue;
+    }
+
+    private void OnLabelWidthPropertyChanged(object newValue)
+    {
+        if (Content is Grid grid)
+        {
+            grid.ColumnDefinitions[0].Width = new GridLength((double)newValue, GridUnitType.Absolute);
+        }
     }
 
     private ValidationStateEnum CalculateValidationState(string text)
@@ -273,14 +297,12 @@ public class TextBox : ContentView
 
     private Entry CreateEntry()
     {
-#pragma warning disable CS0618 // Type or member is obsolete
         var entry = new Entry
         {
             Placeholder = Placeholder,
-            HorizontalOptions = LayoutOptions.FillAndExpand,
+            HorizontalOptions = LayoutOptions.Fill,
             VerticalOptions = LayoutOptions.Center
         };
-#pragma warning restore CS0618 // Type or member is obsolete
         entry.TextChanged += Entry_TextChanged;
         entry.Focused += Entry_Focused;
         entry.Unfocused += Entry_Unfocused;
@@ -298,19 +320,19 @@ public class TextBox : ContentView
         };
     }
 
+    //private Grid CreateLayoutGrid(double fieldLabelWidth)
     private Grid CreateLayoutGrid()
     {
         var grid = new Grid
         {
             ColumnDefinitions =
                 {
-                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                    new ColumnDefinition { Width = new GridLength(8, GridUnitType.Star)  },
-                    new ColumnDefinition { Width = 50 }
+                    new ColumnDefinition { Width = new GridLength(LabelWidth, GridUnitType.Absolute) },
+                    new ColumnDefinition { Width = GridLength.Star },
+                    new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute)  },
                 },
             RowDefinitions =
                 {
-                    new RowDefinition { Height = GridLength.Auto },
                     new RowDefinition { Height = GridLength.Auto },
                     new RowDefinition { Height = GridLength.Auto }
                 }
@@ -325,33 +347,6 @@ public class TextBox : ContentView
         return grid;
     }
 
-    private static Label CreateNotificationLabel()
-    {
-        return new Label
-        {
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            IsVisible = false,
-            TextColor = Colors.Red
-        };
-    }
-
-    private static Button CreateUndoButton()
-    {
-        return new Button
-        {
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo),
-            BackgroundColor = Colors.Transparent,
-            WidthRequest = -1,
-            HeightRequest = -1,
-            BorderWidth = 0,
-            Margin = new Thickness(0),
-            Padding = new Thickness(5, 0, 0, 0)
-        };
-    }
-
     private void Entry_Focused(object? sender, FocusEventArgs e)
     {
     }
@@ -360,24 +355,24 @@ public class TextBox : ContentView
     {
         ProcessAndSetText(e.NewTextValue);
         UpdateValidationState();
-        UpdateNotificationMessage(Text);
+        UpdateNotificationMessage(_entry.Text);
     }
 
     private void Entry_Unfocused(object? sender, FocusEventArgs e)
     {
-        UpdateNotificationMessage(Text);
+        UpdateNotificationMessage(_entry.Text);
     }
 
     private void EvaluateToRaiseHasChangesEvent()
     {
-        bool hasChanged = _originalText != Text;
+        bool hasChanged = _originalText != _entry.Text;
         if (_previousHasChangedState != hasChanged)
         {
             void UpdateUI()
             {
-                using (ResourceHelper resourceHelper = new ())
+                using (ResourceHelper resourceHelper = new())
                 {
-                    _buttonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo);
+                    _buttonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo, cUndoButtonSize);
                 }
                 _previousHasChangedState = hasChanged;
                 ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
@@ -398,7 +393,7 @@ public class TextBox : ContentView
 
     private void EvaluateToRaiseValidationChangesEvent(bool forceRaise = false)
     {
-        bool isValid = IsValidData(Text);
+        bool isValid = IsValidData(_entry.Text);
         if (_previousInvalidDataState != isValid || forceRaise)
         {
             void UpdateUI()
@@ -417,14 +412,13 @@ public class TextBox : ContentView
             {
                 MainThread.BeginInvokeOnMainThread(() => UpdateUI());
             }
-
         }
     }
 
-    private void InitializeTextBox()
-    {
-        _originalText = Text;
-    }
+    //private void InitializeTextBox()
+    //{
+    //    _originalText = Text;
+    //}
 
     private bool IsValidData(string text)
     {
@@ -456,7 +450,7 @@ public class TextBox : ContentView
 
     private void ProcessAndSetText(string newText)
     {
-        Text = ProcessUsernameFilter(
+        _entry.Text = ProcessUsernameFilter(
             ProcessEmailFilter(
                 ProcessAllLowercase(
                     ProcessAllowWhiteSpace(newText ?? ""))));
@@ -472,6 +466,19 @@ public class TextBox : ContentView
         return FieldType == FieldTypeEnum.Username ? Regex.Replace(text, @"[^a-zA-Z0-9_]", "") : text;
     }
 
+    private void SetLabelText(object newValue)
+    {
+        _label.Text = newValue == null ? "" : newValue.ToString();
+    }
+    private void SetMaxLength(object newValue)
+    {
+        if (newValue != null)
+            _entry.MaxLength = (int)newValue;
+    }
+    private void SetPlaceholderText(object newValue)
+    {
+        _entry.Placeholder = newValue == null ? "" : (string)newValue;
+    }
     private void UpdateNotificationMessage(string text)
     {
         var validationState = CalculateValidationState(text);
@@ -496,6 +503,7 @@ public class TextBox : ContentView
 
         ValidationState = validationState; // Set the validation state based on calculated value
     }
+
     private void UpdateValidationState()
     {
         EvaluateToRaiseHasChangesEvent();

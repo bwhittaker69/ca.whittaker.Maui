@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using Microsoft.Maui.Devices;
-using Microsoft.Maui.Graphics;
 
 namespace ca.whittaker.Maui.Controls
 {
@@ -20,7 +18,7 @@ namespace ca.whittaker.Maui.Controls
         }
 
         // Method to get an ImageSource based on button state and theme
-        public ImageSource? GetImageSource(ButtonStateEnum buttonState, BaseButtonTypeEnum baseButtonType)
+        public ImageSource? GetImageSource(ButtonStateEnum buttonState, BaseButtonTypeEnum baseButtonType, SizeEnum sizeEnum)
         {
             try
             {
@@ -30,7 +28,7 @@ namespace ca.whittaker.Maui.Controls
                 string state = GetResourceState(buttonState);
 
                 // Determine image size based on device screen density
-                int size = GetImageSizeForDevice();
+                int size = DeviceHelper.GetImageSizeForDevice(sizeEnum);
 
                 string resourceName = $"{assemblyName}.Resources.Images.{baseButtonType.ToString().ToLower()}_{size}{theme}{state}.png";
 
@@ -50,21 +48,10 @@ namespace ca.whittaker.Maui.Controls
             }
         }
 
-        private static int GetImageSizeForDevice()
-        {
-            // Adjust these thresholds and sizes as needed
-            double density = DeviceDisplay.MainDisplayInfo.Density;
-            if (density <= 1) return 12; // mdpi
-            if (density <= 1.5) return 24; // hdpi
-            if (density <= 2) return 48; // xhdpi
-            if (density <= 3) return 64; // xxhdpi
-            return 72; // xxxhdpi or higher
-        }
-
         private static string GetResourceTheme()
         {
             AppTheme currentTheme = GetCurrentTheme();
-            return (currentTheme == AppTheme.Dark ? "_dark" : "_light");
+            return (currentTheme != AppTheme.Dark ? "_dark" : "_light");
         }
 
         private static string GetResourceState(ButtonStateEnum buttonState)
