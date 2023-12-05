@@ -5,7 +5,7 @@ namespace ca.whittaker.Maui.Controls
     public class ResourceHelper : IDisposable
     {
         // Method to verify if a resource exists
-        private static bool ResourceExists(string resourceName)
+        public static bool ResourceExists(string resourceName)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             return assembly.GetManifestResourceNames().Any(name => name.EndsWith(resourceName, StringComparison.Ordinal));

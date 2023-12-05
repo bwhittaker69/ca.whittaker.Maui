@@ -10,6 +10,16 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public class TextBoxElement : BaseFormElement
 {
+
+    private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
+    private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
+    private Entry _entry;
+    private bool _isOriginalTextSet = false;
+    private string _originalText = string.Empty;
+    private bool _previousHasChangedState = false;
+    private bool _previousInvalidDataState = false;
+
+
     public static readonly BindableProperty AllLowerCaseProperty = BindableProperty.Create(
         propertyName: nameof(AllLowerCase),
         returnType: typeof(bool),
@@ -27,10 +37,7 @@ public class TextBoxElement : BaseFormElement
         returnType: typeof(FieldTypeEnum),
         declaringType: typeof(TextBoxElement),
         defaultValue: FieldTypeEnum.Text,
-        propertyChanged: (bindable, oldValue, newValue) =>
-        {
-            ((TextBoxElement)bindable).OnFieldTypeChanged(newValue);
-        });
+        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnFieldTypeChanged(newValue); });
 
     public static readonly BindableProperty MandatoryProperty = BindableProperty.Create(
         propertyName: nameof(Mandatory),
@@ -43,20 +50,14 @@ public class TextBoxElement : BaseFormElement
         returnType: typeof(int),
         declaringType: typeof(TextBoxElement),
         defaultValue: 255,
-        propertyChanged: (bindable, oldValue, newValue) =>
-        {
-            ((TextBoxElement)bindable).OnMaxLengthPropertyChanged(newValue);
-        });
+        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnMaxLengthPropertyChanged(newValue); });
 
     public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(
         propertyName: nameof(Placeholder),
         returnType: typeof(string),
         declaringType: typeof(TextBoxElement),
         defaultValue: string.Empty,
-        propertyChanged: (bindable, oldValue, newValue) =>
-        {
-            ((TextBoxElement)bindable).OnPlaceholderPropertyChanged(newValue);
-        });
+        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnPlaceholderPropertyChanged(newValue); });
 
     public static readonly BindableProperty TextBoxSourceProperty = BindableProperty.Create(
         propertyName: nameof(TextBoxSource),
@@ -64,19 +65,8 @@ public class TextBoxElement : BaseFormElement
         declaringType: typeof(TextBoxElement),
         defaultValue: string.Empty,
         defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: (bindable, oldValue, newValue) =>
-        {
-            ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue);
-        });
+        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue); });
 
-    // Fields, constants, and regex
-    public Entry _entry;
-    private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
-    private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
-    private bool _isOriginalTextSet = false;
-    private string _originalText = string.Empty;
-    private bool _previousHasChangedState = false;
-    private bool _previousInvalidDataState = false;
 
     public TextBoxElement()
     {
@@ -85,11 +75,11 @@ public class TextBoxElement : BaseFormElement
     private void InitializeUI()
     {
         _entry = CreateEntry();
-        _label = CreateLabel();
-        _labelNotification = CreateNotificationLabel();
-        _buttonUndo = CreateUndoButton();
+        FieldLabel = CreateLabel();
+        FieldNotification = CreateNotificationLabel();
+        ButtonUndo = CreateUndoButton();
         Content = CreateLayoutGrid();
-        _buttonUndo.Pressed += (s, e) => Undo();
+        ButtonUndo.Pressed += (s, e) => Undo();
     }
 
     public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
@@ -113,12 +103,19 @@ public class TextBoxElement : BaseFormElement
     {
         SetOriginalText("");
         UpdateValidationState();
+        _entry.Unfocus();
     }
-
+    public void Undo()
+    {
+        _entry.Text = _originalText;
+        UpdateValidationState();
+        _entry.Unfocus();
+    }
     public void Saved()
     {
         SetOriginalText(_entry.Text);
         UpdateValidationState();
+        _entry.Unfocus();
     }
 
     public void SetOriginalText(string originalText)
@@ -128,11 +125,6 @@ public class TextBoxElement : BaseFormElement
         EvaluateToRaiseValidationChangesEvent();
     }
 
-    public void Undo()
-    {
-        _entry.Text = _originalText;
-        UpdateValidationState();
-    }
 
 
     private static bool IsValidEmail(string email)
@@ -185,12 +177,10 @@ public class TextBoxElement : BaseFormElement
     }
     private ValidationStateEnum CalculateValidationState(string text)
     {
-        // mandatory field, so its not valid
         if (Mandatory && string.IsNullOrEmpty(text))
         {
             return ValidationStateEnum.RequiredFieldError;
         }
-        // not mandatory and no text, so its valid
         else if (!Mandatory && string.IsNullOrEmpty(text))
         {
             return ValidationStateEnum.Valid;
@@ -206,6 +196,11 @@ public class TextBoxElement : BaseFormElement
 
         return ValidationStateEnum.Valid;
     }
+    public override void Unfocus()
+    {
+        base.Unfocus();
+        _entry.Unfocus();
+    }
 
     private Entry CreateEntry()
     {
@@ -215,6 +210,7 @@ public class TextBoxElement : BaseFormElement
             HorizontalOptions = LayoutOptions.Fill,
             VerticalOptions = LayoutOptions.Center
         };
+        
         entry.TextChanged += Entry_TextChanged;
         entry.Focused += Entry_Focused;
         entry.Unfocused += Entry_Unfocused;
@@ -238,11 +234,11 @@ public class TextBoxElement : BaseFormElement
                 }
         };
 
-        grid.Add(_label, 0, 0);
+        grid.Add(FieldLabel, 0, 0);
         grid.Add(_entry, 1, 0);
-        grid.Add(_buttonUndo, 2, 0);
-        grid.Add(_labelNotification, 0, 1);
-        Grid.SetColumnSpan(_labelNotification, 3);
+        grid.Add(ButtonUndo, 2, 0);
+        grid.Add(FieldNotification, 0, 1);
+        Grid.SetColumnSpan(FieldNotification, 3);
 
         return grid;
     }
@@ -270,9 +266,11 @@ public class TextBoxElement : BaseFormElement
         {
             void UpdateUI()
             {
+                // update the binded data source
+                TextBoxSource = _entry.Text;
                 using (ResourceHelper resourceHelper = new())
                 {
-                    _buttonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo, cUndoButtonSize);
+                    ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo, cUndoButtonSize);
                 }
                 _previousHasChangedState = hasChanged;
                 ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
@@ -389,8 +387,8 @@ public class TextBoxElement : BaseFormElement
                 break;
         }
 
-        _labelNotification.Text = notificationMessage;
-        _labelNotification.IsVisible = isNotificationVisible;
+        FieldNotification.Text = notificationMessage;
+        FieldNotification.IsVisible = isNotificationVisible;
 
         ValidationState = validationState; // Set the validation state based on calculated value
     }

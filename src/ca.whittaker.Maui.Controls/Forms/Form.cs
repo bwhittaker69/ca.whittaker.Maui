@@ -134,6 +134,7 @@ public class Form : ContentView
                 Text = FormSaveButtonText,
                 ButtonSize = cButtonSize,
                 BackgroundColor = Colors.Transparent,
+                BorderWidth = 0,
                 VerticalOptions = LayoutOptions.Center,
                 HorizontalOptions = LayoutOptions.Center,
                 ButtonState = ButtonStateEnum.Enabled,
@@ -145,9 +146,10 @@ public class Form : ContentView
             {
                 Text = FormCancelButtonText,
                 ButtonSize = cButtonSize,
+                BackgroundColor = Colors.Transparent,
+                BorderWidth = 0,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                BackgroundColor = Colors.Transparent,
                 ButtonState = ButtonStateEnum.Enabled,
                 ButtonType = BaseButtonTypeEnum.Cancel,
             };
@@ -389,8 +391,9 @@ public class Form : ContentView
     {
         foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
         {
-            if (t is TextBoxElement tbe) tbe.Undo();
-            if (t is CheckBoxElement cbe) cbe.Undo();
+            if (t is TextBoxElement tbe) { tbe.Undo(); }
+            if (t is CheckBoxElement cbe) { cbe.Undo(); }
+            
         }
     }
 
@@ -400,6 +403,7 @@ public class Form : ContentView
         {
             if (t is TextBoxElement tbe) tbe.Clear();
             if (t is CheckBoxElement cbe) cbe.Clear();
+            t.Unfocus();
         }
     }
 
@@ -476,6 +480,7 @@ public class Form : ContentView
         {
             if (t is TextBoxElement tbe) tbe.Saved();
             if (t is CheckBoxElement cbe) cbe.Saved();
+            t.Unfocus();
         }
     }
 
