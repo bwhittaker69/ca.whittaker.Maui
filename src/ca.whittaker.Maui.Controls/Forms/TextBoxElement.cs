@@ -1,7 +1,5 @@
-﻿using ca.whittaker.Maui.Controls.Buttons;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Entry = Microsoft.Maui.Controls.Entry;
-using Label = Microsoft.Maui.Controls.Label;
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
@@ -52,6 +50,18 @@ public class TextBoxElement : BaseFormElement
         defaultValue: 255,
         propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnMaxLengthPropertyChanged(newValue); });
 
+    public new static readonly BindableProperty HeightRequestProperty = BindableProperty.Create(
+        propertyName: nameof(HeightRequest),
+        returnType: typeof(double),
+        declaringType: typeof(TextBoxElement),
+        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnHeightRequestPropertyChanged(newValue); });
+
+    public new static readonly BindableProperty WidthRequestProperty = BindableProperty.Create(
+        propertyName: nameof(WidthRequest),
+        returnType: typeof(double),
+        declaringType: typeof(TextBoxElement),
+        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnWidthRequestPropertyChanged(newValue); });
+
     public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(
         propertyName: nameof(Placeholder),
         returnType: typeof(string),
@@ -88,6 +98,8 @@ public class TextBoxElement : BaseFormElement
     public bool Mandatory { get => (bool)GetValue(MandatoryProperty); set => SetValue(MandatoryProperty, value); }
     public int MaxLength { get => (int)GetValue(MaxLengthProperty); set => SetValue(MaxLengthProperty, value); }
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
+    public new double HeightRequest { get => (double)GetValue(HeightRequestProperty); set => SetValue(HeightRequestProperty, value); }
+    public new double WidthRequest { get => (double)GetValue(WidthRequestProperty); set => SetValue(WidthRequestProperty, value); }
 
     public string TextBoxSource
     {
@@ -98,7 +110,10 @@ public class TextBoxElement : BaseFormElement
             SetOriginalText(value);
         }
     }
-
+    public string GetText()
+    {
+        return _entry.Text;
+    }
     public void Clear()
     {
         SetOriginalText("");
@@ -159,6 +174,16 @@ public class TextBoxElement : BaseFormElement
             FieldTypeEnum.Chat => Keyboard.Chat,
             _ => Keyboard.Default,
         };
+    }
+    private void OnHeightRequestPropertyChanged(object newValue)
+    {
+        base.HeightRequest = (double)newValue;
+        RefreshLayoutGrid();
+    }
+    private void OnWidthRequestPropertyChanged(object newValue)
+    {
+        base.WidthRequest = (double)newValue;
+        RefreshLayoutGrid();
     }
 
     private void OnMaxLengthPropertyChanged(object newValue)
@@ -233,7 +258,10 @@ public class TextBoxElement : BaseFormElement
                     new RowDefinition { Height = GridLength.Auto }
                 }
         };
-
+        grid.HeightRequest = HeightRequest;
+        grid.WidthRequest = WidthRequest;
+        grid.HorizontalOptions = LayoutOptions.Center;
+        grid.VerticalOptions = LayoutOptions.Center;
         grid.Add(FieldLabel, 0, 0);
         grid.Add(_entry, 1, 0);
         grid.Add(ButtonUndo, 2, 0);
@@ -242,7 +270,25 @@ public class TextBoxElement : BaseFormElement
 
         return grid;
     }
+    private void RefreshLayoutGrid()
+    {
+        Grid grid = (Grid)Content;
+        grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
+        grid.ColumnDefinitions[1].Width = GridLength.Star;
+        grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
+        grid.HeightRequest = HeightRequest;
+        grid.WidthRequest = WidthRequest;
+        grid.HorizontalOptions = LayoutOptions.Center;
+        grid.VerticalOptions = LayoutOptions.Center;
+        FieldLabel.HeightRequest = HeightRequest;
+        FieldLabel.WidthRequest = LabelWidth;
+        _entry.WidthRequest = -1;
+        _entry.HeightRequest = HeightRequest;
+        ButtonUndo.HeightRequest = HeightRequest;
+        FieldLabel.HeightRequest = HeightRequest;
+        ButtonUndo.HeightRequest = HeightRequest;
 
+    }
     private void Entry_Focused(object? sender, FocusEventArgs e)
     {
     }

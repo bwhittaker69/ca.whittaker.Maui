@@ -1,6 +1,4 @@
 ﻿using ca.whittaker.Maui.Controls.Buttons;
-using System.Text.RegularExpressions;
-using Entry = Microsoft.Maui.Controls.Entry;
 using Label = Microsoft.Maui.Controls.Label;
 
 namespace ca.whittaker.Maui.Controls.Forms
@@ -103,7 +101,8 @@ namespace ca.whittaker.Maui.Controls.Forms
             {
                 Text = Label,
                 HorizontalOptions = LayoutOptions.Start,
-                VerticalOptions = LayoutOptions.Center
+                VerticalOptions = LayoutOptions.Center,
+                HeightRequest = -1
             };
         }
 
@@ -125,11 +124,17 @@ namespace ca.whittaker.Maui.Controls.Forms
             }
         }
 
+        public void UpdateLabelWidth(double newWidth)
+        {
+            ((Grid)Content).ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
+            FieldLabel.WidthRequest = newWidth;
+        }
+
         private static void OnLabelWidthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (bindable is BaseFormElement element && element.Content is Grid grid)
             {
-                grid.ColumnDefinitions[0].Width = new GridLength((double)newValue, GridUnitType.Absolute);
+                element.UpdateLabelWidth((double)newValue);
             }
         }
     }
