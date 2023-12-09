@@ -195,4 +195,10 @@
   <data name="Field_IsPublic" xml:space="preserve">
     <value>public profile?</value>
   </data>
+  <data name="Tab_CheckBox" xml:space="preserve">
+    <value>CheckBox</value>
+  </data>
+  <data name="Tab_TextBox" xml:space="preserve">
+    <value>TextBox</value>
+  </data>
 </root>

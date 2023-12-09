@@ -10,9 +10,12 @@
              Title="{Binding LoginLogoutHeaderText}">
 
     <VerticalStackLayout>
+        
         <VerticalStackLayout Spacing="15"
-                             Padding="0"  Margin="20, 20, 20, 20"
+                             Padding="25"  
+                             Margin="20, 20, 20, 20"
                              VerticalOptions="Start">
+            
             <Buttons:SigninButton Text="{x:Static strings:AppResources.Button_SignInWithApple}" 
                                   SigninButtonType="Apple"
                                   x:Name="SigninAppleButton"  
@@ -62,6 +65,7 @@
                                    Grid.Column="0" />
 
             <TableView x:Name="LoginDetailsTable" Margin="10,10,10,10" Intent="Settings" IsVisible="{Binding IsVisible}">
+                
                 <TableRoot>
                     <TableSection Title="{x:Static strings:AppResources.Table_LoginDetails_Title}" >
                         <TextCell Text="{Binding Lastlogin_device}" Detail="{x:Static strings:AppResources.Table_LoginDetails_TextCell_Device}" />
@@ -69,8 +73,11 @@
                         <TextCell Text="{Binding Lastlogin_ipaddress}" Detail="{x:Static strings:AppResources.Table_LoginDetails_TextCell_Location}" />
                     </TableSection>
                 </TableRoot>
+                
             </TableView>
             
         </VerticalStackLayout>
+        
     </VerticalStackLayout>
+    
 </ContentPage>

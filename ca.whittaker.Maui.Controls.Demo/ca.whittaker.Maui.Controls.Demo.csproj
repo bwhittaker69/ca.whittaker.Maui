@@ -43,8 +43,8 @@
 
 	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios'">
 	  <ProvisioningType>manual</ProvisioningType>
-	  <CodesignKey>iPhone Distribution</CodesignKey>
-	  <CodesignProvision>ca.whittaker.Maui.Controls.Demo: Ad hoc</CodesignProvision>
+	  <CodesignKey>iPhone Developer</CodesignKey>
+	  <CodesignProvision>ca.whittaker.Maui.Controls.Demo: Dev</CodesignProvision>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
@@ -118,6 +118,12 @@
 	  <Compile Update="Views\LoginLogoutPage.xaml.cs">
 	    <DependentUpon>LoginLogoutPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\SampleTextBox.xaml.cs">
+	    <DependentUpon>SampleTextBox.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\SampleCheckBoxPage.xaml.cs">
+	    <DependentUpon>SampleCheckBoxPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\UserProfilePage.xaml.cs">
 	    <DependentUpon>UserProfilePage.xaml</DependentUpon>
 	  </Compile>
@@ -129,6 +135,15 @@
 	    <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
 	    <CopyToOutputDirectory></CopyToOutputDirectory>
 	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\SampleTextBox.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\SampleCheckBoxPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>

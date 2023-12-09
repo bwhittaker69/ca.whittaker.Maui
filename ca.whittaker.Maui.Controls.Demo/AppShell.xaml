@@ -9,10 +9,16 @@
     Shell.FlyoutBehavior="Disabled">
 
     <TabBar>
+        
         <Tab Title="Account Management">
+            
             <ShellContent Title="{x:Static strings:AppResources.Tab_LoginLogout}" Icon="home_24.png" FlyoutIcon="home_24.png" Route="LoginLogoutPage" ContentTemplate="{DataTemplate views:LoginLogoutPage}" />
             <ShellContent Title="{x:Static strings:AppResources.Tab_UserProfile}"  Icon="form_yellow_24.png" Route="UserProfilePage" ContentTemplate="{DataTemplate views:UserProfilePage}" />
+            <ShellContent Title="{x:Static strings:AppResources.Tab_TextBox}"  Icon="form_yellow_24.png" Route="SampleTextBox" ContentTemplate="{DataTemplate views:SampleTextBox}" />
+            <ShellContent Title="{x:Static strings:AppResources.Tab_CheckBox}"  Icon="form_yellow_24.png" Route="SampleCheckBoxPage" ContentTemplate="{DataTemplate views:SampleCheckBoxPage}" />
+            
         </Tab>
+        
     </TabBar>
     
 </Shell>

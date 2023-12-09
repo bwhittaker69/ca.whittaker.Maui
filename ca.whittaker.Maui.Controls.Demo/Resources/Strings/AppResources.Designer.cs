@@ -241,11 +241,29 @@ namespace ca.whittaker.Maui.Controls.Demo.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CheckBox.
+        /// </summary>
+        internal static string Tab_CheckBox {
+            get {
+                return ResourceManager.GetString("Tab_CheckBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to security.
         /// </summary>
         internal static string Tab_LoginLogout {
             get {
                 return ResourceManager.GetString("Tab_LoginLogout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TextBox.
+        /// </summary>
+        internal static string Tab_TextBox {
+            get {
+                return ResourceManager.GetString("Tab_TextBox", resourceCulture);
             }
         }
         

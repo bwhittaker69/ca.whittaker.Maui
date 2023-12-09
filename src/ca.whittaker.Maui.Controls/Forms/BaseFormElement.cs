@@ -1,141 +1,149 @@
 ﻿using ca.whittaker.Maui.Controls.Buttons;
 using Label = Microsoft.Maui.Controls.Label;
 
-namespace ca.whittaker.Maui.Controls.Forms
+namespace ca.whittaker.Maui.Controls.Forms;
+
+/// <summary>
+/// Represents the base class for customizable controls with various properties for data capture.
+/// </summary>
+public abstract class BaseFormElement : ContentView
 {
-    /// <summary>
-    /// Represents the base class for customizable controls with various properties for data capture 
-    /// </summary>
-    public abstract class BaseFormElement : ContentView
+    // Bindable properties
+    public static readonly BindableProperty ChangeStateProperty =
+        BindableProperty.Create(nameof(ChangeState), typeof(ChangeStateEnum), typeof(BaseFormElement), ChangeStateEnum.NotChanged, BindingMode.TwoWay);
+
+    public static readonly BindableProperty LabelProperty =
+        BindableProperty.Create(nameof(Label), typeof(string), typeof(BaseFormElement), string.Empty, propertyChanged: OnLabelPropertyChanged);
+
+    public static readonly BindableProperty LabelWidthProperty =
+        BindableProperty.Create(nameof(LabelWidth), typeof(double?), typeof(BaseFormElement), 100d, BindingMode.TwoWay, propertyChanged: OnLabelWidthPropertyChanged);
+
+    public static readonly BindableProperty ValidationStateProperty =
+        BindableProperty.Create(nameof(ValidationState), typeof(ValidationStateEnum), typeof(BaseFormElement), ValidationStateEnum.Valid, BindingMode.TwoWay);
+
+    public UndoButton ButtonUndo;
+    public Label FieldLabel;
+    public Label FieldNotification;
+    private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
+    // Constructor
+    public BaseFormElement()
     {
-        private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
+    }
 
-        // Bindable properties
-        public static readonly BindableProperty ChangeStateProperty =
-            BindableProperty.Create(nameof(ChangeState), typeof(ChangeStateEnum), typeof(BaseFormElement), ChangeStateEnum.NotChanged, BindingMode.TwoWay);
+    // Events
+    public event EventHandler<HasChangesEventArgs> HasChanges;
 
-        public static readonly BindableProperty LabelProperty =
-            BindableProperty.Create(nameof(Label), typeof(string), typeof(BaseFormElement), string.Empty, propertyChanged: OnLabelPropertyChanged);
+    public event EventHandler<ValidationDataChangesEventArgs> HasValidationChanges;
 
-        public static readonly BindableProperty LabelWidthProperty =
-            BindableProperty.Create(nameof(LabelWidth), typeof(double?), typeof(BaseFormElement), 100d, BindingMode.TwoWay, propertyChanged: OnLabelWidthPropertyChanged);
+    // Properties
+    public ChangeStateEnum ChangeState
+    {
+        get => (ChangeStateEnum)GetValue(ChangeStateProperty);
+        set => SetValue(ChangeStateProperty, value);
+    }
 
-        public static readonly BindableProperty ValidationStateProperty =
-            BindableProperty.Create(nameof(ValidationState), typeof(ValidationStateEnum), typeof(BaseFormElement), ValidationStateEnum.Valid, BindingMode.TwoWay);
+    public string Label
+    {
+        get => (string)GetValue(LabelProperty);
+        set => SetValue(LabelProperty, value);
+    }
 
-        // Events
-        public event EventHandler<HasChangesEventArgs>? HasChanges;
-        public event EventHandler<ValidationDataChangesEventArgs>? HasValidationChanges;
+    public double LabelWidth
+    {
+        get => (double)GetValue(LabelWidthProperty);
+        set => SetValue(LabelWidthProperty, value);
+    }
 
-        // Properties
-        public ChangeStateEnum ChangeState
+    public ValidationStateEnum ValidationState
+    {
+        get => (ValidationStateEnum)GetValue(ValidationStateProperty);
+        set => SetValue(ValidationStateProperty, value);
+    }
+
+    public void RaiseHasChanges(bool hasChanged)
+    {
+        HasChanges?.Invoke(this, new HasChangesEventArgs(hasChanged));
+    }
+
+    public void RaiseValidationChanges(bool isValid)
+    {
+        HasValidationChanges?.Invoke(this, new ValidationDataChangesEventArgs(!isValid));
+    }
+
+    public virtual new void Unfocus()
+    {
+        base.Unfocus();
+    }
+
+    public void UpdateLabelWidth(double newWidth)
+    {
+        ((Grid)Content).ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
+        FieldLabel.WidthRequest = newWidth;
+    }
+
+    // Methods
+    protected static Label CreateNotificationLabel()
+    {
+        return new Label
         {
-            get => (ChangeStateEnum)GetValue(ChangeStateProperty);
-            set => SetValue(ChangeStateProperty, value);
-        }
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            IsVisible = false,
+            TextColor = Colors.Red
+        };
+    }
 
-        public string Label
+    protected static UndoButton CreateUndoButton()
+    {
+        return new UndoButton
         {
-            get => (string)GetValue(LabelProperty);
-            set => SetValue(LabelProperty, value);
-        }
+            Text = "",
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            BackgroundColor = Colors.Transparent,
+            ButtonSize = cUndoButtonSize,
+            WidthRequest = -1,
+            ButtonState = ButtonStateEnum.Disabled,
+            ButtonType = BaseButtonTypeEnum.Undo,
+            BorderWidth = 0,
+            Margin = new Thickness(0),
+            Padding = new Thickness(5, 0, 0, 0)
+        };
+    }
 
-        public double LabelWidth
+    [Obsolete]
+    protected Label CreateLabel()
+    {
+        return new Label
         {
-            get => (double)GetValue(LabelWidthProperty);
-            set => SetValue(LabelWidthProperty, value);
-        }
+            Text = Label,
+            HorizontalOptions = LayoutOptions.Start,
+            BackgroundColor = Colors.Transparent,
+            VerticalOptions = LayoutOptions.CenterAndExpand, // Ensure vertical centering
+            HeightRequest = -1
+        };
+    }
 
-        public ValidationStateEnum ValidationState
-        {
-            get => (ValidationStateEnum)GetValue(ValidationStateProperty);
-            set => SetValue(ValidationStateProperty, value);
-        }
+    protected void OnSizeRequestChanged(double newValue)
+    {
+        HeightRequest = newValue;
+        WidthRequest = newValue;
+    }
 
-        // Constructor
-        public BaseFormElement()
+    private static void OnLabelPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is BaseFormElement element)
         {
-        }
-        public virtual new void Unfocus()
-        {
-            base.Unfocus();
-        }
-
-        public UndoButton ButtonUndo;
-        public Label FieldNotification;
-        public Label FieldLabel;
-
-        // Methods
-        protected static Label CreateNotificationLabel()
-        {
-            return new Label
-            {
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                IsVisible = false,
-                TextColor = Colors.Red
-            };
-        }
-
-        protected static UndoButton CreateUndoButton()
-        {
-            return new UndoButton
-            {
-                Text = "",
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                BackgroundColor = Colors.Transparent,
-                ButtonSize = cUndoButtonSize,
-                WidthRequest = -1,
-                ButtonState = ButtonStateEnum.Disabled,
-                ButtonType = BaseButtonTypeEnum.Undo,
-                BorderWidth = 0,
-                Margin = new Thickness(0),
-                Padding = new Thickness(5, 0, 0, 0)
-            };
-        }
-
-        protected Label CreateLabel()
-        {
-            return new Label
-            {
-                Text = Label,
-                HorizontalOptions = LayoutOptions.Start,
-                VerticalOptions = LayoutOptions.Center,
-                HeightRequest = -1
-            };
-        }
-
-        public void RaiseValidationChanges(bool isValid)
-        {
-            HasValidationChanges?.Invoke(this, new ValidationDataChangesEventArgs(!isValid));
-        }
-
-        public void RaiseHasChanges(bool hasChanged)
-        {
-            HasChanges?.Invoke(this, new HasChangesEventArgs(hasChanged));
-        }
-
-        private static void OnLabelPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is BaseFormElement element)
-            {
-                element.FieldLabel.Text = newValue?.ToString() ?? "";
-            }
-        }
-
-        public void UpdateLabelWidth(double newWidth)
-        {
-            ((Grid)Content).ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
-            FieldLabel.WidthRequest = newWidth;
-        }
-
-        private static void OnLabelWidthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is BaseFormElement element && element.Content is Grid grid)
-            {
-                element.UpdateLabelWidth((double)newValue);
-            }
+            element.FieldLabel.Text = newValue?.ToString() ?? "";
         }
     }
+
+    private static void OnLabelWidthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is BaseFormElement element && element.Content is Grid grid)
+        {
+            element.UpdateLabelWidth((double)newValue);
+        }
+    }
+
 }

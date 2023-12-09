@@ -23,6 +23,8 @@ namespace ca.whittaker.Maui.Controls.Demo
 
             builder.Services.AddSingleton<LoginLogoutViewModel>();
             builder.Services.AddSingleton<UserProfilePage>();
+            builder.Services.AddSingleton<SampleCheckBoxPage>();
+            builder.Services.AddSingleton<SampleTextBox>();
             builder.Services.AddSingleton<LoginLogoutPage>();
 
             return builder.Build();

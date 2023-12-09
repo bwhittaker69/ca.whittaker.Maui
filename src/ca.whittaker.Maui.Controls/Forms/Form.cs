@@ -8,7 +8,6 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public class Form : ContentView
 {
-
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
         typeof(object),
@@ -49,12 +48,13 @@ public class Form : ContentView
         defaultBindingMode: BindingMode.TwoWay,
         propertyChanged: OnFormStateChanged);
 
-
     private SaveButton _buttonCancel;
     private CancelButton _buttonSave;
     private Label _labelForm;
     private Label _labelNotification;
 
+    private StackLayout _stackedLayout;
+    private SizeEnum cButtonSize = SizeEnum.XXSmall;
     private bool HasNoChanges = false;
     private bool HasNoErrors = false;
 
@@ -92,13 +92,22 @@ public class Form : ContentView
         set => SetValue(FormSaveButtonTextProperty, value);
     }
 
-
     public FormStateEnum FormState
     {
         get => (FormStateEnum)GetValue(FormStateProperty);
         set => SetValue(FormStateProperty, value);
     }
 
+    // called when user clicks cancel button
+    // also should be called when the page form is OnDissapearing
+    public void CancelForm()
+    {
+        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
+        {
+            if (t is TextBoxElement tbe) { tbe.Undo(); }
+            if (t is CheckBoxElement cbe) { cbe.Undo(); }
+        }
+    }
 
     /// <summary>
     /// Called when the parent of the form is set. This method is responsible for initializing and wiring up controls within the form.
@@ -106,154 +115,10 @@ public class Form : ContentView
     protected override void OnParentSet()
     {
         base.OnParentSet();
-
-        try
-        {
-            InitializeFormControls();
-            WireUpControls();
-            EvaluateForm();
-        }
-        catch
-        {
-            // Handle exception, log error or display a message
-            //Console.WriteLine($"Error initializing form: {ex.Message}");
-        }
-    }
-
-    private StackLayout _stackedLayout;
-
-    private SizeEnum cButtonSize = SizeEnum.XXSmall;
-
-    private void InitializeFormControls()
-    {
-        void UpdateUI()
-        {
-
-            _buttonSave = new()
-            {
-                Text = FormSaveButtonText,
-                ButtonSize = cButtonSize,
-                BackgroundColor = Colors.Transparent,
-                BorderWidth = 0,
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center,
-                ButtonState = ButtonStateEnum.Enabled,
-                ButtonType = BaseButtonTypeEnum.Save,
-            };
-            _buttonSave.Clicked += ButtonSave_Clicked;
-            _buttonSave.ConfigureButton();
-            _buttonCancel = new()
-            {
-                Text = FormCancelButtonText,
-                ButtonSize = cButtonSize,
-                BackgroundColor = Colors.Transparent,
-                BorderWidth = 0,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                ButtonState = ButtonStateEnum.Enabled,
-                ButtonType = BaseButtonTypeEnum.Cancel,
-            };
-            _buttonCancel.Clicked += (sender, e) => CancelForm();
-            _buttonCancel.ConfigureButton();
-            _labelNotification = new Label
-            {
-                Text = "",
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                IsVisible = false,
-                TextColor = Colors.Red
-            };
-            _labelForm = new Label
-            {
-                Text = FormName,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                IsVisible = !string.IsNullOrEmpty(FormName)
-            };
-
-            var gridLayout = new Grid
-            {
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Fill,
-
-                // Define rows
-                RowDefinitions =
-                        {
-                            new RowDefinition { Height = GridLength.Auto }, // Row for _labelForm
-                            new RowDefinition { Height = GridLength.Auto }, // Row for Buttons
-                            new RowDefinition { Height = GridLength.Auto }  // Row for _labelNotification
-                        },
-
-                // Define columns for the buttons
-                ColumnDefinitions =
-                        {
-                            new ColumnDefinition { Width = GridLength.Star }, // Column for _buttonSave
-                            new ColumnDefinition { Width = GridLength.Star }  // Column for _buttonCancel
-                        }
-            };
-
-            // Add controls to the grid
-            gridLayout.Add(_labelForm, 0, 0); // Column 0, Row 0
-            gridLayout.Add(_buttonSave, 0, 1); // Column 0, Row 1
-            gridLayout.Add(_buttonCancel, 1, 1); // Column 1, Row 1
-            gridLayout.Add(_labelNotification, 0, 2); // Column 0, Row 2
-            Grid.SetColumnSpan(_labelForm, 2); // Span _labelForm across both columns
-            Grid.SetColumnSpan(_labelNotification, 2); // Span _labelNotification across both columns
-
-
-
-            if (this.Content is Layout existingLayout)
-            {
-                // Check if the existing content is a layout (e.g., Grid, StackLayout)
-                if (existingLayout.Children.Count > 0)
-                {
-                    // If there are existing children, insert the new element as the first child
-                    existingLayout.Children.Insert(0, gridLayout);
-                }
-                else
-                {
-                    // If there are no existing children, just add the new element to the layout
-                    existingLayout.Children.Add(gridLayout);
-                }
-            }
-            else if (this.Content is View existingElement)
-            {
-                // If the existing content is a single element, create a new container (e.g., StackLayout)
-                // and add both the existing element and the new element to it
-                StackLayout containerLayout = new StackLayout();
-                containerLayout.Children.Add(existingElement);
-                containerLayout.Children.Add(gridLayout);
-                this.Content = containerLayout;
-            }
-            else
-            {
-                // If there's no existing content, set the new element as the content
-                this.Content = gridLayout;
-            }
-
-
-        }
-
-        // Check if on the main thread and update UI accordingly
-        if (MainThread.IsMainThread)
-        {
-            UpdateUI();
-        }
-        else
-        {
-            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
-        }
+        InitializeFormControls();
         WireUpControls();
+        EvaluateForm();
     }
-
-    private void ButtonSave_Clicked(object? sender, EventArgs e)
-    {
-        if (Command?.CanExecute(CommandParameter) == true)
-        {
-            Command.Execute(CommandParameter);
-        }
-    }
-
     private static void OnFormCancelButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is Form form && newValue is string newText)
@@ -369,6 +234,14 @@ public class Form : ContentView
         }
     }
 
+    private void ButtonSave_Clicked(object? sender, EventArgs e)
+    {
+        if (Command?.CanExecute(CommandParameter) == true)
+        {
+            Command.Execute(CommandParameter);
+        }
+    }
+
     private FormStateEnum CalcFormState()
     {
         if (!IsVisible)
@@ -385,18 +258,6 @@ public class Form : ContentView
         }
     }
 
-    // called when user clicks cancel button 
-    // also should be called when the page form is OnDissapearing
-    public void CancelForm()
-    {
-        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
-        {
-            if (t is TextBoxElement tbe) { tbe.Undo(); }
-            if (t is CheckBoxElement cbe) { cbe.Undo(); }
-            
-        }
-    }
-
     private void ClearForm()
     {
         foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
@@ -406,47 +267,6 @@ public class Form : ContentView
             t.Unfocus();
         }
     }
-
-    /// <summary>
-    /// Creates the layout grid for the form.
-    /// </summary>
-    /// <returns>The created grid layout.</returns>
-    private Grid CreateFormLayoutGrid()
-    {
-        _labelNotification.HorizontalOptions = LayoutOptions.Center;
-        _labelForm.HorizontalOptions = LayoutOptions.Center;
-        _buttonSave.HorizontalOptions = LayoutOptions.Center;
-        _buttonCancel.HorizontalOptions = LayoutOptions.Center;
-
-        var grid = new Grid
-        {
-            Margin = new Thickness(5, 5, 5, 5),
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = GridLength.Star }
-            },
-            RowDefinitions =
-            {
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto }
-            }
-        };
-
-        grid.Add(_labelForm, 0, 0);
-        Grid.SetColumnSpan(_labelForm, 2);
-
-        grid.Add(_buttonSave, 0, 1);
-        grid.Add(_buttonCancel, 1, 1);
-
-        grid.Add(_labelNotification, 0, 2);
-        Grid.SetColumnSpan(_labelNotification, 2);
-
-        return grid;
-    }
-
 
     private void CustomTextBox_HasChanges(object? sender, HasChangesEventArgs e) => EvaluateForm();
 
@@ -471,6 +291,134 @@ public class Form : ContentView
         return true;
     }
 
+    private void Hide()
+    {
+        Console.WriteLine("hide");
+        var descendants = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
+
+        foreach (var element in descendants)
+        {
+            Console.WriteLine($"{nameof(element)}.IsVisible = false");
+            element.IsVisible = false;
+        }
+    }
+
+    private void InitializeFormControls()
+    {
+        void UpdateUI()
+        {
+            _buttonSave = new()
+            {
+                Text = FormSaveButtonText,
+                ButtonSize = cButtonSize,
+                BackgroundColor = Colors.Transparent,
+                BorderWidth = 0,
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Center,
+                ButtonState = ButtonStateEnum.Enabled,
+                ButtonType = BaseButtonTypeEnum.Save,
+            };
+            _buttonSave.Clicked += ButtonSave_Clicked;
+            _buttonSave.ConfigureButton();
+            _buttonCancel = new()
+            {
+                Text = FormCancelButtonText,
+                ButtonSize = cButtonSize,
+                BackgroundColor = Colors.Transparent,
+                BorderWidth = 0,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                ButtonState = ButtonStateEnum.Enabled,
+                ButtonType = BaseButtonTypeEnum.Cancel,
+            };
+            _buttonCancel.Clicked += (sender, e) => CancelForm();
+            _buttonCancel.ConfigureButton();
+            _labelNotification = new Label
+            {
+                Text = "",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                IsVisible = false,
+                TextColor = Colors.Red
+            };
+            _labelForm = new Label
+            {
+                Text = FormName,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                IsVisible = !string.IsNullOrEmpty(FormName)
+            };
+
+            var gridLayout = new Grid
+            {
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Fill,
+                Margin = new Thickness(5, 5, 5, 5),
+                // Define rows
+                RowDefinitions =
+                        {
+                            new RowDefinition { Height = GridLength.Auto }, // Row for _labelForm
+                            new RowDefinition { Height = GridLength.Auto }, // Row for Buttons
+                            new RowDefinition { Height = GridLength.Auto }  // Row for _labelNotification
+                        },
+
+                // Define columns for the buttons
+                ColumnDefinitions =
+                        {
+                            new ColumnDefinition { Width = GridLength.Star }, // Column for _buttonSave
+                            new ColumnDefinition { Width = GridLength.Star }  // Column for _buttonCancel
+                        }
+            };
+
+            // Add controls to the grid
+            gridLayout.Add(_labelForm, 0, 0); // Column 0, Row 0
+            gridLayout.Add(_buttonSave, 0, 1); // Column 0, Row 1
+            gridLayout.Add(_buttonCancel, 1, 1); // Column 1, Row 1
+            gridLayout.Add(_labelNotification, 0, 2); // Column 0, Row 2
+            gridLayout.SetColumnSpan(_labelForm, 2); // Span _labelForm across both columns
+            gridLayout.SetColumnSpan(_labelNotification, 2); // Span _labelNotification across both columns
+
+            if (this.Content is Layout existingLayout)
+            {
+                // Check if the existing content is a layout (e.g., Grid, StackLayout)
+                if (existingLayout.Children.Count > 0)
+                {
+                    // If there are existing children, insert the new element as the first child
+                    existingLayout.Children.Insert(0, gridLayout);
+                }
+                else
+                {
+                    // If there are no existing children, just add the new element to the layout
+                    existingLayout.Children.Add(gridLayout);
+                }
+            }
+            else if (this.Content is View existingElement)
+            {
+                // If the existing content is a single element, create a new container (e.g., StackLayout)
+                // and add both the existing element and the new element to it
+                StackLayout containerLayout = new StackLayout();
+                containerLayout.Children.Add(existingElement);
+                containerLayout.Children.Add(gridLayout);
+                this.Content = containerLayout;
+            }
+            else
+            {
+                // If there's no existing content, set the new element as the content
+                this.Content = gridLayout;
+            }
+        }
+
+        // Check if on the main thread and update UI accordingly
+        if (MainThread.IsMainThread)
+        {
+            UpdateUI();
+        }
+        else
+        {
+            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+        }
+        WireUpControls();
+    }
     private bool IsFormDataValid() =>
         this.GetVisualTreeDescendants().OfType<TextBoxElement>().All(ctb => ctb.ValidationState == ValidationStateEnum.Valid);
 
@@ -481,6 +429,18 @@ public class Form : ContentView
             if (t is TextBoxElement tbe) tbe.Saved();
             if (t is CheckBoxElement cbe) cbe.Saved();
             t.Unfocus();
+        }
+    }
+
+    private void Show()
+    {
+        Console.WriteLine("show");
+        var descendants = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
+
+        foreach (var element in descendants)
+        {
+            Console.WriteLine($"{nameof(element)}.IsVisible = true");
+            element.IsVisible = true;
         }
     }
 
@@ -544,30 +504,4 @@ public class Form : ContentView
             element.HasValidationChanges += CustomTextBox_HasValidationChanges;
         }
     }
-
-    private void Show()
-    {
-        Console.WriteLine("show");
-        var descendants = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
-
-        foreach (var element in descendants)
-        {
-            Console.WriteLine($"{nameof(element)}.IsVisible = true");
-            element.IsVisible = true;
-        }
-    }
-
-
-    private void Hide()
-    {
-        Console.WriteLine("hide");
-        var descendants = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
-
-        foreach (var element in descendants)
-        {
-            Console.WriteLine($"{nameof(element)}.IsVisible = false");
-            element.IsVisible = false;
-        }
-    }
-
 }

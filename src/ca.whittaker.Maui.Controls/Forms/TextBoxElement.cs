@@ -8,7 +8,6 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public class TextBoxElement : BaseFormElement
 {
-
     private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
     private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
     private Entry _entry;
@@ -17,71 +16,32 @@ public class TextBoxElement : BaseFormElement
     private bool _previousHasChangedState = false;
     private bool _previousInvalidDataState = false;
 
+    public static readonly BindableProperty AllLowerCaseProperty =
+        BindableProperty.Create(propertyName: nameof(AllLowerCase), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: false);
 
-    public static readonly BindableProperty AllLowerCaseProperty = BindableProperty.Create(
-        propertyName: nameof(AllLowerCase),
-        returnType: typeof(bool),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: false);
+    public static readonly BindableProperty AllowWhiteSpaceProperty =
+        BindableProperty.Create(propertyName: nameof(AllowWhiteSpace), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: true);
 
-    public static readonly BindableProperty AllowWhiteSpaceProperty = BindableProperty.Create(
-        propertyName: nameof(AllowWhiteSpace),
-        returnType: typeof(bool),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: true);
+    public static readonly BindableProperty FieldTypeProperty =
+        BindableProperty.Create(propertyName: nameof(FieldType), returnType: typeof(FieldTypeEnum), declaringType: typeof(TextBoxElement), defaultValue: FieldTypeEnum.Text, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnFieldTypeChanged(newValue); });
 
-    public static readonly BindableProperty FieldTypeProperty = BindableProperty.Create(
-        propertyName: nameof(FieldType),
-        returnType: typeof(FieldTypeEnum),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: FieldTypeEnum.Text,
-        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnFieldTypeChanged(newValue); });
+    public static readonly BindableProperty MandatoryProperty =
+        BindableProperty.Create(propertyName: nameof(Mandatory), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: false);
 
-    public static readonly BindableProperty MandatoryProperty = BindableProperty.Create(
-        propertyName: nameof(Mandatory),
-        returnType: typeof(bool),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: false);
+    public static readonly BindableProperty MaxLengthProperty =
+        BindableProperty.Create(propertyName: nameof(MaxLength), returnType: typeof(int), declaringType: typeof(TextBoxElement), defaultValue: 255, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnMaxLengthPropertyChanged(newValue); });
 
-    public static readonly BindableProperty MaxLengthProperty = BindableProperty.Create(
-        propertyName: nameof(MaxLength),
-        returnType: typeof(int),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: 255,
-        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnMaxLengthPropertyChanged(newValue); });
+    public static readonly BindableProperty PlaceholderProperty =
+        BindableProperty.Create(propertyName: nameof(Placeholder), returnType: typeof(string), declaringType: typeof(TextBoxElement), defaultValue: string.Empty, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnPlaceholderPropertyChanged(newValue); });
 
-    public new static readonly BindableProperty HeightRequestProperty = BindableProperty.Create(
-        propertyName: nameof(HeightRequest),
-        returnType: typeof(double),
-        declaringType: typeof(TextBoxElement),
-        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnHeightRequestPropertyChanged(newValue); });
-
-    public new static readonly BindableProperty WidthRequestProperty = BindableProperty.Create(
-        propertyName: nameof(WidthRequest),
-        returnType: typeof(double),
-        declaringType: typeof(TextBoxElement),
-        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnWidthRequestPropertyChanged(newValue); });
-
-    public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(
-        propertyName: nameof(Placeholder),
-        returnType: typeof(string),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: string.Empty,
-        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnPlaceholderPropertyChanged(newValue); });
-
-    public static readonly BindableProperty TextBoxSourceProperty = BindableProperty.Create(
-        propertyName: nameof(TextBoxSource),
-        returnType: typeof(string),
-        declaringType: typeof(TextBoxElement),
-        defaultValue: string.Empty,
-        defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue); });
-
+    public static readonly BindableProperty TextBoxSourceProperty =
+        BindableProperty.Create(propertyName: nameof(TextBoxSource), returnType: typeof(string), declaringType: typeof(TextBoxElement), defaultValue: string.Empty, defaultBindingMode: BindingMode.TwoWay, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue); });
 
     public TextBoxElement()
     {
         InitializeUI();
     }
+
     private void InitializeUI()
     {
         _entry = CreateEntry();
@@ -98,8 +58,7 @@ public class TextBoxElement : BaseFormElement
     public bool Mandatory { get => (bool)GetValue(MandatoryProperty); set => SetValue(MandatoryProperty, value); }
     public int MaxLength { get => (int)GetValue(MaxLengthProperty); set => SetValue(MaxLengthProperty, value); }
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
-    public new double HeightRequest { get => (double)GetValue(HeightRequestProperty); set => SetValue(HeightRequestProperty, value); }
-    public new double WidthRequest { get => (double)GetValue(WidthRequestProperty); set => SetValue(WidthRequestProperty, value); }
+
 
     public string TextBoxSource
     {
@@ -110,22 +69,26 @@ public class TextBoxElement : BaseFormElement
             SetOriginalText(value);
         }
     }
+
     public string GetText()
     {
         return _entry.Text;
     }
+
     public void Clear()
     {
         SetOriginalText("");
         UpdateValidationState();
         _entry.Unfocus();
     }
+
     public void Undo()
     {
         _entry.Text = _originalText;
         UpdateValidationState();
         _entry.Unfocus();
     }
+
     public void Saved()
     {
         SetOriginalText(_entry.Text);
@@ -139,8 +102,6 @@ public class TextBoxElement : BaseFormElement
         _entry.Text = originalText;
         EvaluateToRaiseValidationChangesEvent();
     }
-
-
 
     private static bool IsValidEmail(string email)
     {
@@ -160,6 +121,7 @@ public class TextBoxElement : BaseFormElement
 
         return uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps;
     }
+
     private void OnFieldTypeChanged(object newValue)
     {
         _entry.Keyboard = GetKeyboardForFieldType((FieldTypeEnum)newValue);
@@ -175,16 +137,7 @@ public class TextBoxElement : BaseFormElement
             _ => Keyboard.Default,
         };
     }
-    private void OnHeightRequestPropertyChanged(object newValue)
-    {
-        base.HeightRequest = (double)newValue;
-        RefreshLayoutGrid();
-    }
-    private void OnWidthRequestPropertyChanged(object newValue)
-    {
-        base.WidthRequest = (double)newValue;
-        RefreshLayoutGrid();
-    }
+
 
     private void OnMaxLengthPropertyChanged(object newValue)
     {
@@ -200,6 +153,7 @@ public class TextBoxElement : BaseFormElement
     {
         _entry.Text = (string)newValue;
     }
+
     private ValidationStateEnum CalculateValidationState(string text)
     {
         if (Mandatory && string.IsNullOrEmpty(text))
@@ -221,27 +175,31 @@ public class TextBoxElement : BaseFormElement
 
         return ValidationStateEnum.Valid;
     }
+
     public override void Unfocus()
     {
         base.Unfocus();
         _entry.Unfocus();
     }
 
+    [Obsolete]
     private Entry CreateEntry()
     {
         var entry = new Entry
         {
             Placeholder = Placeholder,
             HorizontalOptions = LayoutOptions.Fill,
-            VerticalOptions = LayoutOptions.Center
+            VerticalOptions = LayoutOptions.CenterAndExpand, // Ensure vertical centering
         };
-        
+
+
         entry.TextChanged += Entry_TextChanged;
         entry.Focused += Entry_Focused;
         entry.Unfocused += Entry_Unfocused;
 
         return entry;
     }
+
     private Grid CreateLayoutGrid()
     {
         var grid = new Grid
@@ -258,37 +216,37 @@ public class TextBoxElement : BaseFormElement
                     new RowDefinition { Height = GridLength.Auto }
                 }
         };
-        grid.HeightRequest = HeightRequest;
-        grid.WidthRequest = WidthRequest;
-        grid.HorizontalOptions = LayoutOptions.Center;
-        grid.VerticalOptions = LayoutOptions.Center;
+
         grid.Add(FieldLabel, 0, 0);
         grid.Add(_entry, 1, 0);
         grid.Add(ButtonUndo, 2, 0);
         grid.Add(FieldNotification, 0, 1);
-        Grid.SetColumnSpan(FieldNotification, 3);
+        grid.SetColumnSpan(FieldNotification, 3);
 
         return grid;
     }
-    private void RefreshLayoutGrid()
-    {
-        Grid grid = (Grid)Content;
-        grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
-        grid.ColumnDefinitions[1].Width = GridLength.Star;
-        grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
-        grid.HeightRequest = HeightRequest;
-        grid.WidthRequest = WidthRequest;
-        grid.HorizontalOptions = LayoutOptions.Center;
-        grid.VerticalOptions = LayoutOptions.Center;
-        FieldLabel.HeightRequest = HeightRequest;
-        FieldLabel.WidthRequest = LabelWidth;
-        _entry.WidthRequest = -1;
-        _entry.HeightRequest = HeightRequest;
-        ButtonUndo.HeightRequest = HeightRequest;
-        FieldLabel.HeightRequest = HeightRequest;
-        ButtonUndo.HeightRequest = HeightRequest;
 
-    }
+    //private void RefreshLayoutGrid()
+    //{
+    //    BatchBegin();
+    //    Grid grid = (Grid)Content;
+    //    grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
+    //    grid.ColumnDefinitions[1].Width = GridLength.Star;
+    //    grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
+    //    grid.HeightRequest = HeightRequest;
+    //    grid.WidthRequest = WidthRequest;
+    //    grid.HorizontalOptions = LayoutOptions.Center;
+    //    grid.VerticalOptions = LayoutOptions.Center;
+    //    FieldLabel.HeightRequest = HeightRequest;
+    //    FieldLabel.WidthRequest = LabelWidth;
+    //    _entry.WidthRequest = -1;
+    //    _entry.HeightRequest = HeightRequest;
+    //    FieldLabel.HeightRequest = HeightRequest;
+    //    ButtonUndo.WidthRequest = DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2;
+    //    ButtonUndo.HeightRequest = HeightRequest;
+    //    BatchCommit();
+    //}
+
     private void Entry_Focused(object? sender, FocusEventArgs e)
     {
     }
@@ -410,10 +368,12 @@ public class TextBoxElement : BaseFormElement
         if (newValue != null)
             _entry.MaxLength = (int)newValue;
     }
+
     private void SetPlaceholderText(object newValue)
     {
         _entry.Placeholder = newValue == null ? "" : (string)newValue;
     }
+
     private void UpdateNotificationMessage(string text)
     {
         var validationState = CalculateValidationState(text);
