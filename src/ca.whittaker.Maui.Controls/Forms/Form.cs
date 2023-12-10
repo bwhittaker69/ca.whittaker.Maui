@@ -319,7 +319,7 @@ public class Form : ContentView
                 ButtonType = BaseButtonTypeEnum.Save,
             };
             _buttonSave.Clicked += ButtonSave_Clicked;
-            _buttonSave.ConfigureButton();
+            _buttonSave.UpdateUI();
             _buttonCancel = new()
             {
                 Text = FormCancelButtonText,
@@ -332,7 +332,7 @@ public class Form : ContentView
                 ButtonType = BaseButtonTypeEnum.Cancel,
             };
             _buttonCancel.Clicked += (sender, e) => CancelForm();
-            _buttonCancel.ConfigureButton();
+            _buttonCancel.UpdateUI();
             _labelNotification = new Label
             {
                 Text = "",

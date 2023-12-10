@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using System.Windows.Input;
 using Entry = Microsoft.Maui.Controls.Entry;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -15,6 +17,16 @@ public class TextBoxElement : BaseFormElement
     private string _originalText = string.Empty;
     private bool _previousHasChangedState = false;
     private bool _previousInvalidDataState = false;
+
+    public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
+        nameof(CommandParameter),
+        typeof(object),
+        typeof(Form));
+
+    public static readonly BindableProperty CommandProperty = BindableProperty.Create(
+        nameof(Command),
+        typeof(ICommand),
+        typeof(Form));
 
     public static readonly BindableProperty AllLowerCaseProperty =
         BindableProperty.Create(propertyName: nameof(AllLowerCase), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: false);
@@ -50,7 +62,29 @@ public class TextBoxElement : BaseFormElement
         ButtonUndo = CreateUndoButton();
         Content = CreateLayoutGrid();
         ButtonUndo.Pressed += (s, e) => Undo();
+        _entry.ReturnCommand = new Command(Return_Pressed);
     }
+
+    private void Return_Pressed(object obj)
+    {
+        if (Command?.CanExecute(CommandParameter) == true)
+        {
+            Command.Execute(CommandParameter);
+        }
+    }
+
+    public ICommand Command
+    {
+        get => (ICommand)GetValue(CommandProperty);
+        set => SetValue(CommandProperty, value);
+    }
+
+    public object CommandParameter
+    {
+        get => GetValue(CommandParameterProperty);
+        set => SetValue(CommandParameterProperty, value);
+    }
+
 
     public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
     public bool AllowWhiteSpace { get => (bool)GetValue(AllowWhiteSpaceProperty); set => SetValue(AllowWhiteSpaceProperty, value); }
@@ -59,6 +93,18 @@ public class TextBoxElement : BaseFormElement
     public int MaxLength { get => (int)GetValue(MaxLengthProperty); set => SetValue(MaxLengthProperty, value); }
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
 
+
+    protected override void OnParentSet()
+    {
+        base.OnParentSet();
+        RefreshUI();
+    }
+
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+        RefreshUI();
+    }
 
     public string TextBoxSource
     {
@@ -226,26 +272,45 @@ public class TextBoxElement : BaseFormElement
         return grid;
     }
 
-    //private void RefreshLayoutGrid()
-    //{
-    //    BatchBegin();
-    //    Grid grid = (Grid)Content;
-    //    grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
-    //    grid.ColumnDefinitions[1].Width = GridLength.Star;
-    //    grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
-    //    grid.HeightRequest = HeightRequest;
-    //    grid.WidthRequest = WidthRequest;
-    //    grid.HorizontalOptions = LayoutOptions.Center;
-    //    grid.VerticalOptions = LayoutOptions.Center;
-    //    FieldLabel.HeightRequest = HeightRequest;
-    //    FieldLabel.WidthRequest = LabelWidth;
-    //    _entry.WidthRequest = -1;
-    //    _entry.HeightRequest = HeightRequest;
-    //    FieldLabel.HeightRequest = HeightRequest;
-    //    ButtonUndo.WidthRequest = DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2;
-    //    ButtonUndo.HeightRequest = HeightRequest;
-    //    BatchCommit();
-    //}
+    private void RefreshUI()
+    {
+        BatchBegin();
+        if (Content is Grid grid)
+        {
+            if (grid != null)
+            {
+                if (grid.ColumnDefinitions != null)
+                {
+                    if (grid.ColumnDefinitions.Count == 3)
+                    {
+                        grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
+                        grid.ColumnDefinitions[1].Width = GridLength.Star;
+                        grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
+                    }
+                }
+                grid.HeightRequest = HeightRequest;
+                grid.WidthRequest = WidthRequest;
+                grid.HorizontalOptions = LayoutOptions.Center;
+                grid.VerticalOptions = LayoutOptions.Center;
+                if (FieldLabel != null)
+                {
+                    FieldLabel.HeightRequest = HeightRequest;
+                    FieldLabel.WidthRequest = LabelWidth;
+                }
+                if (_entry != null)
+                {
+                    _entry.WidthRequest = -1;
+                    _entry.HeightRequest = HeightRequest;
+                }
+                if (ButtonUndo != null)
+                {
+                    ButtonUndo.WidthRequest = DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2;
+                    ButtonUndo.HeightRequest = HeightRequest;
+                }
+            }
+        }
+        BatchCommit();
+    }
 
     private void Entry_Focused(object? sender, FocusEventArgs e)
     {
@@ -360,7 +425,7 @@ public class TextBoxElement : BaseFormElement
 
     private string ProcessUsernameFilter(string text)
     {
-        return FieldType == FieldTypeEnum.Username ? Regex.Replace(text, @"[^a-zA-Z0-9_]", "") : text;
+        return FieldType == FieldTypeEnum.Username ? Regex.Replace(text, @"[^a-zA-Z0-9-._]", "") : text;
     }
 
     private void SetMaxLength(object newValue)

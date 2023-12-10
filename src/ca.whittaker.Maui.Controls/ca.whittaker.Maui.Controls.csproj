@@ -132,6 +132,26 @@
 	  <None Remove="Resources\Images\apple_72_dark_disabled.png" />
 	  <None Remove="Resources\Images\apple_72_light.png" />
 	  <None Remove="Resources\Images\apple_72_light_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_12_dark.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_12_light.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_12_light_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_24_dark.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_24_light.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_24_light_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_48_dark.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_48_light.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_48_light_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_64_dark.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_64_light.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_64_light_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_72_dark.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_72_light.png" />
+	  <None Remove="Resources\Images\bullet_ball_red_72_light_disabled.png" />
 	  <None Remove="Resources\Images\camera.png" />
 	  <None Remove="Resources\Images\camera_12_dark.png" />
 	  <None Remove="Resources\Images\camera_12_dark_disabled.png" />
@@ -195,6 +215,26 @@
 	  <None Remove="Resources\Images\delete_72_dark_disabled.png" />
 	  <None Remove="Resources\Images\delete_72_light.png" />
 	  <None Remove="Resources\Images\delete_72_light_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_12_dark.png" />
+	  <None Remove="Resources\Images\disk_green_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_12_light.png" />
+	  <None Remove="Resources\Images\disk_green_12_light_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_24_dark.png" />
+	  <None Remove="Resources\Images\disk_green_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_24_light.png" />
+	  <None Remove="Resources\Images\disk_green_24_light_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_48_dark.png" />
+	  <None Remove="Resources\Images\disk_green_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_48_light.png" />
+	  <None Remove="Resources\Images\disk_green_48_light_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_64_dark.png" />
+	  <None Remove="Resources\Images\disk_green_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_64_light.png" />
+	  <None Remove="Resources\Images\disk_green_64_light_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_72_dark.png" />
+	  <None Remove="Resources\Images\disk_green_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\disk_green_72_light.png" />
+	  <None Remove="Resources\Images\disk_green_72_light_disabled.png" />
 	  <None Remove="Resources\Images\facebook.png" />
 	  <None Remove="Resources\Images\facebook_12_dark.png" />
 	  <None Remove="Resources\Images\facebook_12_dark_disabled.png" />
@@ -258,6 +298,226 @@
 	  <None Remove="Resources\Images\linkedin_72_dark_disabled.png" />
 	  <None Remove="Resources\Images\linkedin_72_light.png" />
 	  <None Remove="Resources\Images\linkedin_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_12_dark.png" />
+	  <None Remove="Resources\Images\media_beginning_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_12_light.png" />
+	  <None Remove="Resources\Images\media_beginning_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_24_dark.png" />
+	  <None Remove="Resources\Images\media_beginning_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_24_light.png" />
+	  <None Remove="Resources\Images\media_beginning_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_48_dark.png" />
+	  <None Remove="Resources\Images\media_beginning_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_48_light.png" />
+	  <None Remove="Resources\Images\media_beginning_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_64_dark.png" />
+	  <None Remove="Resources\Images\media_beginning_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_64_light.png" />
+	  <None Remove="Resources\Images\media_beginning_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_72_dark.png" />
+	  <None Remove="Resources\Images\media_beginning_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_beginning_72_light.png" />
+	  <None Remove="Resources\Images\media_beginning_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_end_12_dark.png" />
+	  <None Remove="Resources\Images\media_end_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_end_12_light.png" />
+	  <None Remove="Resources\Images\media_end_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_end_24_dark.png" />
+	  <None Remove="Resources\Images\media_end_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_end_24_light.png" />
+	  <None Remove="Resources\Images\media_end_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_end_48_dark.png" />
+	  <None Remove="Resources\Images\media_end_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_end_48_light.png" />
+	  <None Remove="Resources\Images\media_end_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_end_64_dark.png" />
+	  <None Remove="Resources\Images\media_end_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_end_64_light.png" />
+	  <None Remove="Resources\Images\media_end_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_end_72_dark.png" />
+	  <None Remove="Resources\Images\media_end_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_end_72_light.png" />
+	  <None Remove="Resources\Images\media_end_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_12_dark.png" />
+	  <None Remove="Resources\Images\media_fast_forward_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_12_light.png" />
+	  <None Remove="Resources\Images\media_fast_forward_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_24_dark.png" />
+	  <None Remove="Resources\Images\media_fast_forward_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_24_light.png" />
+	  <None Remove="Resources\Images\media_fast_forward_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_48_dark.png" />
+	  <None Remove="Resources\Images\media_fast_forward_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_48_light.png" />
+	  <None Remove="Resources\Images\media_fast_forward_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_64_dark.png" />
+	  <None Remove="Resources\Images\media_fast_forward_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_64_light.png" />
+	  <None Remove="Resources\Images\media_fast_forward_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_72_dark.png" />
+	  <None Remove="Resources\Images\media_fast_forward_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_fast_forward_72_light.png" />
+	  <None Remove="Resources\Images\media_fast_forward_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_12_dark.png" />
+	  <None Remove="Resources\Images\media_pause_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_12_light.png" />
+	  <None Remove="Resources\Images\media_pause_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_24_dark.png" />
+	  <None Remove="Resources\Images\media_pause_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_24_light.png" />
+	  <None Remove="Resources\Images\media_pause_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_48_dark.png" />
+	  <None Remove="Resources\Images\media_pause_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_48_light.png" />
+	  <None Remove="Resources\Images\media_pause_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_64_dark.png" />
+	  <None Remove="Resources\Images\media_pause_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_64_light.png" />
+	  <None Remove="Resources\Images\media_pause_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_72_dark.png" />
+	  <None Remove="Resources\Images\media_pause_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_pause_72_light.png" />
+	  <None Remove="Resources\Images\media_pause_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_12_dark.png" />
+	  <None Remove="Resources\Images\media_play_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_12_light.png" />
+	  <None Remove="Resources\Images\media_play_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_24_dark.png" />
+	  <None Remove="Resources\Images\media_play_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_24_light.png" />
+	  <None Remove="Resources\Images\media_play_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_48_dark.png" />
+	  <None Remove="Resources\Images\media_play_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_48_light.png" />
+	  <None Remove="Resources\Images\media_play_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_64_dark.png" />
+	  <None Remove="Resources\Images\media_play_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_64_light.png" />
+	  <None Remove="Resources\Images\media_play_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_72_dark.png" />
+	  <None Remove="Resources\Images\media_play_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_72_light.png" />
+	  <None Remove="Resources\Images\media_play_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_12_dark.png" />
+	  <None Remove="Resources\Images\media_play_green_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_12_light.png" />
+	  <None Remove="Resources\Images\media_play_green_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_24_dark.png" />
+	  <None Remove="Resources\Images\media_play_green_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_24_light.png" />
+	  <None Remove="Resources\Images\media_play_green_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_48_dark.png" />
+	  <None Remove="Resources\Images\media_play_green_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_48_light.png" />
+	  <None Remove="Resources\Images\media_play_green_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_64_dark.png" />
+	  <None Remove="Resources\Images\media_play_green_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_64_light.png" />
+	  <None Remove="Resources\Images\media_play_green_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_72_dark.png" />
+	  <None Remove="Resources\Images\media_play_green_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_play_green_72_light.png" />
+	  <None Remove="Resources\Images\media_play_green_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_12_dark.png" />
+	  <None Remove="Resources\Images\media_rewind_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_12_light.png" />
+	  <None Remove="Resources\Images\media_rewind_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_24_dark.png" />
+	  <None Remove="Resources\Images\media_rewind_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_24_light.png" />
+	  <None Remove="Resources\Images\media_rewind_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_48_dark.png" />
+	  <None Remove="Resources\Images\media_rewind_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_48_light.png" />
+	  <None Remove="Resources\Images\media_rewind_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_64_dark.png" />
+	  <None Remove="Resources\Images\media_rewind_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_64_light.png" />
+	  <None Remove="Resources\Images\media_rewind_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_72_dark.png" />
+	  <None Remove="Resources\Images\media_rewind_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_rewind_72_light.png" />
+	  <None Remove="Resources\Images\media_rewind_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_12_dark.png" />
+	  <None Remove="Resources\Images\media_step_back_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_12_light.png" />
+	  <None Remove="Resources\Images\media_step_back_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_24_dark.png" />
+	  <None Remove="Resources\Images\media_step_back_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_24_light.png" />
+	  <None Remove="Resources\Images\media_step_back_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_48_dark.png" />
+	  <None Remove="Resources\Images\media_step_back_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_48_light.png" />
+	  <None Remove="Resources\Images\media_step_back_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_64_dark.png" />
+	  <None Remove="Resources\Images\media_step_back_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_64_light.png" />
+	  <None Remove="Resources\Images\media_step_back_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_72_dark.png" />
+	  <None Remove="Resources\Images\media_step_back_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_back_72_light.png" />
+	  <None Remove="Resources\Images\media_step_back_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_12_dark.png" />
+	  <None Remove="Resources\Images\media_step_forward_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_12_light.png" />
+	  <None Remove="Resources\Images\media_step_forward_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_24_dark.png" />
+	  <None Remove="Resources\Images\media_step_forward_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_24_light.png" />
+	  <None Remove="Resources\Images\media_step_forward_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_48_dark.png" />
+	  <None Remove="Resources\Images\media_step_forward_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_48_light.png" />
+	  <None Remove="Resources\Images\media_step_forward_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_64_dark.png" />
+	  <None Remove="Resources\Images\media_step_forward_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_64_light.png" />
+	  <None Remove="Resources\Images\media_step_forward_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_72_dark.png" />
+	  <None Remove="Resources\Images\media_step_forward_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_step_forward_72_light.png" />
+	  <None Remove="Resources\Images\media_step_forward_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_12_dark.png" />
+	  <None Remove="Resources\Images\media_stop_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_12_light.png" />
+	  <None Remove="Resources\Images\media_stop_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_24_dark.png" />
+	  <None Remove="Resources\Images\media_stop_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_24_light.png" />
+	  <None Remove="Resources\Images\media_stop_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_48_dark.png" />
+	  <None Remove="Resources\Images\media_stop_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_48_light.png" />
+	  <None Remove="Resources\Images\media_stop_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_64_dark.png" />
+	  <None Remove="Resources\Images\media_stop_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_64_light.png" />
+	  <None Remove="Resources\Images\media_stop_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_72_dark.png" />
+	  <None Remove="Resources\Images\media_stop_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_72_light.png" />
+	  <None Remove="Resources\Images\media_stop_72_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_12_dark.png" />
+	  <None Remove="Resources\Images\media_stop_red_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_12_light.png" />
+	  <None Remove="Resources\Images\media_stop_red_12_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_24_dark.png" />
+	  <None Remove="Resources\Images\media_stop_red_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_24_light.png" />
+	  <None Remove="Resources\Images\media_stop_red_24_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_48_dark.png" />
+	  <None Remove="Resources\Images\media_stop_red_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_48_light.png" />
+	  <None Remove="Resources\Images\media_stop_red_48_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_64_dark.png" />
+	  <None Remove="Resources\Images\media_stop_red_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_64_light.png" />
+	  <None Remove="Resources\Images\media_stop_red_64_light_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_72_dark.png" />
+	  <None Remove="Resources\Images\media_stop_red_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\media_stop_red_72_light.png" />
+	  <None Remove="Resources\Images\media_stop_red_72_light_disabled.png" />
 	  <None Remove="Resources\Images\microsoft.png" />
 	  <None Remove="Resources\Images\microsoft_12_dark.png" />
 	  <None Remove="Resources\Images\microsoft_12_dark_disabled.png" />
@@ -406,48 +666,46 @@
 	  <None Remove="Resources\Images\undo_72_dark_disabled.png" />
 	  <None Remove="Resources\Images\undo_72_light.png" />
 	  <None Remove="Resources\Images\undo_72_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomin.png" />
-	  <None Remove="Resources\Images\zoomin_12_dark.png" />
-	  <None Remove="Resources\Images\zoomin_12_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_12_light.png" />
-	  <None Remove="Resources\Images\zoomin_12_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_24_dark.png" />
-	  <None Remove="Resources\Images\zoomin_24_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_24_light.png" />
-	  <None Remove="Resources\Images\zoomin_24_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_48_dark.png" />
-	  <None Remove="Resources\Images\zoomin_48_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_48_light.png" />
-	  <None Remove="Resources\Images\zoomin_48_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_64_dark.png" />
-	  <None Remove="Resources\Images\zoomin_64_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_64_light.png" />
-	  <None Remove="Resources\Images\zoomin_64_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_72_dark.png" />
-	  <None Remove="Resources\Images\zoomin_72_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomin_72_light.png" />
-	  <None Remove="Resources\Images\zoomin_72_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomout.png" />
-	  <None Remove="Resources\Images\zoomout_12_dark.png" />
-	  <None Remove="Resources\Images\zoomout_12_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_12_light.png" />
-	  <None Remove="Resources\Images\zoomout_12_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_24_dark.png" />
-	  <None Remove="Resources\Images\zoomout_24_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_24_light.png" />
-	  <None Remove="Resources\Images\zoomout_24_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_48_dark.png" />
-	  <None Remove="Resources\Images\zoomout_48_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_48_light.png" />
-	  <None Remove="Resources\Images\zoomout_48_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_64_dark.png" />
-	  <None Remove="Resources\Images\zoomout_64_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_64_light.png" />
-	  <None Remove="Resources\Images\zoomout_64_light_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_72_dark.png" />
-	  <None Remove="Resources\Images\zoomout_72_dark_disabled.png" />
-	  <None Remove="Resources\Images\zoomout_72_light.png" />
-	  <None Remove="Resources\Images\zoomout_72_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_12_dark.png" />
+	  <None Remove="Resources\Images\zoom_in_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_12_light.png" />
+	  <None Remove="Resources\Images\zoom_in_12_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_24_dark.png" />
+	  <None Remove="Resources\Images\zoom_in_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_24_light.png" />
+	  <None Remove="Resources\Images\zoom_in_24_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_48_dark.png" />
+	  <None Remove="Resources\Images\zoom_in_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_48_light.png" />
+	  <None Remove="Resources\Images\zoom_in_48_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_64_dark.png" />
+	  <None Remove="Resources\Images\zoom_in_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_64_light.png" />
+	  <None Remove="Resources\Images\zoom_in_64_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_72_dark.png" />
+	  <None Remove="Resources\Images\zoom_in_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_in_72_light.png" />
+	  <None Remove="Resources\Images\zoom_in_72_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_12_dark.png" />
+	  <None Remove="Resources\Images\zoom_out_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_12_light.png" />
+	  <None Remove="Resources\Images\zoom_out_12_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_24_dark.png" />
+	  <None Remove="Resources\Images\zoom_out_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_24_light.png" />
+	  <None Remove="Resources\Images\zoom_out_24_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_48_dark.png" />
+	  <None Remove="Resources\Images\zoom_out_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_48_light.png" />
+	  <None Remove="Resources\Images\zoom_out_48_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_64_dark.png" />
+	  <None Remove="Resources\Images\zoom_out_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_64_light.png" />
+	  <None Remove="Resources\Images\zoom_out_64_light_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_72_dark.png" />
+	  <None Remove="Resources\Images\zoom_out_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\zoom_out_72_light.png" />
+	  <None Remove="Resources\Images\zoom_out_72_light_disabled.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -514,6 +772,26 @@
 	  <EmbeddedResource Include="Resources\Images\apple_72_light_disabled.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\camera.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
@@ -703,6 +981,26 @@
 	  <EmbeddedResource Include="Resources\Images\delete_72_light_disabled.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\disk_green_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\disk_green_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\facebook.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
@@ -892,6 +1190,226 @@
 	  <EmbeddedResource Include="Resources\Images\linkedin_72_light_disabled.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\media_beginning_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_beginning_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_end_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_fast_forward_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_pause_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_play_green_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_rewind_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_back_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_step_forward_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\media_stop_red_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\microsoft.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
@@ -1333,132 +1851,46 @@
 	  <EmbeddedResource Include="Resources\Images\undo_72_light_disabled.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomin_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\zoomout_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\zoom_in_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_in_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\zoom_out_72_light_disabled.png" />
 	</ItemGroup>
 
   <ItemGroup>
