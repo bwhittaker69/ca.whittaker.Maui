@@ -111,7 +111,6 @@ public abstract class ButtonBase : Button, IButton
     {
         void UpdateUI()
         {
-
             if (ButtonState != null)
             {
                 base.BatchBegin();
@@ -127,19 +126,14 @@ public abstract class ButtonBase : Button, IButton
                                 {
                                     base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize);
                                 }
-                                if (Text == null || Text == "")
+                                if (!String.IsNullOrEmpty(Text))
                                 {
-                                    base.Text = null;
-                                    base.WidthRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4; 
-                                }
-                                else
-                                {
-                                    base.WidthRequest = -1;
                                     base.Text = Text;
                                 }
                             }
                             break;
                         }
+                    case ButtonStateEnum.Pressed:
                     case ButtonStateEnum.Disabled:
                         {
                             base.IsVisible = true;
@@ -150,52 +144,18 @@ public abstract class ButtonBase : Button, IButton
                                 {
                                     base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize);
                                 }
-                                if (DisabledText == null || DisabledText == "")
+                                if (!String.IsNullOrEmpty(DisabledText))
                                 {
-                                    base.Text = null;
-                                    base.WidthRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
-                                }
-                                else
-                                {
-                                    base.WidthRequest = -1;
                                     base.Text = DisabledText;
                                 }
                             }
                             break;
                         }
-                    case ButtonStateEnum.Pressed:
-                        {
-                            base.IsVisible = true;
-                            if (ButtonSize != null)
-                            {
-                                base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
-                                if (ButtonType != null)
-                                {
-                                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize);
-                                }
-                                if (DisabledText == null || DisabledText == "")
-                                {
-                                    base.Text = null;
-                                    base.WidthRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
-                                }
-                                else
-                                {
-                                    base.WidthRequest = -1;
-                                    base.Text = DisabledText;
-                                }
-                            }
-                        }
-                        break;
                     case ButtonStateEnum.Hidden:
                         base.IsVisible = false;
                         break;
                 }
                 base.BatchCommit();
-            }
-            else
-            {
-                // hide button if not configured
-                base.IsVisible = false;
             }
         }
 

@@ -17,14 +17,27 @@ public class Form : ContentView
         nameof(Command),
         typeof(ICommand),
         typeof(Form));
-
     public static readonly BindableProperty FormCancelButtonTextProperty = BindableProperty.Create(
-        propertyName: nameof(FormCancelButtonText),
-        returnType: typeof(string),
-        declaringType: typeof(Form),
-        defaultValue: "cancel",
-        propertyChanged: OnFormCancelButtonTextChanged);
+            propertyName: nameof(FormCancelButtonText),
+            returnType: typeof(string),
+            declaringType: typeof(Form),
+            defaultValue: "cancel",
+            propertyChanged: OnFormCancelButtonTextChanged);
 
+    //
+    public static readonly BindableProperty FormHasChangesProperty = BindableProperty.Create(
+        propertyName: nameof(FormHasChanges),
+        returnType: typeof(bool),
+        declaringType: typeof(Form),
+        defaultValue: false,
+        defaultBindingMode: BindingMode.OneWayToSource);
+
+    public static readonly BindableProperty FormHasErrorsProperty = BindableProperty.Create(
+        propertyName: nameof(FormHasErrors),
+        returnType: typeof(bool),
+        declaringType: typeof(Form),
+        defaultValue: false,
+        defaultBindingMode: BindingMode.OneWayToSource);
     public static readonly BindableProperty FormNameProperty = BindableProperty.Create(
         propertyName: nameof(FormName),
         returnType: typeof(string),
@@ -55,8 +68,6 @@ public class Form : ContentView
 
     private StackLayout _stackedLayout;
     private SizeEnum cButtonSize = SizeEnum.XXSmall;
-    private bool HasNoChanges = false;
-    private bool HasNoErrors = false;
 
     public Form()
     {
@@ -80,6 +91,18 @@ public class Form : ContentView
         set => SetValue(FormCancelButtonTextProperty, value);
     }
 
+    public bool FormHasChanges
+    {
+        get => (bool)GetValue(FormHasChangesProperty);
+        set => SetValue(FormHasChangesProperty, value);
+    }
+
+    public bool FormHasErrors
+    {
+        get => (bool)GetValue(FormHasErrorsProperty);
+        set => SetValue(FormHasErrorsProperty, value);
+    }
+
     public string FormName
     {
         get => (string)GetValue(FormNameProperty);
@@ -97,7 +120,6 @@ public class Form : ContentView
         get => (FormStateEnum)GetValue(FormStateProperty);
         set => SetValue(FormStateProperty, value);
     }
-
     // called when user clicks cancel button
     // also should be called when the page form is OnDissapearing
     public void CancelForm()
@@ -195,15 +217,22 @@ public class Form : ContentView
             {
                 if (oldValue != newValue)
                 {
-                    if (newState == FormStateEnum.Undo)
+
+                    if (newState == FormStateEnum.Initialize)
                     {
-                        form.CancelForm();
+                        form.InitForm();
                         form.IsVisible = true;
                         form.FormState = FormStateEnum.Enabled;
                     }
                     else if (newState == FormStateEnum.Saved)
                     {
                         form.SavedForm();
+                        form.IsVisible = true;
+                        form.FormState = FormStateEnum.Enabled;
+                    }
+                    else if (newState == FormStateEnum.Undo)
+                    {
+                        form.CancelForm();
                         form.IsVisible = true;
                         form.FormState = FormStateEnum.Enabled;
                     }
@@ -274,8 +303,8 @@ public class Form : ContentView
 
     private void EvaluateForm()
     {
-        HasNoErrors = IsFormDataValid();
-        HasNoChanges = HasFormNotChanged();
+        FormHasErrors = !IsFormDataValid();
+        FormHasChanges = !HasFormNotChanged();
         FormState = CalcFormState();
         UpdateFormControlStates();
     }
@@ -431,6 +460,15 @@ public class Form : ContentView
             t.Unfocus();
         }
     }
+    private void InitForm()
+    {
+        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
+        {
+            if (t is TextBoxElement tbe) tbe.InitField();
+            if (t is CheckBoxElement cbe) cbe.InitField();
+            t.Unfocus();
+        }
+    }
 
     private void Show()
     {
@@ -454,14 +492,14 @@ public class Form : ContentView
                     Show();
                     IsEnabled = true;
                     IsVisible = true;
-                    SetButtonImages(resourceHelper, HasNoChanges, HasNoErrors, SizeEnum.Large);
+                    SetButtonImages(resourceHelper, !FormHasChanges, !FormHasErrors, SizeEnum.Large);
                     break;
 
                 case FormStateEnum.Disabled:
                     Show();
                     IsEnabled = false;
                     IsVisible = true; // Assuming visibility should be true here as well
-                    SetButtonImages(resourceHelper, HasNoChanges, HasNoErrors, SizeEnum.Large);
+                    SetButtonImages(resourceHelper, !FormHasChanges, !FormHasErrors, SizeEnum.Large);
                     break;
 
                 case FormStateEnum.Hidden:

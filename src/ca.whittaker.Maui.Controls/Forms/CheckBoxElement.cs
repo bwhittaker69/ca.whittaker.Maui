@@ -80,6 +80,13 @@ namespace ca.whittaker.Maui.Controls.Forms
             _checkBox.Unfocus();
         }
 
+        public void InitField()
+        {
+            SetOriginalValue(CheckBoxSource);
+            UpdateValidationState();
+            _checkBox.Unfocus();
+        }
+
         public void SetOriginalValue(bool originalValue)
         {
             _originalValue = originalValue;

@@ -10,13 +10,11 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public class TextBoxElement : BaseFormElement
 {
-    private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
-    private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
-    private Entry _entry;
-    private bool _isOriginalTextSet = false;
-    private string _originalText = string.Empty;
-    private bool _previousHasChangedState = false;
-    private bool _previousInvalidDataState = false;
+    public static readonly BindableProperty AllLowerCaseProperty =
+        BindableProperty.Create(propertyName: nameof(AllLowerCase), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: false);
+
+    public static readonly BindableProperty AllowWhiteSpaceProperty =
+        BindableProperty.Create(propertyName: nameof(AllowWhiteSpace), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: true);
 
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
@@ -27,12 +25,6 @@ public class TextBoxElement : BaseFormElement
         nameof(Command),
         typeof(ICommand),
         typeof(Form));
-
-    public static readonly BindableProperty AllLowerCaseProperty =
-        BindableProperty.Create(propertyName: nameof(AllLowerCase), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: false);
-
-    public static readonly BindableProperty AllowWhiteSpaceProperty =
-        BindableProperty.Create(propertyName: nameof(AllowWhiteSpace), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: true);
 
     public static readonly BindableProperty FieldTypeProperty =
         BindableProperty.Create(propertyName: nameof(FieldType), returnType: typeof(FieldTypeEnum), declaringType: typeof(TextBoxElement), defaultValue: FieldTypeEnum.Text, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnFieldTypeChanged(newValue); });
@@ -47,31 +39,51 @@ public class TextBoxElement : BaseFormElement
         BindableProperty.Create(propertyName: nameof(Placeholder), returnType: typeof(string), declaringType: typeof(TextBoxElement), defaultValue: string.Empty, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnPlaceholderPropertyChanged(newValue); });
 
     public static readonly BindableProperty TextBoxSourceProperty =
-        BindableProperty.Create(propertyName: nameof(TextBoxSource), returnType: typeof(string), declaringType: typeof(TextBoxElement), defaultValue: string.Empty, defaultBindingMode: BindingMode.TwoWay, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue); });
+        BindableProperty.Create(propertyName: nameof(TextBoxSource), returnType: typeof(string), declaringType: typeof(TextBoxElement), defaultValue: string.Empty, defaultBindingMode: BindingMode.TwoWay, 
+            propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue, oldValue); });
 
+
+
+
+    private void ProcessAndSetText(string newText)
+    {
+        _entry.TextChanged -= Entry_TextChanged;
+        _entry.Text = ProcessUsernameFilter(
+            ProcessEmailFilter(
+                ProcessAllLowercase(
+                    ProcessAllowWhiteSpace(newText ?? ""))));
+
+        TextBoxSource = _entry.Text;
+        _entry.TextChanged += Entry_TextChanged;
+    }
+
+    private bool _isOriginalTextSet = false;
+    private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
+    private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
+    private Entry _entry;
+    private bool _onTextBoxSourcePropertyChanging = false;
+    private string _originalText = string.Empty;
+    private bool _previousHasChangedState = false;
+    private bool _previousInvalidDataState = false;
     public TextBoxElement()
     {
         InitializeUI();
     }
+    //protected override void OnBindingContextChanged()
+    //{
+    //    base.OnBindingContextChanged();
+    //    if (!_isOriginalTextSet)
+    //    {
+    //        var initialText = this.BindingContext as string; // Adjust as per your context
+    //        SetOriginalText(initialText);
+    //        _isOriginalTextSet = true;
+    //    }
+    //}
 
-    private void InitializeUI()
-    {
-        _entry = CreateEntry();
-        FieldLabel = CreateLabel();
-        FieldNotification = CreateNotificationLabel();
-        ButtonUndo = CreateUndoButton();
-        Content = CreateLayoutGrid();
-        ButtonUndo.Pressed += (s, e) => Undo();
-        _entry.ReturnCommand = new Command(Return_Pressed);
-    }
 
-    private void Return_Pressed(object obj)
-    {
-        if (Command?.CanExecute(CommandParameter) == true)
-        {
-            Command.Execute(CommandParameter);
-        }
-    }
+    public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
+
+    public bool AllowWhiteSpace { get => (bool)GetValue(AllowWhiteSpaceProperty); set => SetValue(AllowWhiteSpaceProperty, value); }
 
     public ICommand Command
     {
@@ -85,14 +97,69 @@ public class TextBoxElement : BaseFormElement
         set => SetValue(CommandParameterProperty, value);
     }
 
-
-    public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
-    public bool AllowWhiteSpace { get => (bool)GetValue(AllowWhiteSpaceProperty); set => SetValue(AllowWhiteSpaceProperty, value); }
     public FieldTypeEnum FieldType { get => (FieldTypeEnum)GetValue(FieldTypeProperty); set => SetValue(FieldTypeProperty, value); }
+
     public bool Mandatory { get => (bool)GetValue(MandatoryProperty); set => SetValue(MandatoryProperty, value); }
+
     public int MaxLength { get => (int)GetValue(MaxLengthProperty); set => SetValue(MaxLengthProperty, value); }
+
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
 
+    public string TextBoxSource { get => (string)GetValue(TextBoxSourceProperty); set { SetValue(TextBoxSourceProperty, value); } }
+
+    public void Clear()
+    {
+        _entry.TextChanged -= Entry_TextChanged;
+        _entry.Text = "";
+        _entry.TextChanged += Entry_TextChanged;
+        SetOriginalText("");
+        UpdateValidationAndChangedState();
+        _entry.Unfocus();
+    }
+
+    public string GetText()
+    {
+        return _entry.Text;
+    }
+
+    public void InitField()
+    {
+        SetOriginalText(TextBoxSource);
+        UpdateValidationAndChangedState();
+        _entry.Unfocus();
+    }
+
+    public void Saved()
+    {
+        SetOriginalText(_entry.Text);
+        UpdateValidationAndChangedState();
+        _entry.Unfocus();
+    }
+
+    public void SetOriginalText(string originalText)
+    {
+        _isOriginalTextSet = true;
+        _originalText = originalText;
+        _entry.TextChanged -= Entry_TextChanged;
+        _entry.Text = originalText;
+        _entry.TextChanged += Entry_TextChanged;
+        EvaluateToRaiseValidationChangesEvent();
+    }
+
+    public void Undo()
+    {
+        _entry.TextChanged -= Entry_TextChanged;
+        _entry.Text = _originalText;
+        _entry.TextChanged += Entry_TextChanged;
+        UpdateValidationAndChangedState();
+        _entry.Unfocus();
+    }
+
+    public override void Unfocus()
+    {
+        base.Unfocus();
+        _entry.Unfocus();
+    }
 
     protected override void OnParentSet()
     {
@@ -104,49 +171,6 @@ public class TextBoxElement : BaseFormElement
     {
         base.OnPropertyChanged(propertyName);
         RefreshUI();
-    }
-
-    public string TextBoxSource
-    {
-        get => (string)GetValue(TextBoxSourceProperty);
-        set
-        {
-            SetValue(TextBoxSourceProperty, value);
-            SetOriginalText(value);
-        }
-    }
-
-    public string GetText()
-    {
-        return _entry.Text;
-    }
-
-    public void Clear()
-    {
-        SetOriginalText("");
-        UpdateValidationState();
-        _entry.Unfocus();
-    }
-
-    public void Undo()
-    {
-        _entry.Text = _originalText;
-        UpdateValidationState();
-        _entry.Unfocus();
-    }
-
-    public void Saved()
-    {
-        SetOriginalText(_entry.Text);
-        UpdateValidationState();
-        _entry.Unfocus();
-    }
-
-    public void SetOriginalText(string originalText)
-    {
-        _originalText = originalText;
-        _entry.Text = originalText;
-        EvaluateToRaiseValidationChangesEvent();
     }
 
     private static bool IsValidEmail(string email)
@@ -166,38 +190,6 @@ public class TextBoxElement : BaseFormElement
             return false;
 
         return uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps;
-    }
-
-    private void OnFieldTypeChanged(object newValue)
-    {
-        _entry.Keyboard = GetKeyboardForFieldType((FieldTypeEnum)newValue);
-    }
-
-    private Keyboard GetKeyboardForFieldType(FieldTypeEnum fieldType)
-    {
-        return fieldType switch
-        {
-            FieldTypeEnum.Email => Keyboard.Email,
-            FieldTypeEnum.Url => Keyboard.Url,
-            FieldTypeEnum.Chat => Keyboard.Chat,
-            _ => Keyboard.Default,
-        };
-    }
-
-
-    private void OnMaxLengthPropertyChanged(object newValue)
-    {
-        _entry.MaxLength = (int)newValue;
-    }
-
-    private void OnPlaceholderPropertyChanged(object newValue)
-    {
-        _entry.Placeholder = newValue?.ToString() ?? "";
-    }
-
-    private void OnTextBoxSourcePropertyChanged(object newValue)
-    {
-        _entry.Text = (string)newValue;
     }
 
     private ValidationStateEnum CalculateValidationState(string text)
@@ -222,12 +214,6 @@ public class TextBoxElement : BaseFormElement
         return ValidationStateEnum.Valid;
     }
 
-    public override void Unfocus()
-    {
-        base.Unfocus();
-        _entry.Unfocus();
-    }
-
     [Obsolete]
     private Entry CreateEntry()
     {
@@ -237,7 +223,6 @@ public class TextBoxElement : BaseFormElement
             HorizontalOptions = LayoutOptions.Fill,
             VerticalOptions = LayoutOptions.CenterAndExpand, // Ensure vertical centering
         };
-
 
         entry.TextChanged += Entry_TextChanged;
         entry.Focused += Entry_Focused;
@@ -272,46 +257,6 @@ public class TextBoxElement : BaseFormElement
         return grid;
     }
 
-    private void RefreshUI()
-    {
-        BatchBegin();
-        if (Content is Grid grid)
-        {
-            if (grid != null)
-            {
-                if (grid.ColumnDefinitions != null)
-                {
-                    if (grid.ColumnDefinitions.Count == 3)
-                    {
-                        grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
-                        grid.ColumnDefinitions[1].Width = GridLength.Star;
-                        grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
-                    }
-                }
-                grid.HeightRequest = HeightRequest;
-                grid.WidthRequest = WidthRequest;
-                grid.HorizontalOptions = LayoutOptions.Center;
-                grid.VerticalOptions = LayoutOptions.Center;
-                if (FieldLabel != null)
-                {
-                    FieldLabel.HeightRequest = HeightRequest;
-                    FieldLabel.WidthRequest = LabelWidth;
-                }
-                if (_entry != null)
-                {
-                    _entry.WidthRequest = -1;
-                    _entry.HeightRequest = HeightRequest;
-                }
-                if (ButtonUndo != null)
-                {
-                    ButtonUndo.WidthRequest = DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2;
-                    ButtonUndo.HeightRequest = HeightRequest;
-                }
-            }
-        }
-        BatchCommit();
-    }
-
     private void Entry_Focused(object? sender, FocusEventArgs e)
     {
     }
@@ -319,7 +264,7 @@ public class TextBoxElement : BaseFormElement
     private void Entry_TextChanged(object? sender, TextChangedEventArgs e)
     {
         ProcessAndSetText(e.NewTextValue);
-        UpdateValidationState();
+        UpdateValidationAndChangedState();
         UpdateNotificationMessage(_entry.Text);
     }
 
@@ -335,8 +280,6 @@ public class TextBoxElement : BaseFormElement
         {
             void UpdateUI()
             {
-                // update the binded data source
-                TextBoxSource = _entry.Text;
                 using (ResourceHelper resourceHelper = new())
                 {
                     ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo, cUndoButtonSize);
@@ -382,6 +325,28 @@ public class TextBoxElement : BaseFormElement
         }
     }
 
+    private Keyboard GetKeyboardForFieldType(FieldTypeEnum fieldType)
+    {
+        return fieldType switch
+        {
+            FieldTypeEnum.Email => Keyboard.Email,
+            FieldTypeEnum.Url => Keyboard.Url,
+            FieldTypeEnum.Chat => Keyboard.Chat,
+            _ => Keyboard.Default,
+        };
+    }
+
+    private void InitializeUI()
+    {
+        _entry = CreateEntry();
+        FieldLabel = CreateLabel();
+        FieldNotification = CreateNotificationLabel();
+        ButtonUndo = CreateUndoButton();
+        Content = CreateLayoutGrid();
+        ButtonUndo.Pressed += (s, e) => Undo();
+        _entry.ReturnCommand = new Command(Return_Pressed);
+    }
+
     private bool IsValidData(string text)
     {
         // mandatory field, so its not valid
@@ -400,6 +365,37 @@ public class TextBoxElement : BaseFormElement
         return true;
     }
 
+    private void OnFieldTypeChanged(object newValue)
+    {
+        _entry.Keyboard = GetKeyboardForFieldType((FieldTypeEnum)newValue);
+    }
+
+    private void OnMaxLengthPropertyChanged(object newValue)
+    {
+        _entry.MaxLength = (int)newValue;
+    }
+
+    private void OnPlaceholderPropertyChanged(object newValue)
+    {
+        _entry.Placeholder = newValue?.ToString() ?? "";
+    }
+
+    private void OnTextBoxSourcePropertyChanged(object newValue, object oldValue)
+    {
+        if (!_isOriginalTextSet)
+        {
+            // prevent loop back
+            if (!_onTextBoxSourcePropertyChanging)
+            {
+                _onTextBoxSourcePropertyChanging = true;
+                _entry.TextChanged -= Entry_TextChanged;
+                _entry.Text = (string)newValue;
+                _entry.TextChanged += Entry_TextChanged;
+                _onTextBoxSourcePropertyChanging = false;
+            }
+        }
+    }
+
     private string ProcessAllLowercase(string text)
     {
         return AllLowerCase ? text.ToLower() : text;
@@ -410,13 +406,6 @@ public class TextBoxElement : BaseFormElement
         return AllowWhiteSpace ? text : text.Replace(" ", "");
     }
 
-    private void ProcessAndSetText(string newText)
-    {
-        _entry.Text = ProcessUsernameFilter(
-            ProcessEmailFilter(
-                ProcessAllLowercase(
-                    ProcessAllowWhiteSpace(newText ?? ""))));
-    }
 
     private string ProcessEmailFilter(string text)
     {
@@ -428,6 +417,53 @@ public class TextBoxElement : BaseFormElement
         return FieldType == FieldTypeEnum.Username ? Regex.Replace(text, @"[^a-zA-Z0-9-._]", "") : text;
     }
 
+    private void RefreshUI()
+    {
+        BatchBegin();
+        if (Content is Grid grid)
+        {
+            if (grid != null)
+            {
+                if (grid.ColumnDefinitions != null)
+                {
+                    if (grid.ColumnDefinitions.Count == 3)
+                    {
+                        grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
+                        grid.ColumnDefinitions[1].Width = GridLength.Star;
+                        grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
+                    }
+                }
+                grid.HeightRequest = HeightRequest;
+                grid.WidthRequest = WidthRequest;
+                grid.HorizontalOptions = LayoutOptions.Center;
+                grid.VerticalOptions = LayoutOptions.Center;
+                if (FieldLabel != null)
+                {
+                    FieldLabel.HeightRequest = HeightRequest;
+                    FieldLabel.WidthRequest = LabelWidth;
+                }
+                if (_entry != null)
+                {
+                    _entry.WidthRequest = -1;
+                    _entry.HeightRequest = HeightRequest;
+                }
+                if (ButtonUndo != null)
+                {
+                    ButtonUndo.WidthRequest = DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2;
+                    ButtonUndo.HeightRequest = HeightRequest;
+                }
+            }
+        }
+        BatchCommit();
+    }
+
+    private void Return_Pressed(object obj)
+    {
+        if (Command?.CanExecute(CommandParameter) == true)
+        {
+            Command.Execute(CommandParameter);
+        }
+    }
     private void SetMaxLength(object newValue)
     {
         if (newValue != null)
@@ -464,7 +500,7 @@ public class TextBoxElement : BaseFormElement
         ValidationState = validationState; // Set the validation state based on calculated value
     }
 
-    private void UpdateValidationState()
+    private void UpdateValidationAndChangedState()
     {
         EvaluateToRaiseHasChangesEvent();
         EvaluateToRaiseValidationChangesEvent();
