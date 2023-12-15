@@ -3,7 +3,7 @@
 public class EditButton : ButtonBase
 {
 
-    public EditButton() : base(BaseButtonTypeEnum.Edit)
+    public EditButton() : base(ImageResourceEnum.Edit)
     {
     }
 }

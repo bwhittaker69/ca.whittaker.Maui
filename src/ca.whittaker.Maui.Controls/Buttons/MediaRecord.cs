@@ -3,7 +3,7 @@
 public class MediaRecord : ButtonBase
 {
 
-    public MediaRecord() : base(BaseButtonTypeEnum.Bullet_Ball_Red)
+    public MediaRecord() : base(ImageResourceEnum.Bullet_Ball_Red)
     {
 
     }

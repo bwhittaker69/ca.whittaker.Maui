@@ -159,7 +159,7 @@ namespace ca.whittaker.Maui.Controls.Forms
 
             using (var resourceHelper = new ResourceHelper())
             {
-                ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, BaseButtonTypeEnum.Undo, cUndoButtonSize);
+                ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, ImageResourceEnum.Undo, cUndoButtonSize);
             }
             _previousHasChangedState = hasChanged;
             ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;

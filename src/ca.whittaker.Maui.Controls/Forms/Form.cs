@@ -345,7 +345,7 @@ public class Form : ContentView
                 VerticalOptions = LayoutOptions.Center,
                 HorizontalOptions = LayoutOptions.Center,
                 ButtonState = ButtonStateEnum.Enabled,
-                ButtonType = BaseButtonTypeEnum.Save,
+                ButtonType = ImageResourceEnum.Save,
             };
             _buttonSave.Clicked += ButtonSave_Clicked;
             _buttonSave.UpdateUI();
@@ -358,7 +358,7 @@ public class Form : ContentView
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 ButtonState = ButtonStateEnum.Enabled,
-                ButtonType = BaseButtonTypeEnum.Cancel,
+                ButtonType = ImageResourceEnum.Cancel,
             };
             _buttonCancel.Clicked += (sender, e) => CancelForm();
             _buttonCancel.UpdateUI();

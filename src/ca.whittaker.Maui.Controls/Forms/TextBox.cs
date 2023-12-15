@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
+using static System.Net.Mime.MediaTypeNames;
 using Entry = Microsoft.Maui.Controls.Entry;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -8,13 +9,13 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// <summary>
 /// Represents a customizable text box control with various properties for text manipulation and validation.
 /// </summary>
-public class TextBoxElement : BaseFormElement
+public class TextBox : BaseFormElement
 {
     public static readonly BindableProperty AllLowerCaseProperty =
-        BindableProperty.Create(propertyName: nameof(AllLowerCase), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: false);
+        BindableProperty.Create(propertyName: nameof(AllLowerCase), returnType: typeof(bool), declaringType: typeof(TextBox), defaultValue: false);
 
     public static readonly BindableProperty AllowWhiteSpaceProperty =
-        BindableProperty.Create(propertyName: nameof(AllowWhiteSpace), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: true);
+        BindableProperty.Create(propertyName: nameof(AllowWhiteSpace), returnType: typeof(bool), declaringType: typeof(TextBox), defaultValue: true);
 
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
@@ -27,24 +28,21 @@ public class TextBoxElement : BaseFormElement
         typeof(Form));
 
     public static readonly BindableProperty FieldTypeProperty =
-        BindableProperty.Create(propertyName: nameof(FieldType), returnType: typeof(FieldTypeEnum), declaringType: typeof(TextBoxElement), defaultValue: FieldTypeEnum.Text, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnFieldTypeChanged(newValue); });
+        BindableProperty.Create(propertyName: nameof(FieldType), returnType: typeof(FieldTypeEnum), declaringType: typeof(TextBox), defaultValue: FieldTypeEnum.Text, propertyChanged: (bindable, oldValue, newValue) => { ((TextBox)bindable).OnFieldTypeChanged(newValue); });
 
     public static readonly BindableProperty MandatoryProperty =
-        BindableProperty.Create(propertyName: nameof(Mandatory), returnType: typeof(bool), declaringType: typeof(TextBoxElement), defaultValue: false);
+        BindableProperty.Create(propertyName: nameof(Mandatory), returnType: typeof(bool), declaringType: typeof(TextBox), defaultValue: false);
 
     public static readonly BindableProperty MaxLengthProperty =
-        BindableProperty.Create(propertyName: nameof(MaxLength), returnType: typeof(int), declaringType: typeof(TextBoxElement), defaultValue: 255, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnMaxLengthPropertyChanged(newValue); });
+        BindableProperty.Create(propertyName: nameof(MaxLength), returnType: typeof(int), declaringType: typeof(TextBox), defaultValue: 255, propertyChanged: (bindable, oldValue, newValue) => { ((TextBox)bindable).OnMaxLengthPropertyChanged(newValue); });
 
     public static readonly BindableProperty PlaceholderProperty =
-        BindableProperty.Create(propertyName: nameof(Placeholder), returnType: typeof(string), declaringType: typeof(TextBoxElement), defaultValue: string.Empty, propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnPlaceholderPropertyChanged(newValue); });
+        BindableProperty.Create(propertyName: nameof(Placeholder), returnType: typeof(string), declaringType: typeof(TextBox), defaultValue: string.Empty, propertyChanged: (bindable, oldValue, newValue) => { ((TextBox)bindable).OnPlaceholderPropertyChanged(newValue); });
 
-    public static readonly BindableProperty TextBoxSourceProperty =
-        BindableProperty.Create(propertyName: nameof(TextBoxSource), returnType: typeof(string), declaringType: typeof(TextBoxElement), defaultValue: string.Empty, defaultBindingMode: BindingMode.TwoWay, 
-            propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue, oldValue); });
+    public static readonly BindableProperty TextProperty =
+        BindableProperty.Create(propertyName: nameof(Text), returnType: typeof(string), declaringType: typeof(TextBox), defaultValue: string.Empty, propertyChanged: (bindable, oldValue, newValue) => { ((TextBox)bindable).OnTextPropertyChanged(newValue, oldValue); });
 
-
-
-
+    
     private void ProcessAndSetText(string newText)
     {
         _entry.TextChanged -= Entry_TextChanged;
@@ -53,7 +51,6 @@ public class TextBoxElement : BaseFormElement
                 ProcessAllLowercase(
                     ProcessAllowWhiteSpace(newText ?? ""))));
 
-        TextBoxSource = _entry.Text;
         _entry.TextChanged += Entry_TextChanged;
     }
 
@@ -61,25 +58,15 @@ public class TextBoxElement : BaseFormElement
     private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
     private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
     private Entry _entry;
-    private bool _onTextBoxSourcePropertyChanging = false;
+    private bool _onTextPropertyChanging = false;
     private string _originalText = string.Empty;
     private bool _previousHasChangedState = false;
     private bool _previousInvalidDataState = false;
-    public TextBoxElement()
+
+    public TextBox()
     {
         InitializeUI();
     }
-    //protected override void OnBindingContextChanged()
-    //{
-    //    base.OnBindingContextChanged();
-    //    if (!_isOriginalTextSet)
-    //    {
-    //        var initialText = this.BindingContext as string; // Adjust as per your context
-    //        SetOriginalText(initialText);
-    //        _isOriginalTextSet = true;
-    //    }
-    //}
-
 
     public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
 
@@ -97,6 +84,13 @@ public class TextBoxElement : BaseFormElement
         set => SetValue(CommandParameterProperty, value);
     }
 
+    public string Text
+    {
+        get => (string)GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
+    }
+
+
     public FieldTypeEnum FieldType { get => (FieldTypeEnum)GetValue(FieldTypeProperty); set => SetValue(FieldTypeProperty, value); }
 
     public bool Mandatory { get => (bool)GetValue(MandatoryProperty); set => SetValue(MandatoryProperty, value); }
@@ -105,10 +99,9 @@ public class TextBoxElement : BaseFormElement
 
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
 
-    public string TextBoxSource { get => (string)GetValue(TextBoxSourceProperty); set { SetValue(TextBoxSourceProperty, value); } }
-
     public void Clear()
     {
+        RaiseHasChanges(true);
         _entry.TextChanged -= Entry_TextChanged;
         _entry.Text = "";
         _entry.TextChanged += Entry_TextChanged;
@@ -124,14 +117,6 @@ public class TextBoxElement : BaseFormElement
 
     public void InitField()
     {
-        SetOriginalText(TextBoxSource);
-        UpdateValidationAndChangedState();
-        _entry.Unfocus();
-    }
-
-    public void Saved()
-    {
-        SetOriginalText(_entry.Text);
         UpdateValidationAndChangedState();
         _entry.Unfocus();
     }
@@ -148,6 +133,7 @@ public class TextBoxElement : BaseFormElement
 
     public void Undo()
     {
+        RaiseHasChanges(true);
         _entry.TextChanged -= Entry_TextChanged;
         _entry.Text = _originalText;
         _entry.TextChanged += Entry_TextChanged;
@@ -266,6 +252,7 @@ public class TextBoxElement : BaseFormElement
         ProcessAndSetText(e.NewTextValue);
         UpdateValidationAndChangedState();
         UpdateNotificationMessage(_entry.Text);
+        RaiseHasChanges(true);
     }
 
     private void Entry_Unfocused(object? sender, FocusEventArgs e)
@@ -273,33 +260,6 @@ public class TextBoxElement : BaseFormElement
         UpdateNotificationMessage(_entry.Text);
     }
 
-    private void EvaluateToRaiseHasChangesEvent()
-    {
-        bool hasChanged = _originalText != _entry.Text;
-        if (_previousHasChangedState != hasChanged)
-        {
-            void UpdateUI()
-            {
-                using (ResourceHelper resourceHelper = new())
-                {
-                    ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, ImageResourceEnum.Undo, cUndoButtonSize);
-                }
-                _previousHasChangedState = hasChanged;
-                ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
-                RaiseHasChanges(hasChanged);
-            }
-
-            // Check if on the main thread and update UI accordingly
-            if (MainThread.IsMainThread)
-            {
-                UpdateUI();
-            }
-            else
-            {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
-            }
-        }
-    }
 
     private void EvaluateToRaiseValidationChangesEvent(bool forceRaise = false)
     {
@@ -380,20 +340,11 @@ public class TextBoxElement : BaseFormElement
         _entry.Placeholder = newValue?.ToString() ?? "";
     }
 
-    private void OnTextBoxSourcePropertyChanged(object newValue, object oldValue)
+    private void OnTextPropertyChanged(object newValue, object oldValue)
     {
-        if (!_isOriginalTextSet)
-        {
-            // prevent loop back
-            if (!_onTextBoxSourcePropertyChanging)
-            {
-                _onTextBoxSourcePropertyChanging = true;
-                _entry.TextChanged -= Entry_TextChanged;
-                _entry.Text = (string)newValue;
-                _entry.TextChanged += Entry_TextChanged;
-                _onTextBoxSourcePropertyChanging = false;
-            }
-        }
+        _entry.TextChanged -= Entry_TextChanged;
+        _entry.Text = (string)newValue;
+        _entry.TextChanged += Entry_TextChanged;
     }
 
     private string ProcessAllLowercase(string text)
@@ -502,7 +453,6 @@ public class TextBoxElement : BaseFormElement
 
     private void UpdateValidationAndChangedState()
     {
-        EvaluateToRaiseHasChangesEvent();
         EvaluateToRaiseValidationChangesEvent();
     }
 }

@@ -19,25 +19,25 @@ public class SigninButton : ButtonBase
                 switch (newValue)
                 {
                     case SiginButtonTypeEnum.Facebook:
-                        signinButton.ButtonType = BaseButtonTypeEnum.Facebook;
+                        signinButton.ButtonType = ImageResourceEnum.Facebook;
                         break;
                     case SiginButtonTypeEnum.Google:
-                        signinButton.ButtonType = BaseButtonTypeEnum.Google;
+                        signinButton.ButtonType = ImageResourceEnum.Google;
                         break;
                     case SiginButtonTypeEnum.Linkedin:
-                        signinButton.ButtonType = BaseButtonTypeEnum.Linkedin;
+                        signinButton.ButtonType = ImageResourceEnum.Linkedin;
                         break;
                     case SiginButtonTypeEnum.Tiktok:
-                        signinButton.ButtonType = BaseButtonTypeEnum.Tiktok;
+                        signinButton.ButtonType = ImageResourceEnum.Tiktok;
                         break;
                     case SiginButtonTypeEnum.Microsoft:
-                        signinButton.ButtonType = BaseButtonTypeEnum.Microsoft;
+                        signinButton.ButtonType = ImageResourceEnum.Microsoft;
                         break;
                     case SiginButtonTypeEnum.Apple:
-                        signinButton.ButtonType = BaseButtonTypeEnum.Apple;
+                        signinButton.ButtonType = ImageResourceEnum.Apple;
                         break;
                     default:
-                        signinButton.ButtonType = BaseButtonTypeEnum.Signin;
+                        signinButton.ButtonType = ImageResourceEnum.Signin;
                         break;
                 }
             }
@@ -49,7 +49,7 @@ public class SigninButton : ButtonBase
         set => SetValue(SigninButtonTypeProperty, value);
     }
 
-    public SigninButton() : base(BaseButtonTypeEnum.Signin)
+    public SigninButton() : base(ImageResourceEnum.Signin)
     {
 
     }

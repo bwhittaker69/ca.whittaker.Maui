@@ -31,14 +31,14 @@ public abstract class ButtonBase : Button, IButton
 
     public static readonly BindableProperty ButtonTypeProperty = BindableProperty.Create(
         propertyName: nameof(ButtonType),
-        returnType: typeof(BaseButtonTypeEnum?),
+        returnType: typeof(ImageResourceEnum?),
         declaringType: typeof(ButtonBase),
         defaultValue: null,
         defaultBindingMode: BindingMode.OneWay);
 
-    public BaseButtonTypeEnum? ButtonType
+    public ImageResourceEnum? ButtonType
     {
-        get => (BaseButtonTypeEnum?)GetValue(ButtonTypeProperty);
+        get => (ImageResourceEnum?)GetValue(ButtonTypeProperty);
         set => SetValue(ButtonTypeProperty, value);
     }
 
@@ -82,7 +82,7 @@ public abstract class ButtonBase : Button, IButton
     }
 
 
-    public ButtonBase(BaseButtonTypeEnum buttonType) : base()
+    public ButtonBase(ImageResourceEnum buttonType) : base()
     {
         ButtonType = buttonType;
         base.PropertyChanged += Button_PropertyChanged;
@@ -124,7 +124,7 @@ public abstract class ButtonBase : Button, IButton
                                 base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
                                 if (ButtonType != null)
                                 {
-                                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize);
+                                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
                                 }
                                 if (!String.IsNullOrEmpty(Text))
                                 {
@@ -142,7 +142,7 @@ public abstract class ButtonBase : Button, IButton
                                 base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
                                 if (ButtonType != null)
                                 {
-                                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (BaseButtonTypeEnum)ButtonType, (SizeEnum)ButtonSize);
+                                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
                                 }
                                 if (!String.IsNullOrEmpty(DisabledText))
                                 {

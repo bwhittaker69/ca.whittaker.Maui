@@ -104,7 +104,7 @@ public abstract class BaseFormElement : ContentView
             ButtonSize = cUndoButtonSize,
             WidthRequest = -1,
             ButtonState = ButtonStateEnum.Disabled,
-            ButtonType = BaseButtonTypeEnum.Undo,
+            ButtonType = ImageResourceEnum.Undo,
             BorderWidth = 0,
             Margin = new Thickness(0),
             Padding = new Thickness(5, 0, 0, 0)

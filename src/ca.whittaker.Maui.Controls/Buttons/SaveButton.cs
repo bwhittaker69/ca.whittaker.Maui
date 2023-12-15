@@ -3,7 +3,7 @@
 public class SaveButton : ButtonBase
 {
 
-    public SaveButton() : base(BaseButtonTypeEnum.Save)
+    public SaveButton() : base(ImageResourceEnum.Save)
     {
     }
 }

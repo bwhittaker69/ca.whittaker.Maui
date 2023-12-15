@@ -560,6 +560,26 @@
 	  <None Remove="Resources\Images\refresh_72_dark_disabled.png" />
 	  <None Remove="Resources\Images\refresh_72_light.png" />
 	  <None Remove="Resources\Images\refresh_72_light_disabled.png" />
+	  <None Remove="Resources\Images\replace2_12_dark.png" />
+	  <None Remove="Resources\Images\replace2_12_dark_disabled.png" />
+	  <None Remove="Resources\Images\replace2_12_light.png" />
+	  <None Remove="Resources\Images\replace2_12_light_disabled.png" />
+	  <None Remove="Resources\Images\replace2_24_dark.png" />
+	  <None Remove="Resources\Images\replace2_24_dark_disabled.png" />
+	  <None Remove="Resources\Images\replace2_24_light.png" />
+	  <None Remove="Resources\Images\replace2_24_light_disabled.png" />
+	  <None Remove="Resources\Images\replace2_48_dark.png" />
+	  <None Remove="Resources\Images\replace2_48_dark_disabled.png" />
+	  <None Remove="Resources\Images\replace2_48_light.png" />
+	  <None Remove="Resources\Images\replace2_48_light_disabled.png" />
+	  <None Remove="Resources\Images\replace2_64_dark.png" />
+	  <None Remove="Resources\Images\replace2_64_dark_disabled.png" />
+	  <None Remove="Resources\Images\replace2_64_light.png" />
+	  <None Remove="Resources\Images\replace2_64_light_disabled.png" />
+	  <None Remove="Resources\Images\replace2_72_dark.png" />
+	  <None Remove="Resources\Images\replace2_72_dark_disabled.png" />
+	  <None Remove="Resources\Images\replace2_72_light.png" />
+	  <None Remove="Resources\Images\replace2_72_light_disabled.png" />
 	  <None Remove="Resources\Images\save.png" />
 	  <None Remove="Resources\Images\save2-fill.png" />
 	  <None Remove="Resources\Images\save_12_dark.png" />
@@ -1536,6 +1556,26 @@
 	  <EmbeddedResource Include="Resources\Images\refresh_72_light_disabled.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\replace2_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\replace2_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\save.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>

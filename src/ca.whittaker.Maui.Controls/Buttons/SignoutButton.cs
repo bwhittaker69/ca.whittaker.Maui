@@ -2,7 +2,7 @@
 
 public class SignoutButton : ButtonBase
 {
-    public SignoutButton() : base(BaseButtonTypeEnum.Signout)
+    public SignoutButton() : base(ImageResourceEnum.Signout)
     {
     }
 }

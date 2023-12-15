@@ -3,7 +3,7 @@
 public class UndoButton : ButtonBase
 {
 
-    public UndoButton() : base(BaseButtonTypeEnum.Undo)
+    public UndoButton() : base(ImageResourceEnum.Undo)
     {
 
     }

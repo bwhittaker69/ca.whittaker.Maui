@@ -3,7 +3,7 @@
 public class MediaStop : ButtonBase
 {
 
-    public MediaStop() : base(BaseButtonTypeEnum.Media_Stop)
+    public MediaStop() : base(ImageResourceEnum.Media_Stop)
     {
 
     }

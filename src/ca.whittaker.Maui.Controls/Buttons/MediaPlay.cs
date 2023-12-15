@@ -3,7 +3,7 @@
 public class MediaPlay : ButtonBase
 {
 
-    public MediaPlay() : base(BaseButtonTypeEnum.Media_Play)
+    public MediaPlay() : base(ImageResourceEnum.Media_Play)
     {
 
     }

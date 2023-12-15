@@ -3,7 +3,7 @@
 public class CameraButton : ButtonBase
 {
 
-    public CameraButton() : base(BaseButtonTypeEnum.Camera)
+    public CameraButton() : base(ImageResourceEnum.Camera)
     {
 
     }

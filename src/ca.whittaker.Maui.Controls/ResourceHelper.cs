@@ -18,7 +18,7 @@ namespace ca.whittaker.Maui.Controls
         }
 
         // Method to get an ImageSource based on button state and theme
-        public ImageSource? GetImageSource(ButtonStateEnum buttonState, BaseButtonTypeEnum baseButtonType, SizeEnum sizeEnum)
+        public ImageSource? GetImageSource(ButtonStateEnum buttonState, ImageResourceEnum baseButtonType, SizeEnum sizeEnum)
         {
             try
             {
