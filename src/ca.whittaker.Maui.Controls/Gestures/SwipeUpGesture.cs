@@ -1,9 +1,9 @@
 ﻿namespace ca.whittaker.Maui.Controls.Gestures;
-public class SwipeUpContainer : ContentView
+public class SwipeUpGesture : ContentView
 {
     public event EventHandler<SwipedEventArgs> SwipeUp;
 
-    public SwipeUpContainer()
+    public SwipeUpGesture()
     {
         GestureRecognizers.Add(GetSwipeGestureRecognizer(SwipeDirection.Up));
     }

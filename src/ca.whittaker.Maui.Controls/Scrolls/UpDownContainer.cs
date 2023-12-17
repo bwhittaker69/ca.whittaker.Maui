@@ -21,7 +21,7 @@ public class UpDownContainer : ContentView
            returnType: typeof(bool),
            declaringType: typeof(UpDownContainer),
            defaultValue: null,
-           defaultBindingMode: BindingMode.TwoWay);
+           defaultBindingMode: BindingMode.OneWay);
 
     public bool AllowedSwipeUp
     {
@@ -34,7 +34,7 @@ public class UpDownContainer : ContentView
            returnType: typeof(bool),
            declaringType: typeof(UpDownContainer),
            defaultValue: null,
-           defaultBindingMode: BindingMode.TwoWay);
+           defaultBindingMode: BindingMode.OneWay);
 
     public bool AllowedSwipeDown
     {
