@@ -153,7 +153,7 @@ public class TextBox : BaseFormElement
         RefreshUI();
     }
 
-    protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected override void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         base.OnPropertyChanged(propertyName);
         RefreshUI();
@@ -200,7 +200,6 @@ public class TextBox : BaseFormElement
         return ValidationStateEnum.Valid;
     }
 
-    [Obsolete]
     private Entry CreateEntry()
     {
         var entry = new Entry

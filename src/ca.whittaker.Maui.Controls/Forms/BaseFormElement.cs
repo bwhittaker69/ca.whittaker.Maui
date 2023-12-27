@@ -111,7 +111,6 @@ public abstract class BaseFormElement : ContentView
         };
     }
 
-    [Obsolete]
     protected Label CreateLabel()
     {
         return new Label
