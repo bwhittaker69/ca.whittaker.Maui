@@ -1,17 +1,10 @@
 # Custom Controls for .NET MAUI
 
 - [Buttons](#ca.whittaker.maui.controls.buttons)
-  - *Delete Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/delete_12_light.png) 
-  - *Camera Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/camera_12_light.png) 
-  - *Cancel Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/cancel_12_light.png) 
-  - *Undo Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/undo_12_light.png) 
-  - *Save Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/save_12_light.png) 
-  - *Refresh Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/refresh_12_light.png) 
-  - *Zoom In Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/zoomin_12_light.png) 
-  - *Zoom Out Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/zoomout_12_light.png) 
-  - *Signout Button* ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/signout_12_light.png) 
 - [Forms](#ca.whittaker.maui.controls.forms)
+- [Gestures](#ca.whittaker.maui.controls.gestures)
 - [Enumerations](#enumerations)
+- [Author](#author)
 
 # ca.whittaker.Maui.Controls.Buttons
 
@@ -35,10 +28,15 @@ Regular button types include:
 | CameraFlipButton     | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/phone_flip_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/phone_flip_24_light_disabled.png) |
 | CameraRecordButton   | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/record_circle_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/record_circle_24_light_disabled.png) |
 | EditButton           | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/edit_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/edit_24_light_disabled.png) |
-| MediaPause           | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/mediapause_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/mediapause_24_light_disabled.png) |
-| MediaPlay            | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/mediaplay_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/mediaplay_24_light_disabled.png) |
-| MediaRecord          | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/mediarecord_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/mediarecord_24_light_disabled.png) |
-| MediaStop            | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/mediastop_
+| MediaPause           | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/media_pause_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/media_pause_24_light_disabled.png) |
+| MediaPlay            | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/media_play_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/media_play_24_light_disabled.png) |
+| MediaRecord          | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/bullet_ball_red_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/bullet_ball_red_24_light_disabled.png) |
+| MediaStop            | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/media_stop_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/media_stop_24_light_disabled.png) |
+| RefreshButton        | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/refresh_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/refresh_24_light_disabled.png) |
+| SaveButton           | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/save_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/save_24_light_disabled.png) |
+| SigninButton         | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/signin_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/signin_24_light_disabled.png) |
+| SignoutButton         | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/signout_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/signout_24_light_disabled.png) |
+| UndoButton         | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/undo_24_light.png) | ![alt text](https://raw.github.com/bwhittaker69/ca.whittaker.Maui/master/src/ca.whittaker.Maui.Controls/Resources/Images/undo_24_light_disabled.png) |
 
 Signin button exposes additional social media images:
 
@@ -205,6 +203,22 @@ These controls are placed within a VerticalStackLayout inside the Form, which ar
     </Forms:Form>
 ```
 
+# ca.whittaker.Maui.Controls.Gestures
+
+| Gesture                   | Description                                       |
+|---------------------------|---------------------------------------------------|
+| `PanContainer`            | Handles panning gestures within a container.      |
+| `PanPinchZoomContainer`   | Enables panning and pinch-to-zoom in a container. |
+| `PanUpDownContainer`      | Manages up and down panning within a container.   |
+| `PinchToZoomContainer`    | Supports pinch-to-zoom functionality.             |
+| `SwipeDownGesture`        | Detects and handles downward swipe gestures.      |
+| `SwipeGesture`            | Recognizes swipe gestures in general.             |
+| `SwipeUpContainer`        | Manages upward swipe gestures within a container. |
+| `SwipeUpDownGesture`      | Handles both upward and downward swipe gestures.  |
+| `SwipeUpGesture`          | Detects and responds to upward swipe gestures.    |
+| `SwipeLeftRightGesture`   | Recognizes left and right swipe gestures.          |
+
+
 # Enumerations
 
 ```csharp
@@ -235,3 +249,4 @@ Brett Whittaker - brett@whittaker.ca
 - https://github.com/bwhittaker69
 - https://tiktok.com/@cowboycanadian
 - https://www.linkedin.com/in/brettdouglaswhittaker
+- https://youtube.com/@CowboyCanadian
