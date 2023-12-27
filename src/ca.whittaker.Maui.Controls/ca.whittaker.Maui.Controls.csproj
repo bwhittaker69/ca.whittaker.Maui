@@ -27,7 +27,7 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <MyApplicationTitle>Whittaker Maui Controls</MyApplicationTitle>
     <MyApplicationId>ca.whittaker.Maui.Controls</MyApplicationId>
-    <MyVersionPrefix>2.0.1</MyVersionPrefix>
+    <MyVersionPrefix>2.0.2</MyVersionPrefix>
     <MyVersion>1</MyVersion>
     <PackageProjectUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</PackageProjectUrl>
 		<PackageIcon>bwhittaker69.png</PackageIcon>
