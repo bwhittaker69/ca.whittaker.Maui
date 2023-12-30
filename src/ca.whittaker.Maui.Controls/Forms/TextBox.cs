@@ -11,6 +11,9 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public class TextBox : BaseFormElement
 {
+    public static readonly BindableProperty ShowLabelProperty =
+        BindableProperty.Create(propertyName: nameof(ShowLabel), returnType: typeof(bool), declaringType: typeof(TextBox), defaultValue: false);
+
     public static readonly BindableProperty AllLowerCaseProperty =
         BindableProperty.Create(propertyName: nameof(AllLowerCase), returnType: typeof(bool), declaringType: typeof(TextBox), defaultValue: false);
 
@@ -67,6 +70,8 @@ public class TextBox : BaseFormElement
     {
         InitializeUI();
     }
+
+    public bool ShowLabel { get => (bool)GetValue(ShowLabelProperty); set => SetValue(ShowLabelProperty, value); }
 
     public bool AllLowerCase { get => (bool)GetValue(AllLowerCaseProperty); set => SetValue(AllLowerCaseProperty, value); }
 
@@ -378,7 +383,10 @@ public class TextBox : BaseFormElement
                 {
                     if (grid.ColumnDefinitions.Count == 3)
                     {
-                        grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
+                        if (ShowLabel == false)
+                            grid.ColumnDefinitions[0].Width = new GridLength(0, GridUnitType.Absolute);
+                        else
+                            grid.ColumnDefinitions[0].Width = new GridLength(LabelWidth, GridUnitType.Absolute);
                         grid.ColumnDefinitions[1].Width = GridLength.Star;
                         grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
                     }
@@ -389,8 +397,11 @@ public class TextBox : BaseFormElement
                 grid.VerticalOptions = LayoutOptions.Center;
                 if (FieldLabel != null)
                 {
-                    FieldLabel.HeightRequest = HeightRequest;
-                    FieldLabel.WidthRequest = LabelWidth;
+                    if (ShowLabel != false)
+                    {
+                        FieldLabel.HeightRequest = HeightRequest;
+                        FieldLabel.WidthRequest = LabelWidth;
+                    }
                 }
                 if (_entry != null)
                 {
