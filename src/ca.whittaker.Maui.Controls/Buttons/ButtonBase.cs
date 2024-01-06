@@ -118,42 +118,24 @@ public abstract class ButtonBase : Button, IButton
                 {
                     case ButtonStateEnum.Enabled:
                         {
-                            base.IsVisible = true;
-                            if (ButtonSize != null)
-                            {
-                                base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
-                                if (ButtonType != null)
-                                {
-                                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
-                                }
-                                if (!String.IsNullOrEmpty(Text))
-                                {
-                                    base.Text = Text;
-                                }
-                            }
+                            ConfigureEnabled();
+                            break;
+                        }
+                    case ButtonStateEnum.Disabled:
+                        {
+                            ConfigureDisabled();
                             break;
                         }
                     case ButtonStateEnum.Pressed:
-                    case ButtonStateEnum.Disabled:
                         {
-                            base.IsVisible = true;
-                            if (ButtonSize != null)
-                            {
-                                base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
-                                if (ButtonType != null)
-                                {
-                                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
-                                }
-                                if (!String.IsNullOrEmpty(DisabledText))
-                                {
-                                    base.Text = DisabledText;
-                                }
-                            }
+                            ConfigurePressed();
                             break;
                         }
                     case ButtonStateEnum.Hidden:
-                        base.IsVisible = false;
-                        break;
+                        {
+                            ConfigureHidden();
+                            break;
+                        }
                 }
                 base.BatchCommit();
             }
@@ -169,5 +151,62 @@ public abstract class ButtonBase : Button, IButton
             MainThread.BeginInvokeOnMainThread(() => UpdateUI());
         }
     }
+    private void ConfigureEnabled()
+    {
+        base.IsEnabled = true;
+        base.IsVisible = true;
+
+        if (ButtonSize != null)
+        {
+            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum) ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum) ButtonSize)* 0.4;
+            if (ButtonType != null)
+            {
+                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ImageResourceEnum) ButtonType, (SizeEnum) ButtonSize);
+            }
+            if (!String.IsNullOrEmpty(Text))
+            {
+                base.Text = Text;
+            }
+        }
+    }
+    private void ConfigureDisabled()
+    {
+        base.IsEnabled = false;
+        base.IsVisible = true;
+
+        if (ButtonSize != null)
+        {
+            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
+            if (ButtonType != null)
+            {
+                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
+            }
+            if (!String.IsNullOrEmpty(DisabledText))
+            {
+                base.Text = DisabledText;
+            }
+        }
+    }
+    private void ConfigurePressed()
+    {
+        base.IsEnabled = true;
+        base.IsVisible = true;
+
+        if (ButtonSize != null)
+        {
+            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
+            if (ButtonType != null)
+            {
+                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
+            }
+        }
+    }
+
+    private void ConfigureHidden()
+    {
+        base.IsEnabled = true;
+        base.IsVisible = false;
+    }
+
 
 }
