@@ -42,7 +42,6 @@ public class UpDownContainer : ContentView
         set => SetValue(AllowedSwipeDownProperty, value);
     }
 
-    public event EventHandler<EventArgs> LoadNext;
 
     public UpDownContainer()
     {
@@ -85,6 +84,7 @@ public class UpDownContainer : ContentView
         }
         return swipe;
     }
+    public event EventHandler<EventArgs> LoadNext;
 
     private void SwipeUp()
     {
