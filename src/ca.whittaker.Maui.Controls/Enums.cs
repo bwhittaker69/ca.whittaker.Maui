@@ -8,7 +8,38 @@ namespace ca.whittaker.Maui.Controls
 {
 
     public enum SiginButtonTypeEnum { Generic, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple }
-    public enum ImageResourceEnum { Bullet_Ball_Glass_Green, Bookmark_Delete, Bookmark, Alarmclock, Alarmclock_Stop, Record_Circle, Phone_Flip, Replace2, Signin, Signout, Save, Edit, Cancel, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple, Undo, Camera, Zoom_In, Zoom_Out, Refresh, Media_Stop, Media_Play_Green, Media_Play, Media_Pause, Bullet_Ball_Red }
+    public enum ImageResourceEnum { 
+        Alarmclock, 
+        Alarmclock_Stop, 
+        Apple, 
+        Bookmark, 
+        Bookmark_Delete,
+        Bullet_Ball_Glass_Green, 
+        Bullet_Ball_Red,
+        Camera, 
+        Cancel, 
+        Edit, 
+        Facebook, 
+        Google, 
+        Linkedin, 
+        Media_Pause, 
+        Media_Play, 
+        Media_Play_Green, 
+        Media_Stop, 
+        Media_Stop_Red,
+        Microsoft, 
+        Phone_Flip, 
+        Record_Circle, 
+        Refresh, 
+        Replace2,
+        Save, 
+        Signin, 
+        Signout, 
+        Tiktok, 
+        Undo, 
+        Zoom_In, 
+        Zoom_Out
+    }
     public enum FieldTypeEnum { Text, Email, Url, Chat, Username }
     public enum ButtonStateEnum { Enabled, Disabled, Pressed, Hidden }
     public enum ChangeStateEnum { Changed, NotChanged }
