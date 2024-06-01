@@ -1,4 +1,9 @@
-﻿namespace ca.whittaker.Maui.Controls.Gestures;
+﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.ApplicationModel;
+
+namespace ca.whittaker.Maui.Controls.Gestures;
 public class PanContainer : ContentView
 {
     double panX, panY;

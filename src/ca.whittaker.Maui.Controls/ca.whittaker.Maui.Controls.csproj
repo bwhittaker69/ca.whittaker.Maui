@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net8.0-ios;net8.0-maccatalyst;net8.0-android</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
 		<UseMaui>true</UseMaui>
@@ -108,6 +107,10 @@
 	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios'">
 	  <CodesignKey>Apple Development: Created via API (WCJ2HG994G)</CodesignKey>
 	  <CodesignProvision>VS: WildCard Development</CodesignProvision>
+	</PropertyGroup>
+
+	<PropertyGroup>
+	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -741,7 +744,6 @@
 	  <None Remove="Resources\Images\replace2_72_light.png" />
 	  <None Remove="Resources\Images\replace2_72_light_disabled.png" />
 	  <None Remove="Resources\Images\save.png" />
-	  <None Remove="Resources\Images\save2-fill.png" />
 	  <None Remove="Resources\Images\save_12_dark.png" />
 	  <None Remove="Resources\Images\save_12_dark_disabled.png" />
 	  <None Remove="Resources\Images\save_12_light.png" />
@@ -888,12 +890,45 @@
 	  <None Remove="Resources\Images\zoom_out_72_light_disabled.png" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\bwhittaker69.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+
 	<ItemGroup>
-	  <EmbeddedResource Include="Resources\Images\alarmclock_12_dark.png" />
-	  <EmbeddedResource Include="Resources\Images\alarmclock_12_dark_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\alarmclock_12_light.png" />
-	  <EmbeddedResource Include="Resources\Images\alarmclock_12_light_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\alarmclock_24_dark.png" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.40" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Resources\Images\alarmclock_12_dark.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\alarmclock_12_dark_disabled.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\alarmclock_12_light.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\alarmclock_12_light_disabled.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\alarmclock_24_dark.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
 	  <EmbeddedResource Include="Resources\Images\alarmclock_24_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\alarmclock_24_light.png" />
 	  <EmbeddedResource Include="Resources\Images\alarmclock_24_light_disabled.png" />
@@ -929,69 +964,27 @@
 	  <EmbeddedResource Include="Resources\Images\alarmclock_stop_72_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\alarmclock_stop_72_light.png" />
 	  <EmbeddedResource Include="Resources\Images\alarmclock_stop_72_light_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\apple.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\apple_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\apple.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\apple_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\bookmark_12_dark.png" />
 	  <EmbeddedResource Include="Resources\Images\bookmark_12_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\bookmark_12_light.png" />
@@ -1072,195 +1065,69 @@
 	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_72_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_72_light.png" />
 	  <EmbeddedResource Include="Resources\Images\bullet_ball_red_72_light_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\camera.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\camera_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\cancel_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\delete_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\camera.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\camera_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\cancel_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\delete_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\disk_green_12_dark.png" />
 	  <EmbeddedResource Include="Resources\Images\disk_green_12_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\disk_green_12_light.png" />
@@ -1301,195 +1168,69 @@
 	  <EmbeddedResource Include="Resources\Images\edit_72_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\edit_72_light.png" />
 	  <EmbeddedResource Include="Resources\Images\edit_72_light_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\facebook.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\facebook_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\google_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\linkedin_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\facebook.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\facebook_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google.png" />
+	  <EmbeddedResource Include="Resources\Images\google_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\google_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\google_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\google_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\google_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\google_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\google_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\google_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\google_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\google_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\google_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\google_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\linkedin_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\media_beginning_12_dark.png" />
 	  <EmbeddedResource Include="Resources\Images\media_beginning_12_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\media_beginning_12_light.png" />
@@ -1710,69 +1451,27 @@
 	  <EmbeddedResource Include="Resources\Images\media_stop_red_72_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\media_stop_red_72_light.png" />
 	  <EmbeddedResource Include="Resources\Images\media_stop_red_72_light_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\microsoft.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\microsoft_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\microsoft.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\microsoft_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\phone_flip_12_dark.png" />
 	  <EmbeddedResource Include="Resources\Images\phone_flip_12_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\phone_flip_12_light.png" />
@@ -1813,69 +1512,27 @@
 	  <EmbeddedResource Include="Resources\Images\record_circle_72_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\record_circle_72_light.png" />
 	  <EmbeddedResource Include="Resources\Images\record_circle_72_light_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\refresh.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\refresh_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\refresh.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\refresh_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\replace2_12_dark.png" />
 	  <EmbeddedResource Include="Resources\Images\replace2_12_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\replace2_12_light.png" />
@@ -1896,321 +1553,111 @@
 	  <EmbeddedResource Include="Resources\Images\replace2_72_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\replace2_72_light.png" />
 	  <EmbeddedResource Include="Resources\Images\replace2_72_light_disabled.png" />
-	  <EmbeddedResource Include="Resources\Images\save.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\save_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signin_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\signout_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\tiktok_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_12_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_12_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_12_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_12_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_24_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_24_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_24_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_24_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_48_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_48_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_48_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_48_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_64_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_64_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_64_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_64_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_72_dark.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_72_dark_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_72_light.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Images\undo_72_light_disabled.png">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Images\save.png" />
+	  <EmbeddedResource Include="Resources\Images\save_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\save_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\save_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\save_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\save_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\save_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\save_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\save_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\save_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\save_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\save_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\save_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signin_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\signout_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\tiktok_72_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_12_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_12_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_12_light.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_12_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_24_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_24_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_24_light.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_24_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_48_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_48_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_48_light.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_48_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_64_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_64_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_64_light.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_64_light_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_72_dark.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_72_dark_disabled.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_72_light.png" />
+	  <EmbeddedResource Include="Resources\Images\undo_72_light_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\zoom_in_12_dark.png" />
 	  <EmbeddedResource Include="Resources\Images\zoom_in_12_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\zoom_in_12_light.png" />
@@ -2253,31 +1700,9 @@
 	  <EmbeddedResource Include="Resources\Images\zoom_out_72_light_disabled.png" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\bwhittaker69.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\..\LICENSE.txt">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.21" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.21" />
+	  <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.40" />
 	</ItemGroup>
 
 </Project>

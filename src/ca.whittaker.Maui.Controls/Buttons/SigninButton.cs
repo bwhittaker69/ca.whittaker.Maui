@@ -1,4 +1,9 @@
-﻿namespace ca.whittaker.Maui.Controls.Buttons;
+﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.ApplicationModel;
+
+namespace ca.whittaker.Maui.Controls.Buttons;
 
 public class SigninButton : ButtonBase
 {

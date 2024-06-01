@@ -1,4 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.ApplicationModel;
+
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using static System.Net.Mime.MediaTypeNames;

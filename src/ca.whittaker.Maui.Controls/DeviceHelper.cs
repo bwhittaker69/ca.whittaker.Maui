@@ -1,4 +1,6 @@
-﻿namespace ca.whittaker.Maui.Controls;
+﻿using Microsoft.Maui.Devices;
+
+namespace ca.whittaker.Maui.Controls;
 
 public static class DeviceHelper
 {

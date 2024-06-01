@@ -1,4 +1,9 @@
-﻿using ca.whittaker.Maui.Controls.Buttons;
+﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.ApplicationModel;
+
+using ca.whittaker.Maui.Controls.Buttons;
 using System.Text.RegularExpressions;
 using Entry = Microsoft.Maui.Controls.Entry;
 using Label = Microsoft.Maui.Controls.Label;

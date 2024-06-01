@@ -1,4 +1,5 @@
-﻿using ca.whittaker.Maui.Controls.Demo.Views;
+﻿using Microsoft.Maui.Controls;
+using ca.whittaker.Maui.Controls.Demo.Views;
 using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
 using ShellItem = Microsoft.Maui.Controls.ShellItem;
 

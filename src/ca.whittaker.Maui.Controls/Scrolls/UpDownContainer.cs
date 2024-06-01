@@ -1,4 +1,8 @@
-﻿using System.Windows.Input;
+﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.ApplicationModel;
+using System.Windows.Input;
 
 namespace ca.whittaker.Maui.Controls.Scrolls;
 public class UpDownContainer : ContentView
