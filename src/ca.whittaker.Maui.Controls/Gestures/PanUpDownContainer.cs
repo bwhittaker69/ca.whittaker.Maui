@@ -9,7 +9,7 @@ namespace ca.whittaker.Maui.Controls.Gestures;
 public class PanUpDownContainer : ContentView
 {
     double panY;
-    DateTime? startTime;
+    DateTimeOffset? startTime;
 
     public PanUpDownContainer()
     {
