@@ -28,6 +28,7 @@
     <MyApplicationId>ca.whittaker.Maui.Controls</MyApplicationId>
     <MyVersionPrefix>2.0.2</MyVersionPrefix>
     <MyVersion>1</MyVersion>
+
     <PackageProjectUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</PackageProjectUrl>
 		<PackageIcon>bwhittaker69.png</PackageIcon>
 		<AssemblyVersion>$(MyVersionPrefix)</AssemblyVersion>
@@ -112,6 +113,12 @@
 	<PropertyGroup>
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
 	</PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Update="Microsoft.Maui.Controls" Version="8.0.93" />
+		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.93" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <None Remove="Resources\Images\alarmclock_12_dark.png" />
@@ -909,11 +916,6 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.80" />
-	</ItemGroup>
-
-
-	<ItemGroup>
 	  <EmbeddedResource Include="Resources\Images\alarmclock_12_dark.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
@@ -1701,8 +1703,5 @@
 	</ItemGroup>
 
 
-	<ItemGroup>
-	  <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.80" />
-	</ItemGroup>
 
 </Project>
