@@ -216,7 +216,7 @@ public class TextBox : BaseFormElement
         {
             Placeholder = Placeholder,
             HorizontalOptions = LayoutOptions.Fill,
-            VerticalOptions = LayoutOptions.CenterAndExpand, // Ensure vertical centering
+            VerticalOptions = LayoutOptions.Center, // Updated to use Grid instead of deprecated StackLayout options
         };
 
         entry.TextChanged += Entry_TextChanged;

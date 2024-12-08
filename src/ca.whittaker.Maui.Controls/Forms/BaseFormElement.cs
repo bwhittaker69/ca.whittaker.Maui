@@ -123,7 +123,7 @@ public abstract class BaseFormElement : ContentView
             Text = Label,
             HorizontalOptions = LayoutOptions.Start,
             BackgroundColor = Colors.Transparent,
-            VerticalOptions = LayoutOptions.CenterAndExpand, // Ensure vertical centering
+            VerticalOptions = LayoutOptions.Center, // Ensure vertical centering
             HeightRequest = -1
         };
     }

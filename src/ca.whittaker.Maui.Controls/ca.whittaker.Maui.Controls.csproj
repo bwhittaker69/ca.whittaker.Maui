@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-ios;net8.0-maccatalyst;net8.0-android</TargetFrameworks>
+		<TargetFrameworks>net9.0-ios;net9.0-maccatalyst;net9.0-android</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
 		<UseMaui>true</UseMaui>
@@ -17,16 +17,16 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-		<Title>Custom form controls for .NET8 MAUI</Title>
+		<Title>Custom form controls for .NET9 MAUI</Title>
 		<Authors>Brett Whittaker</Authors>
-		<Description>form controls for .NET8 MAUI</Description>
+		<Description>form controls for .NET9 MAUI</Description>
 		<RepositoryUrl>https://github.com/bwhittaker69/ca.whittaker.Maui/tree/master/src/ca.whittaker.Maui.Controls</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>MAUI;MAUI form controls</PackageTags>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <MyApplicationTitle>Whittaker Maui Controls</MyApplicationTitle>
     <MyApplicationId>ca.whittaker.Maui.Controls</MyApplicationId>
-    <MyVersionPrefix>2.0.2</MyVersionPrefix>
+    <MyVersionPrefix>3.0.2</MyVersionPrefix>
     <MyVersion>1</MyVersion>
 
     <PackageProjectUrl>https://github.com/bwhittaker69/ca.whittaker.Maui</PackageProjectUrl>
@@ -37,7 +37,7 @@
 		<IncludeSymbols>True</IncludeSymbols>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
 	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
@@ -45,41 +45,7 @@
     <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
   </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
-    <ApplicationId>$(MyApplicationId)</ApplicationId>
-    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
-    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
-    <MtouchDebug>True</MtouchDebug>
-    <MtouchProfiling>True</MtouchProfiling>
-  </PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
-	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
-    <ApplicationId>$(MyApplicationId)</ApplicationId>
-    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
-    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
-  </PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
-    <ApplicationId>$(MyApplicationId)</ApplicationId>
-    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
-    <NoWarn>1701;1702;CS8618</NoWarn>
-  </PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
-	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
-    <ApplicationId>$(MyApplicationId)</ApplicationId>
-    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
-    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
-  </PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-ios|AnyCPU'">
 	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
@@ -89,7 +55,7 @@
     <MtouchProfiling>True</MtouchProfiling>
   </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-maccatalyst|AnyCPU'">
 	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
@@ -97,7 +63,7 @@
     <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
   </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
 	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
 	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
     <ApplicationId>$(MyApplicationId)</ApplicationId>
@@ -105,19 +71,53 @@
     <NoWarn>1701;1702;CS8618</NoWarn>
   </PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-ios|AnyCPU'">
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
+    <MtouchDebug>True</MtouchDebug>
+    <MtouchProfiling>True</MtouchProfiling>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-maccatalyst|AnyCPU'">
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618;CS8622</NoWarn>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.19041.0|AnyCPU'">
+	  <ApplicationDisplayVersion>$(MyVersionPrefix)</ApplicationDisplayVersion>
+	  <ApplicationVersion>$(MyVersion)</ApplicationVersion>
+    <ApplicationId>$(MyApplicationId)</ApplicationId>
+    <ApplicationTitle>$(MyApplicationTitle)</ApplicationTitle>
+    <NoWarn>1701;1702;CS8618</NoWarn>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
 	  <CodesignKey>Apple Development: Created via API (WCJ2HG994G)</CodesignKey>
 	  <CodesignProvision>VS: WildCard Development</CodesignProvision>
 	</PropertyGroup>
 
 	<PropertyGroup>
-	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
 	</PropertyGroup>
 
 
 	<ItemGroup>
-		<PackageReference Update="Microsoft.Maui.Controls" Version="8.0.93" />
-		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.93" />
+		<PackageReference Update="Microsoft.Maui.Controls" Version="9.0.0" />
+		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -71,6 +71,17 @@ public class TextBoxElement : BaseFormElement
     private bool _previousInvalidDataState = false;
     public TextBoxElement()
     {
+        _entry = new Entry
+        {
+            Placeholder = Placeholder,
+            HorizontalOptions = LayoutOptions.Fill,
+            VerticalOptions = LayoutOptions.Center, // Ensure vertical centering
+        };
+
+        _entry.TextChanged += Entry_TextChanged;
+        _entry.Focused += Entry_Focused;
+        _entry.Unfocused += Entry_Unfocused;
+
         InitializeUI();
     }
     //protected override void OnBindingContextChanged()
@@ -171,7 +182,7 @@ public class TextBoxElement : BaseFormElement
         RefreshUI();
     }
 
-    protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
     {
         base.OnPropertyChanged(propertyName);
         RefreshUI();
