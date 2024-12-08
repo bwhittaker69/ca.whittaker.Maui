@@ -116,8 +116,8 @@
 
 
 	<ItemGroup>
-		<PackageReference Update="Microsoft.Maui.Controls" Version="9.0.0" />
-		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="9.0.0" />
+		<PackageReference Update="Microsoft.Maui.Controls" Version="9.0.12" />
+		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="9.0.12" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -1700,6 +1700,11 @@
 	  <EmbeddedResource Include="Resources\Images\zoom_out_72_dark_disabled.png" />
 	  <EmbeddedResource Include="Resources\Images\zoom_out_72_light.png" />
 	  <EmbeddedResource Include="Resources\Images\zoom_out_72_light_disabled.png" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.0" />
 	</ItemGroup>
 
 
