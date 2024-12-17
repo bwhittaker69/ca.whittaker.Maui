@@ -3,6 +3,8 @@ using System.Net.NetworkInformation;
 using System.Net;
 using System.Linq;
 using System.Net.Sockets;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.ApplicationModel;
 
 
 namespace ca.whittaker.Maui.Controls.Demo.ViewModels
