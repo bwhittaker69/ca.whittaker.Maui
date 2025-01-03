@@ -60,9 +60,6 @@
 	  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\ca.whittaker.Maui.Controls\ca.whittaker.Maui.Controls.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Resources\Strings\AppResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
