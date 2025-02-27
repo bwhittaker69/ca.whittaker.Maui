@@ -20,7 +20,7 @@ public class PanUpDownContainer : ContentView
         GestureRecognizers.Add(panGesture);
     }
 
-    void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+    void OnPanUpdated(object? sender, PanUpdatedEventArgs e)
     {
         switch (e.StatusType)
         {

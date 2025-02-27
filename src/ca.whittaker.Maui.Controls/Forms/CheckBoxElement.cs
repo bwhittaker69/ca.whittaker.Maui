@@ -16,11 +16,11 @@ namespace ca.whittaker.Maui.Controls.Forms
     public class CheckBoxElement : BaseFormElement
     {
         private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
-        private Microsoft.Maui.Controls.CheckBox _checkBox;
-        private bool _isOriginalValueSet = false;
+        private Microsoft.Maui.Controls.CheckBox? _checkBox;
+        //private bool _isOriginalValueSet = false;
         private bool _originalValue = false;
         private bool _previousHasChangedState = false;
-        private bool _previousInvalidDataState = false;
+        //private bool _previousInvalidDataState = false;
 
         public static readonly BindableProperty MandatoryProperty =
             BindableProperty.Create(nameof(Mandatory), typeof(bool), typeof(CheckBoxElement), false);
@@ -53,13 +53,14 @@ namespace ca.whittaker.Maui.Controls.Forms
         {
             if (bindable is CheckBoxElement element)
             {
-                element._checkBox.IsChecked = (bool)newValue;
+                if (element._checkBox != null)
+                    element._checkBox.IsChecked = (bool)newValue;
             }
         }
         public override void Unfocus()
         {
             base.Unfocus();
-            _checkBox.Unfocus();
+            _checkBox?.Unfocus();
         }
         private void InitializeUI()
         {
@@ -75,34 +76,43 @@ namespace ca.whittaker.Maui.Controls.Forms
         {
             SetOriginalValue(false);
             UpdateValidationState();
-            _checkBox.Unfocus();
+            _checkBox?.Unfocus();
         }
 
         public void Saved()
         {
-            SetOriginalValue(_checkBox.IsChecked);
-            UpdateValidationState();
-            _checkBox.Unfocus();
+            if (_checkBox != null)
+            {
+                SetOriginalValue(_checkBox.IsChecked);
+                UpdateValidationState();
+                _checkBox.Unfocus();
+            }
         }
 
         public void InitField()
         {
             SetOriginalValue(CheckBoxSource);
             UpdateValidationState();
-            _checkBox.Unfocus();
+            if (_checkBox != null)
+            {
+                _checkBox.Unfocus();
+            }
         }
 
         public void SetOriginalValue(bool originalValue)
         {
             _originalValue = originalValue;
-            _checkBox.IsChecked = originalValue;
+            if (_checkBox != null)
+                _checkBox.IsChecked = originalValue;
         }
 
         public void Undo()
         {
-            _checkBox.IsChecked = _originalValue;
+            if (_checkBox != null)
+                _checkBox.IsChecked = _originalValue;
             UpdateValidationState();
-            _checkBox.Unfocus();
+            if (_checkBox != null)
+                _checkBox.Unfocus();
         }
 
         private Microsoft.Maui.Controls.CheckBox CreateCheckBox()
@@ -150,21 +160,20 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         private void EvaluateToRaiseHasChangesEvent()
         {
-            bool hasChanged = _originalValue != _checkBox.IsChecked;
+            bool hasChanged = _originalValue != _checkBox?.IsChecked;
             if (_previousHasChangedState != hasChanged)
-            {
                 UpdateUI(hasChanged);
-            }
         }
 
         private void UpdateUI(bool hasChanged)
         {
             // update the binded data source
-            CheckBoxSource = _checkBox.IsChecked;
+            CheckBoxSource = _checkBox?.IsChecked == true;
 
             using (var resourceHelper = new ResourceHelper())
             {
-                ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, ImageResourceEnum.Undo, cUndoButtonSize);
+                if (ButtonUndo != null)
+                    ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, ImageResourceEnum.Undo, cUndoButtonSize);
             }
             _previousHasChangedState = hasChanged;
             ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
@@ -173,7 +182,8 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         private void ProcessAndSetValue(bool value)
         {
-            _checkBox.IsChecked = value;
+            if (_checkBox != null)
+                _checkBox.IsChecked = value;
         }
 
         private void UpdateValidationState()

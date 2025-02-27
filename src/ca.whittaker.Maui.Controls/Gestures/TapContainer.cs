@@ -14,7 +14,7 @@ public class TapContainer : ContentView
         tapGesture.Tapped += TapGesture_Tapped;
         GestureRecognizers.Add(tapGesture);
     }
-    public event EventHandler<TappedEventArgs> OnTapped;
+    public event EventHandler<TappedEventArgs>? OnTapped;
 
     private void Tapped(TappedEventArgs e)
     {

@@ -6,8 +6,8 @@ using Microsoft.Maui.ApplicationModel;
 namespace ca.whittaker.Maui.Controls.Gestures;
 public class SwipLeftRightGesture : ContentView
 {
-    public event EventHandler<SwipedEventArgs> SwipeLeft;
-    public event EventHandler<SwipedEventArgs> SwipeRight;
+    public event EventHandler<SwipedEventArgs>? SwipeLeft;
+    public event EventHandler<SwipedEventArgs>? SwipeRight;
 
     public SwipLeftRightGesture()
     {

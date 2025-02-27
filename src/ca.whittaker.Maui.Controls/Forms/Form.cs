@@ -66,12 +66,12 @@ public class Form : ContentView
         defaultBindingMode: BindingMode.TwoWay,
         propertyChanged: OnFormStateChanged);
 
-    private SaveButton _buttonCancel;
-    private CancelButton _buttonSave;
-    private Label _labelForm;
-    private Label _labelNotification;
+    private SaveButton? _buttonCancel;
+    private CancelButton? _buttonSave;
+    private Label? _labelForm;
+    private Label? _labelNotification;
 
-    private StackLayout _stackedLayout;
+    //private StackLayout? _stackedLayout;
     private SizeEnum cButtonSize = SizeEnum.XXSmall;
 
     public Form()
@@ -516,20 +516,23 @@ public class Form : ContentView
 
         void SetButtonImages(ResourceHelper resourceHelper, bool noChanges, bool noErrors, SizeEnum size)
         {
-            if (noChanges)
+            if (_buttonSave != null && _buttonCancel != null)
             {
-                _buttonSave.ButtonState = ButtonStateEnum.Disabled;
-                _buttonCancel.ButtonState = ButtonStateEnum.Disabled;
-            }
-            else if (noErrors)
-            {
-                _buttonSave.ButtonState = ButtonStateEnum.Enabled;
-                _buttonCancel.ButtonState = ButtonStateEnum.Enabled;
-            }
-            else
-            {
-                _buttonSave.ButtonState = ButtonStateEnum.Disabled;
-                _buttonCancel.ButtonState = ButtonStateEnum.Enabled;
+                if (noChanges)
+                {
+                    _buttonSave.ButtonState = ButtonStateEnum.Disabled;
+                    _buttonCancel.ButtonState = ButtonStateEnum.Disabled;
+                }
+                else if (noErrors)
+                {
+                    _buttonSave.ButtonState = ButtonStateEnum.Enabled;
+                    _buttonCancel.ButtonState = ButtonStateEnum.Enabled;
+                }
+                else
+                {
+                    _buttonSave.ButtonState = ButtonStateEnum.Disabled;
+                    _buttonCancel.ButtonState = ButtonStateEnum.Enabled;
+                }
             }
         }
     }

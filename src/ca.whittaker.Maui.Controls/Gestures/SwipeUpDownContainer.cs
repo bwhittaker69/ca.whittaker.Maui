@@ -18,9 +18,9 @@ public class SwipeUpDownContainer : ContentView
     private const int AnimationDuration = 250;
     private const int BaseVelocityThreshold = 200;
 
-    private readonly PanGestureRecognizer _panGesture;
-    public event EventHandler<EventArgs> SwipedNextElement;
-    public event EventHandler<EventArgs> SwipedPreviousElement;
+    private readonly PanGestureRecognizer? _panGesture;
+    public event EventHandler<EventArgs>? SwipedNextElement;
+    public event EventHandler<EventArgs>? SwipedPreviousElement;
 
     private int _currentIndex = 0;
 
@@ -82,7 +82,7 @@ public class SwipeUpDownContainer : ContentView
 
 
     // Handles the updates of the pan gesture.
-    private async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+    private async void OnPanUpdated(object? sender, PanUpdatedEventArgs e)
     {
         switch (e.StatusType)
         {

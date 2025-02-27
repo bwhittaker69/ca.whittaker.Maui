@@ -26,9 +26,9 @@ public abstract class BaseFormElement : ContentView
     public static readonly BindableProperty ValidationStateProperty =
         BindableProperty.Create(nameof(ValidationState), typeof(ValidationStateEnum), typeof(BaseFormElement), ValidationStateEnum.Valid, BindingMode.TwoWay);
 
-    public UndoButton ButtonUndo;
-    public Label FieldLabel;
-    public Label FieldNotification;
+    public UndoButton? ButtonUndo;
+    public Label? FieldLabel;
+    public Label? FieldNotification;
     private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
     // Constructor
     public BaseFormElement()
@@ -36,9 +36,9 @@ public abstract class BaseFormElement : ContentView
     }
 
     // Events
-    public event EventHandler<HasChangesEventArgs> HasChanges;
+    public event EventHandler<HasChangesEventArgs>? HasChanges;
 
-    public event EventHandler<ValidationDataChangesEventArgs> HasValidationChanges;
+    public event EventHandler<ValidationDataChangesEventArgs>? HasValidationChanges;
 
     // Properties
     public ChangeStateEnum ChangeState
@@ -83,7 +83,8 @@ public abstract class BaseFormElement : ContentView
     public void UpdateLabelWidth(double newWidth)
     {
         ((Grid)Content).ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
-        FieldLabel.WidthRequest = newWidth;
+        if (FieldLabel != null)
+            FieldLabel.WidthRequest = newWidth;
     }
 
     // Methods
@@ -138,7 +139,8 @@ public abstract class BaseFormElement : ContentView
     {
         if (bindable is BaseFormElement element)
         {
-            element.FieldLabel.Text = newValue?.ToString() ?? "";
+            if (element != null && element.FieldLabel != null)
+                element.FieldLabel.Text = newValue?.ToString() ?? "";
         }
     }
 

@@ -6,7 +6,7 @@ using Microsoft.Maui.ApplicationModel;
 namespace ca.whittaker.Maui.Controls.Gestures;
 public class SwipeDownContainer : ContentView
 {
-    public event EventHandler<SwipedEventArgs> SwipeUp;
+    public event EventHandler<SwipedEventArgs>? SwipeUp;
 
     public SwipeDownContainer()
     {

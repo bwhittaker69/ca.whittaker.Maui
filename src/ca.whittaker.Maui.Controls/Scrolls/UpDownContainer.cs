@@ -60,7 +60,7 @@ public class UpDownContainer : ContentView
 
     }
 
-    void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+    void OnPanUpdated(object? sender, PanUpdatedEventArgs e)
     {
         switch (e.StatusType)
         {
@@ -88,7 +88,7 @@ public class UpDownContainer : ContentView
         }
         return swipe;
     }
-    public event EventHandler<EventArgs> LoadNext;
+    public event EventHandler<EventArgs>? LoadNext;
 
     private void SwipeUp()
     {

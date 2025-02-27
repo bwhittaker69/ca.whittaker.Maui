@@ -53,22 +53,25 @@ public class TextBox : BaseFormElement
     
     private void ProcessAndSetText(string newText)
     {
-        _entry.TextChanged -= Entry_TextChanged;
-        _entry.Text = ProcessUsernameFilter(
-            ProcessEmailFilter(
-                ProcessAllLowercase(
-                    ProcessAllowWhiteSpace(newText ?? ""))));
+        if (_entry != null)
+        {
+            _entry.TextChanged -= Entry_TextChanged;
+            _entry.Text = ProcessUsernameFilter(
+                ProcessEmailFilter(
+                    ProcessAllLowercase(
+                        ProcessAllowWhiteSpace(newText ?? ""))));
 
-        _entry.TextChanged += Entry_TextChanged;
+            _entry.TextChanged += Entry_TextChanged;
+        }
     }
 
-    private bool _isOriginalTextSet = false;
+    //private bool _isOriginalTextSet = false;
     private const SizeEnum cUndoButtonSize = SizeEnum.XXSmall;
     private static readonly Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
-    private Entry _entry;
-    private bool _onTextPropertyChanging = false;
+    private Entry? _entry;
+    //private bool _onTextPropertyChanging = false;
     private string _originalText = string.Empty;
-    private bool _previousHasChangedState = false;
+    //private bool _previousHasChangedState = false;
     private bool _previousInvalidDataState = false;
 
     public TextBox()
@@ -112,49 +115,62 @@ public class TextBox : BaseFormElement
     public void Clear()
     {
         RaiseHasChanges(true);
-        _entry.TextChanged -= Entry_TextChanged;
-        _entry.Text = "";
-        _entry.TextChanged += Entry_TextChanged;
+        if (_entry != null)
+        {
+            _entry.TextChanged -= Entry_TextChanged;
+            _entry.Text = "";
+            _entry.TextChanged += Entry_TextChanged;
+        }
         SetOriginalText("");
         UpdateValidationAndChangedState();
-        _entry.Unfocus();
+        if (_entry != null)
+            _entry.Unfocus();
     }
 
     public string GetText()
     {
-        return _entry.Text;
+        return _entry?.Text ?? String.Empty;
     }
 
     public void InitField()
     {
         UpdateValidationAndChangedState();
-        _entry.Unfocus();
+        if (_entry != null)
+            _entry.Unfocus();
     }
 
     public void SetOriginalText(string originalText)
     {
-        _isOriginalTextSet = true;
+        //_isOriginalTextSet = true;
         _originalText = originalText;
-        _entry.TextChanged -= Entry_TextChanged;
-        _entry.Text = originalText;
-        _entry.TextChanged += Entry_TextChanged;
+        if (_entry != null)
+        {
+            _entry.TextChanged -= Entry_TextChanged;
+            _entry.Text = originalText;
+            _entry.TextChanged += Entry_TextChanged;
+        }
         EvaluateToRaiseValidationChangesEvent();
     }
 
     public void Undo()
     {
         RaiseHasChanges(true);
-        _entry.TextChanged -= Entry_TextChanged;
-        _entry.Text = _originalText;
-        _entry.TextChanged += Entry_TextChanged;
+        if (_entry != null)
+        {
+            _entry.TextChanged -= Entry_TextChanged;
+            _entry.Text = _originalText;
+            _entry.TextChanged += Entry_TextChanged;
+        }
         UpdateValidationAndChangedState();
-        _entry.Unfocus();
+        if (_entry != null)
+            _entry.Unfocus();
     }
 
     public override void Unfocus()
     {
         base.Unfocus();
-        _entry.Unfocus();
+        if (_entry != null)
+            _entry.Unfocus();
     }
 
     protected override void OnParentSet()
@@ -260,19 +276,19 @@ public class TextBox : BaseFormElement
     {
         ProcessAndSetText(e.NewTextValue);
         UpdateValidationAndChangedState();
-        UpdateNotificationMessage(_entry.Text);
+        UpdateNotificationMessage(_entry?.Text ?? String.Empty);
         RaiseHasChanges(true);
     }
 
     private void Entry_Unfocused(object? sender, FocusEventArgs e)
     {
-        UpdateNotificationMessage(_entry.Text);
+        UpdateNotificationMessage(_entry?.Text ?? String.Empty);
     }
 
 
     private void EvaluateToRaiseValidationChangesEvent(bool forceRaise = false)
     {
-        bool isValid = IsValidData(_entry.Text);
+        bool isValid = IsValidData(_entry?.Text ?? String.Empty);
         if (_previousInvalidDataState != isValid || forceRaise)
         {
             void UpdateUI()
@@ -336,24 +352,30 @@ public class TextBox : BaseFormElement
 
     private void OnFieldTypeChanged(object newValue)
     {
-        _entry.Keyboard = GetKeyboardForFieldType((FieldTypeEnum)newValue);
+        if (_entry != null)
+            _entry.Keyboard = GetKeyboardForFieldType((FieldTypeEnum)newValue);
     }
 
     private void OnMaxLengthPropertyChanged(object newValue)
     {
-        _entry.MaxLength = (int)newValue;
+        if (_entry != null)
+            _entry.MaxLength = (int)newValue;
     }
 
     private void OnPlaceholderPropertyChanged(object newValue)
     {
-        _entry.Placeholder = newValue?.ToString() ?? "";
+        if (_entry != null)
+            _entry.Placeholder = newValue?.ToString() ?? "";
     }
 
     private void OnTextPropertyChanged(object newValue, object oldValue)
     {
-        _entry.TextChanged -= Entry_TextChanged;
-        _entry.Text = (string)newValue;
-        _entry.TextChanged += Entry_TextChanged;
+        if (_entry != null)
+        {
+            _entry.TextChanged -= Entry_TextChanged;
+            _entry.Text = (string)newValue;
+            _entry.TextChanged += Entry_TextChanged;
+        }
     }
 
     private string ProcessAllLowercase(string text)
@@ -432,13 +454,14 @@ public class TextBox : BaseFormElement
     }
     private void SetMaxLength(object newValue)
     {
-        if (newValue != null)
+        if (newValue != null && _entry != null)
             _entry.MaxLength = (int)newValue;
     }
 
     private void SetPlaceholderText(object newValue)
     {
-        _entry.Placeholder = newValue == null ? "" : (string)newValue;
+        if (newValue != null && _entry != null)
+            _entry.Placeholder = newValue == null ? "" : (string)newValue;
     }
 
     private void UpdateNotificationMessage(string text)
@@ -459,10 +482,11 @@ public class TextBox : BaseFormElement
                 isNotificationVisible = true;
                 break;
         }
-
-        FieldNotification.Text = notificationMessage;
-        FieldNotification.IsVisible = isNotificationVisible;
-
+        if (FieldNotification != null)
+        {
+            FieldNotification.Text = notificationMessage;
+            FieldNotification.IsVisible = isNotificationVisible;
+        }
         ValidationState = validationState; // Set the validation state based on calculated value
     }
 

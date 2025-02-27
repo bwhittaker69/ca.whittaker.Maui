@@ -297,7 +297,8 @@ public class TextBoxElement : BaseFormElement
             {
                 using (ResourceHelper resourceHelper = new())
                 {
-                    ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, ImageResourceEnum.Undo, cUndoButtonSize);
+                    if (ButtonUndo != null)
+                        ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, ImageResourceEnum.Undo, cUndoButtonSize);
                 }
                 _previousHasChangedState = hasChanged;
                 ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
@@ -353,7 +354,7 @@ public class TextBoxElement : BaseFormElement
 
     private void InitializeUI()
     {
-        _entry = CreateEntry();
+        _entry = new Entry();
         FieldLabel = CreateLabel();
         FieldNotification = CreateNotificationLabel();
         ButtonUndo = CreateUndoButton();
@@ -508,9 +509,11 @@ public class TextBoxElement : BaseFormElement
                 isNotificationVisible = true;
                 break;
         }
-
-        FieldNotification.Text = notificationMessage;
-        FieldNotification.IsVisible = isNotificationVisible;
+        if (FieldNotification != null)
+        {
+            FieldNotification.Text = notificationMessage;
+            FieldNotification.IsVisible = isNotificationVisible;
+        }
 
         ValidationState = validationState; // Set the validation state based on calculated value
     }

@@ -18,7 +18,7 @@ public class PinchToZoomContainer : ContentView
         GestureRecognizers.Add(pinchGesture);
     }
 
-    void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
+    void OnPinchUpdated(object? sender, PinchGestureUpdatedEventArgs e)
     {
         if (e.Status == GestureStatus.Started)
         {

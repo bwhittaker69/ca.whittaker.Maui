@@ -45,7 +45,7 @@ public class PanPinchZoomContainer : ContentView
     }
 
 
-    void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+    void OnPanUpdated(object? sender, PanUpdatedEventArgs e)
     {
         switch (e.StatusType)
         {
@@ -80,7 +80,7 @@ public class PanPinchZoomContainer : ContentView
         }
     }
 
-    void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
+    void OnPinchUpdated(object? sender, PinchGestureUpdatedEventArgs e)
     {
         if (e.Status == GestureStatus.Started)
         {
