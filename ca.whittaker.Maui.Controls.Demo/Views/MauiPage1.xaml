@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="ca.whittaker.Maui.Controls.Demo.Views.MauiPage1"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:ca.whittaker.Maui.Controls.Demo.Views"
+    xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
+    xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
+    mc:Ignorable="d">
+    <ContentPage.Content>
+        <Forms:Form x:Name="UserProfileForm" 
+                        FormName="{x:Static strings:AppResources.Form_UserProfile_TItle}"
+                        FormSaveButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Save}"
+                        FormCancelButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Cancel}"
+                        FormState="{Binding FormState}"
+                        Command="{Binding FormSaveCommand}" 
+                        Padding="10"
+                        HorizontalOptions="Fill"
+                        CommandParameter="">
+            <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Center" HorizontalOptions="Fill">
+                <Entry Text="test"></Entry>
+                <Forms:TextBoxElement   HorizontalOptions="Fill"
+                                        VerticalOptions="Start"
+                                        TextBoxSource="{Binding Userprofile_nickname}"
+                                        Label="{x:Static strings:AppResources.Field_Name}"
+                                        FieldType="Text"
+                                        AllowWhiteSpace="False"
+                                        FieldWidth="300"
+                                        Placeholder="{x:Static strings:AppResources.Field_Name_Placeholder}">
+                </Forms:TextBoxElement>
+                <Forms:TextBoxElement 
+                                        TextBoxSource="{Binding Userprofile_email}"
+                                        FieldType="Email"
+                                        Label="{x:Static strings:AppResources.Field_Email}"
+                                        Placeholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
+                </Forms:TextBoxElement>
+                <Forms:TextBoxElement 
+                                        TextBoxSource="{Binding Userprofile_bio}"
+                                        FieldType="Text"
+                                        Label="{x:Static strings:AppResources.Field_Bio}"
+                                        Placeholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
+                </Forms:TextBoxElement>
+                <!--Forms:TextBoxElement 
+                                        LabelWidth="70"
+                                        TextBoxSource="{Binding Userprofile_email}"
+                                        Label="{x:Static strings:AppResources.Field_Email}"
+                                        Mandatory="False"
+                                        MaxLength="40"
+                                        FieldType="Email"
+                                        Placeholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
+                </Forms:TextBoxElement>
+                <Forms:TextBoxElement LabelWidth="70"
+                                        TextBoxSource="{Binding Userprofile_bio}"
+                                        FieldType="Chat"
+                                        Label="{x:Static strings:AppResources.Field_Bio}"
+                                        MaxLength="50"
+                                        Placeholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
+                </Forms:TextBoxElement>
+                <Forms:CheckBoxElement LabelWidth="150"
+                                        CheckBoxSource="{Binding Userprofile_ispublic}"
+                                        Label="{x:Static strings:AppResources.Field_IsPublic}">
+                </Forms:CheckBoxElement-->
+
+            </VerticalStackLayout>
+
+        </Forms:Form>
+    </ContentPage.Content>
+</ContentPage>

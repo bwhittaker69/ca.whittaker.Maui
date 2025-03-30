@@ -1,16 +1,24 @@
-﻿using Microsoft.Maui.Controls;
-using ca.whittaker.Maui.Controls.Demo.Views;
-using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
-using ShellItem = Microsoft.Maui.Controls.ShellItem;
+﻿using System.Diagnostics;
 
-namespace ca.whittaker.Maui.Controls.Demo;
-
-public partial class AppShell : Shell
+namespace ca.whittaker.Maui.Controls.Demo
 {
-    private readonly Dictionary<string, ShellItem> shellItems = new();
-    public AppShell()
+    public partial class AppShell : Shell
     {
-        InitializeComponent();
-    }
+        public AppShell()
+        {
+            InitializeComponent();
+            Navigating += OnShellNavigating;
+            Navigated += OnShellNavigated;
+        }
 
+        private void OnShellNavigating(object? sender, ShellNavigatingEventArgs e)
+        {
+            Debug.WriteLine($"Navigating from {e.Current?.Location} to {e.Target?.Location}.");
+        }
+
+        private void OnShellNavigated(object? sender, ShellNavigatedEventArgs e)
+        {
+            Debug.WriteLine("Navigation completed.");
+        }
+    }
 }

@@ -6,11 +6,35 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Entry = Microsoft.Maui.Controls.Entry;
+using System.Diagnostics;
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
 /// <summary>
-/// Represents a customizable text box control with various properties for text manipulation and validation.
+/// Represents a customizable text box control that combines several UI elements:
+/// 
+/// - A Grid layout that organizes:
+/// 
+///   • A FieldLabel (Label) for displaying the field's title.
+///   • An Entry control for text input.
+///   • A ButtonUndo for reverting changes.
+///   • A FieldNotification label for showing validation or error messages.
+///   
+/// Grid Layout Overview:
+/// +-------------------+-------------------+----------------------------------+
+/// | FieldLabel        | _entry            | ButtonUndo                       |
+/// +-------------------+-------------------+----------------------------------+
+/// | FieldNotification (spans all three columns)                              |
+/// +--------------------------------------------------------------------------+
+/// 
+/// This composite control supports text manipulation, filtering, and validation.
+/// 
+/// <para>
+/// Differences:
+/// - Exposes its text via a dedicated two-way bindable property named <c>TextBoxSource</c>.
+/// - Includes loopback prevention logic when synchronizing the Entry’s text with the binding.
+/// - Intended for scenarios where robust two-way binding and extra text processing are required.
+/// </para>
 /// </summary>
 public class TextBoxElement : BaseFormElement
 {
@@ -47,17 +71,43 @@ public class TextBoxElement : BaseFormElement
             propertyChanged: (bindable, oldValue, newValue) => { ((TextBoxElement)bindable).OnTextBoxSourcePropertyChanged(newValue, oldValue); });
 
 
+    public new LayoutOptions HorizontalOptions
+    {
+        get => base.HorizontalOptions;
+        set
+        {
+            //((Grid)this.Children[0]).HorizontalOptions = value;
+            //((Grid)Content).HorizontalOptions = value;
+            base.HorizontalOptions = value;
+        }
+    }
+
+    public new LayoutOptions VerticalOptions
+    {
+        get => base.VerticalOptions;
+        set
+        {
+            ((Grid)this.Children[0]).HorizontalOptions = value;
+            ((Grid)Content).VerticalOptions = value;
+            base.VerticalOptions = value;
+        }
+    }
+
 
 
     private void ProcessAndSetText(string newText)
     {
         _entry.TextChanged -= Entry_TextChanged;
-        _entry.Text = ProcessUsernameFilter(
-            ProcessEmailFilter(
-                ProcessAllLowercase(
-                    ProcessAllowWhiteSpace(newText ?? ""))));
 
-        TextBoxSource = _entry.Text;
+        string filteredValue = ProcessUsernameFilter(
+                                  ProcessEmailFilter(
+                                      ProcessAllLowercase(
+                                          ProcessAllowWhiteSpace(newText ?? ""))));
+
+        if (_entry.Text != filteredValue)
+            _entry.Text = filteredValue;
+
+        TextBoxSource = filteredValue;
         _entry.TextChanged += Entry_TextChanged;
     }
 
@@ -73,17 +123,31 @@ public class TextBoxElement : BaseFormElement
     {
         _entry = new Entry
         {
-            Placeholder = Placeholder,
-            HorizontalOptions = LayoutOptions.Fill,
             VerticalOptions = LayoutOptions.Center, // Ensure vertical centering
         };
+
+        SetPlaceholderText(Placeholder);
+        SetMaxLength(MaxLength);
+
+        FieldLabel = CreateLabel();
+        FieldNotification = CreateNotificationLabel();
+        ButtonUndo = CreateUndoButton();
+        Content = CreateLayoutGrid();
+
+        ButtonUndo.Pressed += (s, e) => Undo();
+        _entry.ReturnCommand = new Command(Return_Pressed);
 
         _entry.TextChanged += Entry_TextChanged;
         _entry.Focused += Entry_Focused;
         _entry.Unfocused += Entry_Unfocused;
 
-        InitializeUI();
     }
+
+    private bool HasChangedFromOriginalText()
+    {
+        return _originalText != _entry.Text;
+    }
+
     //protected override void OnBindingContextChanged()
     //{
     //    base.OnBindingContextChanged();
@@ -112,7 +176,14 @@ public class TextBoxElement : BaseFormElement
         set => SetValue(CommandParameterProperty, value);
     }
 
-    public FieldTypeEnum FieldType { get => (FieldTypeEnum)GetValue(FieldTypeProperty); set => SetValue(FieldTypeProperty, value); }
+    public FieldTypeEnum FieldType { 
+        get => (FieldTypeEnum)GetValue(FieldTypeProperty);
+        set 
+        { 
+            SetValue(FieldTypeProperty, value);
+            ConfigureKeyboard();
+        }
+    }
 
     public bool Mandatory { get => (bool)GetValue(MandatoryProperty); set => SetValue(MandatoryProperty, value); }
 
@@ -160,14 +231,44 @@ public class TextBoxElement : BaseFormElement
         _entry.TextChanged += Entry_TextChanged;
         EvaluateToRaiseValidationChangesEvent();
     }
-
+    private bool _undo = false;
     public void Undo()
     {
-        _entry.TextChanged -= Entry_TextChanged;
-        _entry.Text = _originalText;
-        _entry.TextChanged += Entry_TextChanged;
-        UpdateValidationAndChangedState();
+        if (!HasChangedFromOriginalText()) return;
+        if (_undo) return;
+        _undo = true;
+        SetOriginalText(_originalText);
+        ButtonUndo?.Disabled();
+
+        //ButtonUndo?.Disabled();
+        //_entry.TextChanged -= Entry_TextChanged;
+        //_entry.Text = _originalText;
+        //UpdateValidationAndChangedState();
+        //_entry.TextChanged += Entry_TextChanged;
         _entry.Unfocus();
+        _undo = false;
+    }
+    private bool _disable = false;
+    public void Disable()
+    {
+        if (_disable) return;
+        _disable = true;
+        SetOriginalText(_originalText);
+        ButtonUndo?.Hide();
+        _entry.IsEnabled = false;
+        _entry.Unfocus();
+        _disable = false;
+    }
+    private bool _enable = false;
+    public void Enable()
+    {
+        if (_enable) return;
+        _enable = true;
+        SetOriginalText(_originalText);
+        ButtonUndo?.Disabled();
+        _entry.IsEnabled = true;
+        _entry.Unfocus();
+        _enable = false;
     }
 
     public override void Unfocus()
@@ -262,7 +363,8 @@ public class TextBoxElement : BaseFormElement
                     new RowDefinition { Height = GridLength.Auto }
                 }
         };
-
+        grid.VerticalOptions = LayoutOptions.Fill;
+        grid.VerticalOptions= LayoutOptions.Fill;
         grid.Add(FieldLabel, 0, 0);
         grid.Add(_entry, 1, 0);
         grid.Add(ButtonUndo, 2, 0);
@@ -285,40 +387,70 @@ public class TextBoxElement : BaseFormElement
 
     private void Entry_Unfocused(object? sender, FocusEventArgs e)
     {
+        Debug.WriteLine("Entry_Unfocused()");
         UpdateNotificationMessage(_entry.Text);
     }
-
+    private bool _evaluateToRaiseHasChangesEvent = false;
+    bool _updatingUI = false;
     private void EvaluateToRaiseHasChangesEvent()
     {
+        if (_evaluateToRaiseHasChangesEvent) return;
+        _evaluateToRaiseHasChangesEvent = true;
+        Debug.WriteLine("EvaluateToRaiseHasChangesEvent()");
         bool hasChanged = _originalText != _entry.Text;
         if (_previousHasChangedState != hasChanged)
         {
-            void UpdateUI()
+            void _updateUI()
             {
+                if (_updatingUI) return;
+                _updatingUI = true;
                 using (ResourceHelper resourceHelper = new())
                 {
                     if (ButtonUndo != null)
-                        ButtonUndo.ImageSource = resourceHelper.GetImageSource(hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled, ImageResourceEnum.Undo, cUndoButtonSize);
+                    {
+                        ButtonUndo.ImageSource =
+                            resourceHelper.GetImageSource(
+                                buttonState: hasChanged ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled,
+                                baseButtonType: ImageResourceEnum.Undo,
+                                sizeEnum: cUndoButtonSize);
+
+                        if (hasChanged)
+                        {
+                            if (HasChangedFromOriginalText())
+                                ButtonUndo.Enabled();
+                            else
+                                ButtonUndo.Disabled();
+                            //ButtonUndo.Pressed += (s, e) => Undo();
+                        }
+                        else
+                            ButtonUndo.Disabled();
+
+                    }
                 }
                 _previousHasChangedState = hasChanged;
                 ChangeState = hasChanged ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
                 RaiseHasChanges(hasChanged);
+                _updatingUI = false;
             }
 
             // Check if on the main thread and update UI accordingly
             if (MainThread.IsMainThread)
             {
-                UpdateUI();
+                _updateUI();
             }
             else
             {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+                MainThread.BeginInvokeOnMainThread(() => _updateUI());
             }
         }
+        _evaluateToRaiseHasChangesEvent = false;
     }
+    private bool _evaluateToRaiseValidationChangesEvent = false;
 
     private void EvaluateToRaiseValidationChangesEvent(bool forceRaise = false)
     {
+        if (_evaluateToRaiseValidationChangesEvent) return;
+        _evaluateToRaiseValidationChangesEvent = true;
         bool isValid = IsValidData(_entry.Text);
         if (_previousInvalidDataState != isValid || forceRaise)
         {
@@ -339,8 +471,13 @@ public class TextBoxElement : BaseFormElement
                 MainThread.BeginInvokeOnMainThread(() => UpdateUI());
             }
         }
+        _evaluateToRaiseValidationChangesEvent = false;
     }
+    private void ConfigureKeyboard()
+    {
+        _entry.Keyboard = GetKeyboardForFieldType(FieldType);
 
+    }
     private Keyboard GetKeyboardForFieldType(FieldTypeEnum fieldType)
     {
         return fieldType switch
@@ -350,17 +487,6 @@ public class TextBoxElement : BaseFormElement
             FieldTypeEnum.Chat => Keyboard.Chat,
             _ => Keyboard.Default,
         };
-    }
-
-    private void InitializeUI()
-    {
-        _entry = new Entry();
-        FieldLabel = CreateLabel();
-        FieldNotification = CreateNotificationLabel();
-        ButtonUndo = CreateUndoButton();
-        Content = CreateLayoutGrid();
-        ButtonUndo.Pressed += (s, e) => Undo();
-        _entry.ReturnCommand = new Command(Return_Pressed);
     }
 
     private bool IsValidData(string text)
@@ -451,8 +577,6 @@ public class TextBoxElement : BaseFormElement
                 }
                 grid.HeightRequest = HeightRequest;
                 grid.WidthRequest = WidthRequest;
-                grid.HorizontalOptions = LayoutOptions.Center;
-                grid.VerticalOptions = LayoutOptions.Center;
                 if (FieldLabel != null)
                 {
                     FieldLabel.HeightRequest = HeightRequest;
@@ -517,10 +641,13 @@ public class TextBoxElement : BaseFormElement
 
         ValidationState = validationState; // Set the validation state based on calculated value
     }
-
+    private bool _updateValidationAndChangedState = false;
     private void UpdateValidationAndChangedState()
     {
+        if (_updateValidationAndChangedState) return;
+        _updateValidationAndChangedState = true;
         EvaluateToRaiseHasChangesEvent();
         EvaluateToRaiseValidationChangesEvent();
+        _updateValidationAndChangedState = false;
     }
 }

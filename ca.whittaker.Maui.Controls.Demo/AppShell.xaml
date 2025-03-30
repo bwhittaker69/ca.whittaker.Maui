@@ -6,19 +6,16 @@
     xmlns:local="clr-namespace:ca.whittaker.Maui.Controls.Demo"
     xmlns:views="clr-namespace:ca.whittaker.Maui.Controls.Demo.Views"
     xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
-    Shell.FlyoutBehavior="Disabled">
+    Shell.FlyoutBehavior="Flyout"
+    Title="ca.whittaker.Maui.Controls.Demo">
 
     <TabBar>
-        
-        <Tab Title="Account Management">
-            
-            <ShellContent Title="{x:Static strings:AppResources.Tab_LoginLogout}" Icon="home_24.png" FlyoutIcon="home_24.png" Route="LoginLogoutPage" ContentTemplate="{DataTemplate views:LoginLogoutPage}" />
-            <ShellContent Title="{x:Static strings:AppResources.Tab_UserProfile}"  Icon="form_yellow_24.png" Route="UserProfilePage" ContentTemplate="{DataTemplate views:UserProfilePage}" />
-            <ShellContent Title="{x:Static strings:AppResources.Tab_TextBox}"  Icon="form_yellow_24.png" Route="SampleTextBox" ContentTemplate="{DataTemplate views:SampleTextBox}" />
-            <ShellContent Title="{x:Static strings:AppResources.Tab_CheckBox}"  Icon="form_yellow_24.png" Route="SampleCheckBoxPage" ContentTemplate="{DataTemplate views:SampleCheckBoxPage}" />
-            
+        <Tab Title="Tab1">
+            <ShellContent Title="LoginLogout" ContentTemplate="{DataTemplate views:LoginLogoutPage}"></ShellContent>
+            <ShellContent Title="UserProfilePage" ContentTemplate="{DataTemplate views:UserProfilePage}"></ShellContent>
+            <ShellContent Title="MauiPage1" ContentTemplate="{DataTemplate views:MauiPage1}"></ShellContent>
+            <ShellContent Title="MauiPage2" ContentTemplate="{DataTemplate views:MauiPage2}"></ShellContent>
         </Tab>
-        
     </TabBar>
-    
+
 </Shell>

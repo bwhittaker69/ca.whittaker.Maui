@@ -6,6 +6,7 @@ namespace ca.whittaker.Maui.Controls.Buttons;
 
 public abstract class ButtonBase : Button, IButton
 {
+    private double heightMultiplier => DeviceInfo.Platform == DevicePlatform.WinUI ? 2.8 : 1.0;
 
     public static readonly BindableProperty ButtonSizeProperty = BindableProperty.Create(
         propertyName: nameof(ButtonSize),
@@ -24,7 +25,7 @@ public abstract class ButtonBase : Button, IButton
         propertyName: nameof(ButtonState),
         returnType: typeof(ButtonStateEnum?),
         declaringType: typeof(ButtonBase),
-        defaultValue: null,
+        defaultValue: ButtonStateEnum.Enabled,
         defaultBindingMode: BindingMode.OneWay);
 
     public ButtonStateEnum? ButtonState
@@ -85,13 +86,11 @@ public abstract class ButtonBase : Button, IButton
         set => SetValue(PressedTextProperty, value);
     }
 
-
     public ButtonBase(ImageResourceEnum buttonType) : base()
     {
         ButtonType = buttonType;
         base.PropertyChanged += Button_PropertyChanged;
     }
-
 
     protected override void OnParentSet()
     {
@@ -109,11 +108,24 @@ public abstract class ButtonBase : Button, IButton
             || (e.PropertyName == nameof(Text)))
             UpdateUI();
     }
-
-
+    public void Enabled()
+    {
+        ButtonState = ButtonStateEnum.Enabled;
+    }
+    public void Disabled()
+    {
+        ButtonState = ButtonStateEnum.Disabled;
+    }
+    public void Hide()
+    {
+        ButtonState = ButtonStateEnum.Hidden;
+    }
+    private bool _updateUI = false;
     public void UpdateUI()
     {
-        void UpdateUI()
+        if (this._updateUI) return;
+        this._updateUI = true;
+        void _update()
         {
             if (ButtonState != null)
             {
@@ -145,15 +157,15 @@ public abstract class ButtonBase : Button, IButton
             }
         }
 
-        // Check if on the main thread and update UI accordingly
         if (MainThread.IsMainThread)
         {
-            UpdateUI();
+            _update();
         }
         else
         {
-            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+            MainThread.BeginInvokeOnMainThread(() => _update());
         }
+        this._updateUI = false;
     }
     private void ConfigureEnabled()
     {
@@ -162,12 +174,12 @@ public abstract class ButtonBase : Button, IButton
 
         if (ButtonSize != null)
         {
-            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum) ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum) ButtonSize)* 0.4;
+            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
             if (ButtonType != null)
             {
-                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ImageResourceEnum) ButtonType, (SizeEnum) ButtonSize);
+                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
             }
-            if (!String.IsNullOrEmpty(Text))
+            if (!string.IsNullOrEmpty(Text))
             {
                 base.Text = Text;
             }
@@ -180,12 +192,12 @@ public abstract class ButtonBase : Button, IButton
 
         if (ButtonSize != null)
         {
-            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
+            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
             if (ButtonType != null)
             {
                 base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
             }
-            if (!String.IsNullOrEmpty(DisabledText))
+            if (!string.IsNullOrEmpty(DisabledText))
             {
                 base.Text = DisabledText;
             }
@@ -193,12 +205,9 @@ public abstract class ButtonBase : Button, IButton
     }
     private void ConfigurePressed()
     {
-        base.IsEnabled = true;
-        base.IsVisible = true;
-
         if (ButtonSize != null)
         {
-            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) + DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * 0.4;
+            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
             if (ButtonType != null)
             {
                 base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
@@ -211,6 +220,4 @@ public abstract class ButtonBase : Button, IButton
         base.IsEnabled = true;
         base.IsVisible = false;
     }
-
-
 }

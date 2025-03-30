@@ -22,10 +22,12 @@ namespace ca.whittaker.Maui.Controls.Demo
 #endif
 
             builder.Services.AddSingleton<LoginLogoutViewModel>();
-            builder.Services.AddSingleton<UserProfilePage>();
-            builder.Services.AddSingleton<SampleCheckBoxPage>();
-            builder.Services.AddSingleton<SampleTextBox>();
             builder.Services.AddSingleton<LoginLogoutPage>();
+            builder.Services.AddSingleton<UserProfilePage>();
+            //builder.Services.AddSingleton<SampleCheckBoxPage>();
+
+            builder.Services.AddSingleton<MauiPage1>();
+            builder.Services.AddSingleton<MauiPage2>();
 
             return builder.Build();
         }

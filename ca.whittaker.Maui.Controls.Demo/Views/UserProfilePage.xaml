@@ -17,8 +17,10 @@
                              Padding="25"  
                              Margin="0, 0, 0, 0"
                              VerticalOptions="Start" >
+
+            <Label Text="hello"></Label>
             
-            <Forms:Form x:Name="UserProfileForm" 
+            <!--<Forms:Form x:Name="UserProfileForm" 
                         FormName="{x:Static strings:AppResources.Form_UserProfile_TItle}"
                         FormSaveButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Save}"
                         FormCancelButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Cancel}"
@@ -58,7 +60,7 @@
                     
                 </VerticalStackLayout>
                 
-            </Forms:Form>
+            </Forms:Form>-->
             
         </VerticalStackLayout>
         

@@ -1,10 +1,8 @@
 ﻿using Microsoft.Maui.Devices;
 
 namespace ca.whittaker.Maui.Controls;
-
 public static class DeviceHelper
 {
-
     public static int GetImageSizeForDevice(SizeEnum scaleFactor)
     {
         double density = DeviceDisplay.MainDisplayInfo.Density + ((double)scaleFactor / 10);
@@ -14,5 +12,4 @@ public static class DeviceHelper
         if (density <= 3) return 64; // xxhdpi
         return 72; // xxxhdpi or higher
     }
-
 }

@@ -14,6 +14,6 @@ public partial class UserProfilePage : ContentPage
 
     private void ContentPage_Disappearing(object sender, EventArgs e)
     {
-        UserProfileForm.CancelForm();
+        //UserProfileForm.CancelForm();
     }
 }

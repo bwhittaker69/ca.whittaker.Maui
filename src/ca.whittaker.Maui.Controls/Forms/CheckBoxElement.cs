@@ -2,7 +2,6 @@
 using Microsoft.Maui;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.ApplicationModel;
-
 using ca.whittaker.Maui.Controls.Buttons;
 using System.Text.RegularExpressions;
 using Entry = Microsoft.Maui.Controls.Entry;
@@ -11,7 +10,30 @@ using Label = Microsoft.Maui.Controls.Label;
 namespace ca.whittaker.Maui.Controls.Forms
 {
     /// <summary>
-    /// Represents a customizable text box control with various properties for text manipulation and validation.
+    /// Represents a customizable checkbox control that combines several UI elements:
+    /// 
+    /// - A Grid layout that organizes:
+    /// 
+    ///   • A FieldLabel (Label) for displaying the field's title.
+    ///   • A CheckBox control for boolean input.
+    ///   • A ButtonUndo for reverting changes.
+    ///   • A FieldNotification label for showing validation or error messages.
+    ///   
+    /// Grid Layout Overview:
+    /// +-------------------+-------------------+----------------------------------+
+    /// | FieldLabel        | _checkBox         | ButtonUndo                       |
+    /// +-------------------+-------------------+----------------------------------+
+    /// | FieldNotification (spans all three columns)                              |
+    /// +--------------------------------------------------------------------------+
+    /// 
+    /// This composite control supports boolean value capture, change tracking, and validation.
+    /// 
+    /// <para>
+    /// Differences:
+    /// - Uses a CheckBox control instead of an Entry for data input.
+    /// - Exposes its value via a dedicated two-way bindable property named <c>CheckBoxSource</c>.
+    /// - Contains logic to track changes against an original value and update an undo button accordingly.
+    /// </para>
     /// </summary>
     public class CheckBoxElement : BaseFormElement
     {
@@ -115,6 +137,28 @@ namespace ca.whittaker.Maui.Controls.Forms
                 _checkBox.Unfocus();
         }
 
+        private bool _disable = false;
+        public void Disable()
+        {
+            if (_disable || _checkBox != null) return;
+            _disable = true;
+            _checkBox!.IsChecked = _originalValue;
+            ButtonUndo?.Hide();
+            _checkBox!.IsEnabled = false;
+            _checkBox!.Unfocus();
+            _disable = false;
+        }
+        private bool _enable = false;
+        public void Enable()
+        {
+            if (_enable || _checkBox != null) return;
+            _enable = true;
+            _checkBox!.IsChecked = _originalValue;
+            ButtonUndo?.Disabled();
+            _checkBox!.IsEnabled = false;
+            _checkBox!.Unfocus();
+            _enable = false;
+        }
         private Microsoft.Maui.Controls.CheckBox CreateCheckBox()
         {
             var box = new Microsoft.Maui.Controls.CheckBox

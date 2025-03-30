@@ -12,7 +12,30 @@ using Entry = Microsoft.Maui.Controls.Entry;
 namespace ca.whittaker.Maui.Controls.Forms;
 
 /// <summary>
-/// Represents a customizable text box control with various properties for text manipulation and validation.
+/// Represents a customizable text box control that combines several UI elements:
+/// 
+/// - A Grid layout that organizes:
+/// 
+///   • A FieldLabel (Label) for displaying the field's title.
+///   • An Entry control for text input.
+///   • A ButtonUndo for reverting changes.
+///   • A FieldNotification label for showing validation or error messages.
+///   
+/// Grid Layout Overview:
+/// +-------------------+-------------------+----------------------------------+
+/// | FieldLabel        | _entry            | ButtonUndo                       |
+/// +-------------------+-------------------+----------------------------------+
+/// | FieldNotification (spans all three columns)                              |
+/// +--------------------------------------------------------------------------+
+/// 
+/// This composite control supports text manipulation, filtering, and validation.
+/// 
+/// <para>
+/// Differences:
+/// - Uses a simpler bindable property named <c>Text</c> for exposing the input value.
+/// - Lacks the loopback prevention mechanism found in TextBoxElement.
+/// - Suitable for scenarios where standard one-way or simple two-way binding is sufficient.
+/// </para>
 /// </summary>
 public class TextBox : BaseFormElement
 {
@@ -231,7 +254,7 @@ public class TextBox : BaseFormElement
         var entry = new Entry
         {
             Placeholder = Placeholder,
-            HorizontalOptions = LayoutOptions.Fill,
+            HorizontalOptions = LayoutOptions.Center,
             VerticalOptions = LayoutOptions.Center, // Updated to use Grid instead of deprecated StackLayout options
         };
 
@@ -258,7 +281,7 @@ public class TextBox : BaseFormElement
                     new RowDefinition { Height = GridLength.Auto }
                 }
         };
-
+        grid.HorizontalOptions = LayoutOptions.Fill;
         grid.Add(FieldLabel, 0, 0);
         grid.Add(_entry, 1, 0);
         grid.Add(ButtonUndo, 2, 0);

@@ -118,7 +118,7 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
         public void InitializeForm()
         {
             ClearUserProfileForm();
-            FormState = FormStateEnum.Enabled;
+            FormState = FormStateEnum.Editing;
         }
         #endregion
 
@@ -130,7 +130,7 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
                 // we are logged in, show logout button
                 LoginButtonState = ButtonStateEnum.Hidden;
                 LogoutButtonState = ButtonStateEnum.Enabled;
-                FormState = FormStateEnum.Enabled;
+                FormState = FormStateEnum.Editing;
             }
             else
             {

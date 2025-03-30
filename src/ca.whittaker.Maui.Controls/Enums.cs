@@ -44,7 +44,7 @@ namespace ca.whittaker.Maui.Controls
     public enum ButtonStateEnum { Enabled, Disabled, Pressed, Hidden }
     public enum ChangeStateEnum { Changed, NotChanged }
     public enum ValidationStateEnum { Valid, FormatError, RequiredFieldError }
-    public enum FormStateEnum { Enabled, Disabled, Hidden, Undo, Saved, Clear, Initialize }
+    public enum FormStateEnum { Editing, ReadOnly, ViewOnly, Hidden, Undo, Saved, Clear, Initialize }
     public enum SizeEnum
     {
         XXXSmall = -20,

@@ -4,6 +4,7 @@ using Microsoft.Maui.Graphics;
 using Microsoft.Maui.ApplicationModel;
 
 using System.Reflection;
+using System.Diagnostics;
 
 namespace ca.whittaker.Maui.Controls
 {
@@ -36,6 +37,8 @@ namespace ca.whittaker.Maui.Controls
                 int size = DeviceHelper.GetImageSizeForDevice(sizeEnum);
 
                 string resourceName = $"{assemblyName}.Resources.Images.{baseButtonType.ToString().ToLower()}_{size}{theme}{state}.png";
+
+                Debug.WriteLine(resourceName);
 
                 if (ResourceExists(resourceName))
                 {

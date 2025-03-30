@@ -1,5 +1,4 @@
 ﻿using Foundation;
-using Microsoft.Maui;
 
 namespace ca.whittaker.Maui.Controls.Demo
 {
