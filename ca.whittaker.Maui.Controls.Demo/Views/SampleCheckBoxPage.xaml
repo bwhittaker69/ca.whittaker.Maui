@@ -18,11 +18,11 @@
                              Margin="0, 0, 0, 0"
                              VerticalOptions="Start" >
 
-            <Forms:CheckBoxElement LabelWidth="150"
+            <Forms:CheckBoxField FieldLabelWidth="150"
                                 x:Name="CheckBox_IsPublic"
-                                CheckBoxSource="{Binding Userprofile_ispublic}"
-                                Label="{x:Static strings:AppResources.Field_IsPublic}">
-            </Forms:CheckBoxElement>
+                                FieldDataSource="{Binding Userprofile_ispublic}"
+                                FieldLabelText="{x:Static strings:AppResources.Field_IsPublic}">
+            </Forms:CheckBoxField>
 
         </VerticalStackLayout>
         

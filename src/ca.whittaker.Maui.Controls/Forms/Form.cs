@@ -5,6 +5,7 @@ using Microsoft.Maui.ApplicationModel;
 
 using ca.whittaker.Maui.Controls.Buttons;
 using System.Windows.Input;
+using System.Diagnostics;
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
@@ -34,7 +35,7 @@ namespace ca.whittaker.Maui.Controls.Forms;
 ///     • Multiple input controls capture configuration options.
 ///     • The Undo functionality on each child control allows the user to revert individual changes
 ///       before submitting the form.
-/// 
+///
 /// The control automatically wires up events from its child controls (for detecting changes and validation
 /// errors) and updates its bindable properties (e.g., <c>FormHasChanges</c>, <c>FormHasErrors</c>, <c>FormState</c>)
 /// accordingly. This ensures a consistent and responsive form experience.
@@ -42,17 +43,26 @@ namespace ca.whittaker.Maui.Controls.Forms;
 public class Form : ContentView
 {
 
-    public new LayoutOptions HorizontalOptions
-    {
-        get => base.HorizontalOptions;
-        set => base.HorizontalOptions = value;
-    }
+    #region Private Fields
 
-    public new LayoutOptions VerticalOptions
-    {
-        get => base.VerticalOptions;
-        set => base.VerticalOptions = value;
-    }
+    private SaveButton? _formButtonCancel;
+
+    private EditButton? _formButtonEdit;
+
+    private CancelButton? _formButtonSave;
+
+    private Label? _formLabel;
+
+    private Label? _formLabelNotification;
+
+    //private StackLayout? _stackedLayout;
+    private SizeEnum cButtonSize = SizeEnum.XXSmall;
+
+    private bool IsFormEditing = false;
+
+    #endregion Private Fields
+
+    #region Public Fields
 
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
@@ -64,8 +74,16 @@ public class Form : ContentView
         typeof(ICommand),
         typeof(Form));
 
+    public static readonly BindableProperty FormAccessModeProperty = BindableProperty.Create(
+        propertyName: nameof(FormAccessMode),
+        returnType: typeof(FormAccessModeEnum),
+        declaringType: typeof(Form),
+        defaultValue: FormAccessModeEnum.Editable,
+        defaultBindingMode: BindingMode.TwoWay,
+        propertyChanged: OnFormAccessModeChanged);
+
     public static readonly BindableProperty FormCancelButtonTextProperty = BindableProperty.Create(
-            propertyName: nameof(FormCancelButtonText),
+                propertyName: nameof(FormCancelButtonText),
             returnType: typeof(string),
             declaringType: typeof(Form),
             defaultValue: "cancel",
@@ -108,26 +126,16 @@ public class Form : ContentView
         defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly BindableProperty FormStateProperty = BindableProperty.Create(
-        propertyName: nameof(FormState),
-        returnType: typeof(FormStateEnum),
+        propertyName: nameof(FormFieldsState),
+        returnType: typeof(FormFieldsStateEnum),
         declaringType: typeof(Form),
-        defaultValue: FormStateEnum.ReadOnly,
+        defaultValue: FormFieldsStateEnum.ReadOnly,
         defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: OnFormStateChanged);
+        propertyChanged: OnFormFieldStatesChanged);
 
-    private SaveButton? _buttonCancel;
-    private EditButton? _buttonEdit;
-    private CancelButton? _buttonSave;
-    private Label? _labelForm;
-    private Label? _labelNotification;
-    private bool IsEditing = false;
+    #endregion Public Fields
 
-    //private StackLayout? _stackedLayout;
-    private SizeEnum cButtonSize = SizeEnum.XXSmall;
-
-    public Form()
-    {
-    }
+    #region Public Properties
 
     public ICommand Command
     {
@@ -141,15 +149,22 @@ public class Form : ContentView
         set => SetValue(CommandParameterProperty, value);
     }
 
-    public string FormEditButtonText
+    public FormAccessModeEnum FormAccessMode
     {
-        get => (string)GetValue(FormEditButtonTextProperty);
-        set => SetValue(FormEditButtonTextProperty, value);
+        get => (FormAccessModeEnum)GetValue(FormAccessModeProperty);
+        set => SetValue(FormAccessModeProperty, value);
     }
+
     public string FormCancelButtonText
     {
         get => (string)GetValue(FormCancelButtonTextProperty);
         set => SetValue(FormCancelButtonTextProperty, value);
+    }
+
+    public string FormEditButtonText
+    {
+        get => (string)GetValue(FormEditButtonTextProperty);
+        set => SetValue(FormEditButtonTextProperty, value);
     }
 
     public bool FormHasChanges
@@ -176,88 +191,99 @@ public class Form : ContentView
         set => SetValue(FormSaveButtonTextProperty, value);
     }
 
-    public FormStateEnum FormState
+    public FormFieldsStateEnum FormFieldsState
     {
-        get => (FormStateEnum)GetValue(FormStateProperty);
+        get => (FormFieldsStateEnum)GetValue(FormStateProperty);
         set => SetValue(FormStateProperty, value);
     }
-    // called when user clicks cancel button
-    // also should be called when the page form is OnDissapearing
-    public void CancelForm()
+    public new LayoutOptions HorizontalOptions
     {
-        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
-        {
-            if (t is TextBoxElement tbe) { tbe.Disable(); }
-            if (t is CheckBoxElement cbe) { cbe.Disable(); }
-        }
-        IsEditing = false;
-        EvaluateForm();
+        get => base.HorizontalOptions;
+        set => base.HorizontalOptions = value;
     }
 
-    // called when user clicks edit button
-    public void EditForm()
+    public new LayoutOptions VerticalOptions
     {
-        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
-        {
-            if (t is TextBoxElement tbe) { tbe.Enable(); }
-            if (t is CheckBoxElement cbe) { cbe.Enable(); }
-        }
-        IsEditing = true;
-        EvaluateForm();
+        get => base.VerticalOptions;
+        set => base.VerticalOptions = value;
     }
 
-    /// <summary>
-    /// Called when the parent of the form is set. This method is responsible for initializing and wiring up controls within the form.
-    /// </summary>
-    protected override void OnParentSet()
+    #endregion Public Properties
+
+    #region Private Methods
+
+    private static void OnFormAccessModeChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        base.OnParentSet();
-        InitializeFormControls();
-        WireUpControls();
-        EvaluateForm();
+        if (bindable is Form form && newValue is FormAccessModeEnum newAccessMode)
+        {
+            void _onFormAccessModeChanges_UpdateUI()
+            {
+                if (oldValue != newValue)
+                {
+                    if (newAccessMode == FormAccessModeEnum.Editable)
+                    {
+                        form.FormFieldsState = FormFieldsStateEnum.Editing;
+                    }
+                    else if (newAccessMode == FormAccessModeEnum.ViewOnly)
+                    {
+                        form.FormFieldsState = FormFieldsStateEnum.ReadOnly;
+                    }
+                    form.FormConfigureStates();
+                }
+            }
+
+            // Check if on the main thread and update UI accordingly
+            if (MainThread.IsMainThread)
+            {
+                _onFormAccessModeChanges_UpdateUI();
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => _onFormAccessModeChanges_UpdateUI());
+            }
+        }
+    }
+
+    private static void OnFormCancelButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is Form form && newValue is string newText)
+        {
+            void _onFormCancelButtonTextChanged_UpdateUI()
+            {
+                if (form._formButtonCancel != null)
+                    form._formButtonCancel.Text = newText;
+            }
+
+            // Check if on the main thread and update UI accordingly
+            if (MainThread.IsMainThread)
+            {
+                _onFormCancelButtonTextChanged_UpdateUI();
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => _onFormCancelButtonTextChanged_UpdateUI());
+            }
+        }
     }
 
     private static void OnFormEditButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is Form form && newValue is string newText)
         {
-            void UpdateUI()
+            void _onFormEditButtonTextChanged_UpdateUI()
             {
-                if (form._buttonEdit != null)
-                    form._buttonEdit.Text = newText;
+                if (form._formButtonEdit != null)
+                    form._formButtonEdit.Text = newText;
             }
 
             // Check if on the main thread and update UI accordingly
             if (MainThread.IsMainThread)
             {
-                UpdateUI();
+                _onFormEditButtonTextChanged_UpdateUI();
             }
             else
             {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
-            }
-        }
-    }
-
-
-    private static void OnFormCancelButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Form form && newValue is string newText)
-        {
-            void UpdateUI()
-            {
-                if (form._buttonCancel != null)
-                    form._buttonCancel.Text = newText;
-            }
-
-            // Check if on the main thread and update UI accordingly
-            if (MainThread.IsMainThread)
-            {
-                UpdateUI();
-            }
-            else
-            {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+                MainThread.BeginInvokeOnMainThread(() => _onFormEditButtonTextChanged_UpdateUI());
             }
         }
     }
@@ -266,184 +292,167 @@ public class Form : ContentView
     {
         if (bindable is Form form && newValue is string newName)
         {
-            void UpdateUI()
+            void _onFormNameChanged_UpdateUI()
             {
-                if (form._labelForm != null)
+                if (form._formLabel != null)
                 {
-                    form._labelForm.Text = newName;
-                    form._labelForm.IsVisible = !string.IsNullOrEmpty(newName);
+                    form._formLabel.Text = newName;
+                    form._formLabel.IsVisible = !string.IsNullOrEmpty(newName);
                 }
             }
 
             // Check if on the main thread and update UI accordingly
             if (MainThread.IsMainThread)
             {
-                UpdateUI();
+                _onFormNameChanged_UpdateUI();
             }
             else
             {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+                MainThread.BeginInvokeOnMainThread(() => _onFormNameChanged_UpdateUI());
             }
         }
     }
 
     private static void OnFormSaveButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is Form form && newValue is string newText && form._buttonSave != null)
+        if (bindable is Form form && newValue is string newText && form._formButtonSave != null)
         {
-            void UpdateUI()
+            void _onFormSaveButtonTextChanged_UpdateUI()
             {
-                form._buttonSave.Text = newText;
+                form._formButtonSave.Text = newText;
             }
 
             // Check if on the main thread and update UI accordingly
             if (MainThread.IsMainThread)
             {
-                UpdateUI();
+                _onFormSaveButtonTextChanged_UpdateUI();
             }
             else
             {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+                MainThread.BeginInvokeOnMainThread(() => _onFormSaveButtonTextChanged_UpdateUI());
             }
         }
     }
-
-    private static void OnFormStateChanged(BindableObject bindable, object oldValue, object newValue)
+    private static void OnFormFieldStatesChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is Form form && newValue is FormStateEnum newState)
+        if (bindable is Form form && newValue is FormFieldsStateEnum newState)
         {
-            void UpdateUI()
+            void _onFormFieldStatesChanged_UpdateUI()
             {
                 if (oldValue != newValue)
                 {
-
-                    if (newState == FormStateEnum.Initialize)
-                    {
-                        form.InitForm();
-                        form.IsVisible = true;
-                        form.FormState = FormStateEnum.Editing;
-                    }
-                    else if (newState == FormStateEnum.Saved)
-                    {
-                        form.SavedForm();
-                        form.IsVisible = true;
-                        form.FormState = FormStateEnum.Editing;
-                    }
-                    else if (newState == FormStateEnum.Undo)
-                    {
-                        form.CancelForm();
-                        form.IsVisible = true;
-                        form.FormState = FormStateEnum.Editing;
-                    }
-                    else if (newState == FormStateEnum.Clear)
-                    {
-                        form.ClearForm();
-                        form.IsVisible = true;
-                        form.FormState = FormStateEnum.Editing;
-                    }
-                    else if (newState == FormStateEnum.Hidden)
-                    {
-                        form.IsVisible = false;
-                        form.FormState = FormStateEnum.Hidden;
-                    }
-                    form.UpdateFormControlStates();
+                    form.FormConfigureStates();
                 }
             }
 
             // Check if on the main thread and update UI accordingly
             if (MainThread.IsMainThread)
             {
-                UpdateUI();
+                _onFormFieldStatesChanged_UpdateUI();
             }
             else
             {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+                MainThread.BeginInvokeOnMainThread(() => _onFormFieldStatesChanged_UpdateUI());
             }
         }
     }
-
-    private void ButtonEdit_Clicked(object? sender, EventArgs e)
+    private bool FormElementsArePristine()
     {
-        IsEditing = true;
-    }
-
-    private void ButtonSave_Clicked(object? sender, EventArgs e)
-    {
-        if (Command?.CanExecute(CommandParameter) == true)
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
         {
-            Command.Execute(CommandParameter);
-        }
-    }
-
-    private FormStateEnum CalcFormState()
-    {
-        if (!IsVisible)
-        {
-            return FormStateEnum.Hidden;
-        }
-        else if (!IsEnabled)
-        {
-            return FormStateEnum.ViewOnly;
-        }
-        else
-        {
-            if (IsEditing)
-                return FormStateEnum.Editing;
-            else
-                return FormStateEnum.ReadOnly;        
-        }
-    }
-
-    private void ClearForm()
-    {
-        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
-        {
-            if (t is TextBoxElement tbe) tbe.Clear();
-            if (t is CheckBoxElement cbe) cbe.Clear();
-            t.Unfocus();
-        }
-    }
-
-    private void CustomTextBox_HasChanges(object? sender, HasChangesEventArgs e) => EvaluateForm();
-
-    private void CustomTextBox_HasValidationChanges(object? sender, ValidationDataChangesEventArgs e) => EvaluateForm();
-
-    private void EvaluateForm()
-    {
-        FormHasErrors = !IsFormDataValid();
-        FormHasChanges = !HasFormNotChanged();
-        FormState = CalcFormState();
-        UpdateFormControlStates();
-    }
-
-    private bool HasFormNotChanged()
-    {
-        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
-        {
-            //Console.WriteLine(t.ChangeState.ToString());
-            if (t.ChangeState == ChangeStateEnum.Changed)
+            if (t.FieldChangeState == ChangeStateEnum.Changed)
                 return false;
         }
         return true;
     }
 
-    private void Hide()
+    private void FormClear()
     {
-        Console.WriteLine("hide");
-        var descendants = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
-
-        foreach (var element in descendants)
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
         {
-            Console.WriteLine($"{nameof(element)}.IsVisible = false");
-            element.IsVisible = false;
+            if (t is TextBoxField tbe) tbe.FieldClear();
+            if (t is CheckBoxField cbe) cbe.FieldClear();
+            t.FieldUnfocus();
         }
     }
 
-    private void InitializeFormControls()
+    //private void FormFieldsHide()
+    //{
+    //    var formElements = this.GetVisualTreeDescendants().OfType<BaseFormField>();
+
+    //    foreach (var element in formElements)
+    //    {
+    //        Console.WriteLine($"{nameof(element)}.IsVisible = false");
+    //        element.IsVisible = false;
+    //    }
+    //}
+
+    private void FormFieldsMarkAsReadOnly()
     {
-        void UpdateUI()
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
         {
-            _buttonEdit = new()
+            Debug.WriteLine($"{t.FieldLabelText} : FormFieldsMarkAsReadOnly()");
+            if (t is TextBoxField tbe) tbe.FieldMarkAsReadOnly();
+            if (t is CheckBoxField cbe) cbe.FieldMarkAsReadOnly();
+            t.FieldUnfocus();
+        }
+    }
+
+
+    private void FormFieldsMarkAsEditable()
+    {
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
+        {
+            Debug.WriteLine($"{t.FieldLabelText} : FormFieldsMarkAsEditable()");
+            if (t is TextBoxField tbe) tbe.FieldMarkAsEditable();
+            if (t is CheckBoxField cbe) cbe.FieldMarkAsEditable();
+        }
+    }
+
+    private void FormFieldsSavedAndMarkAsReadOnly()
+    {
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
+        {
+            if (t is TextBoxField tbe) tbe.FieldSavedAndMarkAsReadOnly();
+            if (t is CheckBoxField cbe) cbe.FieldSavedAndMarkAsReadOnly();
+            t.FieldUnfocus();
+        }
+    }
+
+    private bool FormFieldsDetectAreValid() =>
+            this.GetVisualTreeDescendants().OfType<TextBoxField>().All(ctb => ctb.FieldValidationState == ValidationStateEnum.Valid);
+
+    private bool _formStatusEvaluating = false;
+    private void FormEvaluateStatus()
+    {
+        if (_formStatusEvaluating) return;
+        _formStatusEvaluating = true;
+        Debug.WriteLine($"FormEvaluateStatus()");
+        FormHasErrors = !FormFieldsDetectAreValid();
+        FormHasChanges = !FormElementsArePristine();
+        FormConfigureStates();
+        _formStatusEvaluating = false;
+    }
+
+    private void FormFieldsWireUp()
+    {
+        var formElements = this.GetVisualTreeDescendants().OfType<BaseFormField>();
+
+        if (!formElements.Any())
+            throw new InvalidOperationException("Form missing controls");
+
+        foreach (var element in formElements)
+        {
+            element.FieldHasChanges += OnFieldHasChanges;
+            element.FieldHasValidationChanges += OnFieldHasValidationChanges;
+        }
+    }
+
+    private void FormInitialize()
+    {
+        void _formInitialize_UI()
+        {
+            _formButtonEdit = new()
             {
                 Text = FormEditButtonText,
                 ButtonSize = cButtonSize,
@@ -453,10 +462,11 @@ public class Form : ContentView
                 HorizontalOptions = LayoutOptions.Center,
                 ButtonState = ButtonStateEnum.Enabled,
                 ButtonType = ImageResourceEnum.Edit,
+                IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
             };
-            _buttonEdit.Clicked += (sender, e) => EditForm();
-            _buttonEdit.UpdateUI();
-            _buttonSave = new()
+            _formButtonEdit.Clicked += (sender, e) => FormEnterEditingMode();
+            _formButtonEdit.UpdateUI();
+            _formButtonSave = new()
             {
                 Text = FormSaveButtonText,
                 ButtonSize = cButtonSize,
@@ -466,10 +476,11 @@ public class Form : ContentView
                 HorizontalOptions = LayoutOptions.Center,
                 ButtonState = ButtonStateEnum.Hidden,
                 ButtonType = ImageResourceEnum.Save,
+                IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
             };
-            _buttonSave.Clicked += ButtonSave_Clicked;
-            _buttonSave.UpdateUI();
-            _buttonCancel = new()
+            _formButtonSave.Clicked += OnFormSaveButtonClicked;
+            _formButtonSave.UpdateUI();
+            _formButtonCancel = new()
             {
                 Text = FormCancelButtonText,
                 ButtonSize = cButtonSize,
@@ -479,18 +490,19 @@ public class Form : ContentView
                 VerticalOptions = LayoutOptions.Center,
                 ButtonState = ButtonStateEnum.Hidden,
                 ButtonType = ImageResourceEnum.Cancel,
+                IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
             };
-            _buttonCancel.Clicked += (sender, e) => CancelForm();
-            _buttonCancel.UpdateUI();
-            _labelNotification = new Label
+            _formButtonCancel.Clicked += (sender, e) => FormEnterReadOnlyMode();
+            _formButtonCancel.UpdateUI();
+            _formLabelNotification = new Label
             {
                 Text = "",
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 IsVisible = false,
-                TextColor = Colors.Red
+                TextColor = Colors.Red,
             };
-            _labelForm = new Label
+            _formLabel = new Label
             {
                 Text = FormName,
                 HorizontalOptions = LayoutOptions.Center,
@@ -521,14 +533,14 @@ public class Form : ContentView
             };
 
             // Add controls to the grid
-            gridLayout.Add(_labelForm, 0, 0); // Column 0, Row 0
-            gridLayout.Add(_buttonSave, 0, 1); // Column 0, Row 1
-            gridLayout.Add(_buttonCancel, 1, 1); // Column 1, Row 1
-            gridLayout.Add(_buttonEdit, 0, 2); // Column 0, Row 1
-            gridLayout.Add(_labelNotification, 0, 3); // Column 0, Row 2
-            gridLayout.SetColumnSpan(_labelForm, 2); // Span _labelForm across both columns
-            gridLayout.SetColumnSpan(_labelNotification, 2); // Span _labelNotification across both columns
-            gridLayout.SetColumnSpan(_buttonEdit, 2); // Span _buttonEdit across both columns
+            gridLayout.Add(_formLabel, 0, 0); // Column 0, Row 0
+            gridLayout.Add(_formButtonSave, 0, 1); // Column 0, Row 1
+            gridLayout.Add(_formButtonCancel, 1, 1); // Column 1, Row 1
+            gridLayout.Add(_formButtonEdit, 0, 2); // Column 0, Row 1
+            gridLayout.Add(_formLabelNotification, 0, 3); // Column 0, Row 2
+            gridLayout.SetColumnSpan(_formLabel, 2); // Span _labelForm across both columns
+            gridLayout.SetColumnSpan(_formLabelNotification, 2); // Span _labelNotification across both columns
+            gridLayout.SetColumnSpan(_formButtonEdit, 2); // Span _buttonEdit across both columns
 
             if (this.Content is Layout existingLayout)
             {
@@ -563,135 +575,191 @@ public class Form : ContentView
         // Check if on the main thread and update UI accordingly
         if (MainThread.IsMainThread)
         {
-            UpdateUI();
+            _formInitialize_UI();
         }
         else
         {
-            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+            MainThread.BeginInvokeOnMainThread(() => _formInitialize_UI());
         }
-        WireUpControls();
-    }
-    private bool IsFormDataValid() =>
-        this.GetVisualTreeDescendants().OfType<TextBoxElement>().All(ctb => ctb.ValidationState == ValidationStateEnum.Valid);
-
-    private void SavedForm()
-    {
-        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
-        {
-            if (t is TextBoxElement tbe) tbe.Saved();
-            if (t is CheckBoxElement cbe) cbe.Saved();
-            t.Unfocus();
-        }
-    }
-    private void InitForm()
-    {
-        foreach (BaseFormElement t in this.GetVisualTreeDescendants().OfType<BaseFormElement>())
-        {
-            if (t is TextBoxElement tbe) tbe.InitField();
-            if (t is CheckBoxElement cbe) cbe.InitField();
-            t.Unfocus();
-        }
+        FormFieldsWireUp();
     }
 
-    private void Show()
+    private void FormConfigureStates()
     {
-        Console.WriteLine("show");
-        var descendants = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
+        Debug.WriteLine($"FormConfigureStates()");
 
-        foreach (var element in descendants)
-        {
-            Console.WriteLine($"{nameof(element)}.IsVisible = true");
-            element.IsVisible = true;
-        }
-    }
-
-    private void UpdateFormControlStates()
-    {
         using (ResourceHelper resourceHelper = new())
         {
-            switch (FormState)
+            // ************
+            //  FIELDSTATE
+            // ************
+            switch (FormFieldsState)
             {
-                case FormStateEnum.ViewOnly:
-                    Show();
-                    IsEnabled = false;
-                    IsVisible = true;
-                    SetButtonImages(resourceHelper, !FormHasChanges, !FormHasErrors, SizeEnum.Large);
+                case FormFieldsStateEnum.ReadOnly:
+                    FormFieldsMarkAsReadOnly();
                     break;
 
-                case FormStateEnum.Editing:
-                case FormStateEnum.ReadOnly:
-                    Show();
-                    IsEnabled = true;
-                    IsVisible = true;
-                    SetButtonImages(resourceHelper, !FormHasChanges, !FormHasErrors, SizeEnum.Large);
+                case FormFieldsStateEnum.Editing:
+                    FormFieldsMarkAsEditable();
                     break;
 
-                case FormStateEnum.Hidden:
-                    IsEnabled = false;
-                    IsVisible = false;
-                    Hide();
+                case FormFieldsStateEnum.Hidden:
+                    FormMakeHidden();
                     break;
             }
+            // ***********
+            //  FORMSTATE
+            // ***********
+            _formRefreshState_ConfigureButtonImages(resourceHelper, !FormHasChanges, !FormHasErrors, SizeEnum.Large);
         }
 
-        void SetButtonImages(ResourceHelper resourceHelper, bool noChanges, bool noErrors, SizeEnum size)
+        void _formRefreshState_ConfigureButtonImages(ResourceHelper resourceHelper, bool noChanges, bool noErrors, SizeEnum size)
         {
-            if (_buttonSave == null && _buttonCancel == null && _buttonEdit == null) return;
+            if (_formButtonSave == null && _formButtonCancel == null && _formButtonEdit == null) return;
 
-            if (FormState == FormStateEnum.Editing)
+            // ***********
+            //  EDITABLE
+            // ***********
+            if (FormAccessMode == FormAccessModeEnum.Editable)
             {
+
                 // *************
                 //   EDIT MODE
                 // *************
-                _buttonEdit!.ButtonState = ButtonStateEnum.Hidden;
-                if (noChanges)
+                if (FormFieldsState == FormFieldsStateEnum.Editing)
                 {
-                    _buttonSave!.ButtonState = ButtonStateEnum.Disabled;
-                    _buttonCancel!.ButtonState = ButtonStateEnum.Enabled;
+                    _formButtonEdit!.ButtonState = ButtonStateEnum.Hidden;
+                    if (noChanges)
+                    {
+                        _formButtonSave!.ButtonState = ButtonStateEnum.Disabled;
+                        _formButtonCancel!.ButtonState = ButtonStateEnum.Enabled;
+                    }
+                    else if (noErrors)
+                    {
+                        _formButtonSave!.ButtonState = ButtonStateEnum.Enabled;
+                        _formButtonCancel!.ButtonState = ButtonStateEnum.Enabled;
+                    }
+                    else
+                    {
+                        _formButtonSave!.ButtonState = ButtonStateEnum.Disabled;
+                        _formButtonCancel!.ButtonState = ButtonStateEnum.Enabled;
+                    }
                 }
-                else if (noErrors)
-                {
-                    _buttonSave!.ButtonState = ButtonStateEnum.Enabled;
-                    _buttonCancel!.ButtonState = ButtonStateEnum.Enabled;
-                }
-                else
-                {
-                    _buttonSave!.ButtonState = ButtonStateEnum.Disabled;
-                    _buttonCancel!.ButtonState = ButtonStateEnum.Enabled;
-                }
-            }
-            else if (FormState == FormStateEnum.ReadOnly)
-            {
                 // *************
                 //   READ MODE
                 // *************
-                _buttonSave!.ButtonState = ButtonStateEnum.Hidden;
-                _buttonCancel!.ButtonState = ButtonStateEnum.Hidden;
-                _buttonEdit!.ButtonState = ButtonStateEnum.Enabled;
+                else if (FormFieldsState == FormFieldsStateEnum.ReadOnly)
+                {
+                    _formButtonSave!.ButtonState = ButtonStateEnum.Hidden;
+                    _formButtonCancel!.ButtonState = ButtonStateEnum.Hidden;
+                    _formButtonEdit!.ButtonState = ButtonStateEnum.Enabled;
+                }
             }
-            else if (FormState == FormStateEnum.ViewOnly)
+            else if (   FormAccessMode == FormAccessModeEnum.ViewOnly
+                     || FormAccessMode == FormAccessModeEnum.Hidden)
             {
-                // *************
-                //   VIEW MODE
-                // *************
-                _buttonSave!.ButtonState = ButtonStateEnum.Hidden;
-                _buttonCancel!.ButtonState = ButtonStateEnum.Hidden;
-                _buttonEdit!.ButtonState = ButtonStateEnum.Hidden;
+                // **********************
+                //   VIEWONLY OR HIDDEN
+                // **********************
+                _formButtonSave!.ButtonState = ButtonStateEnum.Hidden;
+                _formButtonCancel!.ButtonState = ButtonStateEnum.Hidden;
+                _formButtonEdit!.ButtonState = ButtonStateEnum.Hidden;
             }
         }
     }
 
-    private void WireUpControls()
+    private void OnFormEditButtonClicked(object? sender, EventArgs e)
     {
-        var elements = this.GetVisualTreeDescendants().OfType<BaseFormElement>();
+        IsFormEditing = true;
+    }
 
-        if (!elements.Any())
-            throw new InvalidOperationException("Form missing controls");
+    private void OnFieldHasChanges(object? sender, HasChangesEventArgs e) => FormEvaluateStatus();
 
-        foreach (var element in elements)
+    private void OnFieldHasValidationChanges(object? sender, ValidationDataChangesEventArgs e) => FormEvaluateStatus();
+
+    private void OnFormSaveButtonClicked(object? sender, EventArgs e)
+    {
+        if (Command?.CanExecute(CommandParameter) == true)
         {
-            element.HasChanges += CustomTextBox_HasChanges;
-            element.HasValidationChanges += CustomTextBox_HasValidationChanges;
+            Command.Execute(CommandParameter);
         }
     }
+
+    #endregion Private Methods
+
+    #region Protected Methods
+
+    /// <summary>
+    /// Called when the parent of the form is set. This method is responsible for initializing and wiring up controls within the form.
+    /// </summary>
+    protected override void OnParentSet()
+    {
+        base.OnParentSet();
+        FormInitialize();
+        FormFieldsWireUp();
+        FormEvaluateStatus();
+    }
+
+    #endregion Protected Methods
+
+    #region Public Methods
+
+    /// <summary>
+    /// puts form into "hidden" mode with all buttons and fields hidden
+    /// </summary>
+    public void FormEnterEditingMode()
+    {
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
+        {
+            if (t is TextBoxField tbe) { tbe.FieldMarkAsEditable(); }
+            if (t is CheckBoxField cbe) { cbe.FieldMarkAsEditable(); }
+        }
+        FormFieldsState = FormFieldsStateEnum.Editing;
+        FormEvaluateStatus();
+    }
+
+    /// <summary>
+    /// puts form into "hidden" mode with save and cancel buttons visible
+    /// </summary>
+    public void FormMakeHidden()
+    {
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
+        {
+            if (t is TextBoxField tbe) { tbe.FieldHide(); }
+            if (t is CheckBoxField cbe) { cbe.FieldHide(); }
+        }
+        FormFieldsState = FormFieldsStateEnum.Hidden;
+        FormEvaluateStatus();
+    }
+
+    /// <summary>
+    /// puts form into "read" mode with edit button visible
+    /// </summary>
+    public void FormEnterReadOnlyMode()
+    {
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
+        {
+            if (t is TextBoxField tbe) { tbe.FieldMarkAsReadOnly(); }
+            if (t is CheckBoxField cbe) { cbe.FieldMarkAsReadOnly(); }
+        }
+        FormFieldsState = FormFieldsStateEnum.ReadOnly;
+        FormEvaluateStatus();
+    }
+
+    /// <summary>
+    /// puts form into "view only" mode with no buttons visible
+    /// </summary>
+    public void FormEnterViewOnlyMode()
+    {
+        foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
+        {
+            if (t is TextBoxField tbe) { tbe.FieldMarkAsReadOnly(); }
+            if (t is CheckBoxField cbe) { cbe.FieldMarkAsReadOnly(); }
+        }
+        FormFieldsState = FormFieldsStateEnum.ReadOnly;
+        FormEvaluateStatus();
+    }
+
+    #endregion Public Methods
+
 }

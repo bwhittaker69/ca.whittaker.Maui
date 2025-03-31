@@ -14,34 +14,33 @@
                         FormName="{x:Static strings:AppResources.Form_UserProfile_TItle}"
                         FormSaveButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Save}"
                         FormCancelButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Cancel}"
-                        FormState="{Binding FormState}"
                         Command="{Binding FormSaveCommand}" 
                         Padding="10"
                         HorizontalOptions="Fill"
                         CommandParameter="">
             <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Center" HorizontalOptions="Fill">
                 <Entry Text="test"></Entry>
-                <Forms:TextBoxElement   HorizontalOptions="Fill"
+                <Forms:TextBoxField     HorizontalOptions="Fill"
                                         VerticalOptions="Start"
-                                        TextBoxSource="{Binding Userprofile_nickname}"
-                                        Label="{x:Static strings:AppResources.Field_Name}"
-                                        FieldType="Text"
-                                        AllowWhiteSpace="False"
+                                        FieldDataSource="{Binding Userprofile_nickname}"
+                                        FieldLabelText="{x:Static strings:AppResources.Field_Name}"
+                                        TextBoxFieldType="Text"
+                                        TextBoxAllowWhiteSpace="False"
                                         FieldWidth="300"
-                                        Placeholder="{x:Static strings:AppResources.Field_Name_Placeholder}">
-                </Forms:TextBoxElement>
-                <Forms:TextBoxElement 
-                                        TextBoxSource="{Binding Userprofile_email}"
-                                        FieldType="Email"
-                                        Label="{x:Static strings:AppResources.Field_Email}"
-                                        Placeholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
-                </Forms:TextBoxElement>
-                <Forms:TextBoxElement 
-                                        TextBoxSource="{Binding Userprofile_bio}"
-                                        FieldType="Text"
-                                        Label="{x:Static strings:AppResources.Field_Bio}"
-                                        Placeholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
-                </Forms:TextBoxElement>
+                                        TextBoxPlaceholder="{x:Static strings:AppResources.Field_Name_Placeholder}">
+                </Forms:TextBoxField>
+                <Forms:TextBoxField 
+                                        FieldDataSource="{Binding Userprofile_email}"
+                                        TextBoxFieldType="Email"
+                                        FieldLabelText="{x:Static strings:AppResources.Field_Email}"
+                                        TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
+                </Forms:TextBoxField>
+                <Forms:TextBoxField 
+                                        FieldDataSource="{Binding Userprofile_bio}"
+                                        TextBoxFieldType="Text"
+                                        FieldLabelText="{x:Static strings:AppResources.Field_Bio}"
+                                        TextBoxPlaceholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
+                </Forms:TextBoxField>
                 <!--Forms:TextBoxElement 
                                         LabelWidth="70"
                                         TextBoxSource="{Binding Userprofile_email}"

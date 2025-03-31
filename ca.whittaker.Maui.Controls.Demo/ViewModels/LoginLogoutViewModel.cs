@@ -16,7 +16,7 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
         private string loginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignIn;
 
         [ObservableProperty]
-        private FormStateEnum formState;
+        private FormFieldsStateEnum formState;
 
         [ObservableProperty]
         private bool isVisible = false;
@@ -106,7 +106,8 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
         private void Save()
         {
             if (true) // savedSuccess
-                FormState = FormStateEnum.Saved;
+                //FormFieldsState = 
+                FormState = FormFieldsStateEnum.Editing;
         }
 
         #region USER PROFILE FORM
@@ -118,7 +119,7 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
         public void InitializeForm()
         {
             ClearUserProfileForm();
-            FormState = FormStateEnum.Editing;
+            FormState = FormFieldsStateEnum.Editing;
         }
         #endregion
 
@@ -130,14 +131,14 @@ namespace ca.whittaker.Maui.Controls.Demo.ViewModels
                 // we are logged in, show logout button
                 LoginButtonState = ButtonStateEnum.Hidden;
                 LogoutButtonState = ButtonStateEnum.Enabled;
-                FormState = FormStateEnum.Editing;
+                FormState = FormFieldsStateEnum.Editing;
             }
             else
             {
                 // we are logged out, show all login buttons
                 LoginButtonState = ButtonStateEnum.Enabled;
                 LogoutButtonState = ButtonStateEnum.Hidden;
-                FormState = FormStateEnum.Hidden;
+                FormState = FormFieldsStateEnum.Hidden;
             }
             if (isUserLoggedIn)
             {

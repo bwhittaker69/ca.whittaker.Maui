@@ -8,8 +8,8 @@ public class HasChangesEventArgs : EventArgs
 }
 public class HasFormChangesEventArgs : EventArgs
 {
-    public HasFormChangesEventArgs(FormStateEnum formState) => FormState = formState;
-    public FormStateEnum FormState { get; }
+    public HasFormChangesEventArgs(FormFieldsStateEnum formState) => FormState = formState;
+    public FormFieldsStateEnum FormState { get; }
 }
 
 public class ValidationDataChangesEventArgs : EventArgs

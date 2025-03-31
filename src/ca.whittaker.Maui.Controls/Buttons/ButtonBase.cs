@@ -110,15 +110,18 @@ public abstract class ButtonBase : Button, IButton
     }
     public void Enabled()
     {
-        ButtonState = ButtonStateEnum.Enabled;
+        if (ButtonState != ButtonStateEnum.Enabled)
+            ButtonState = ButtonStateEnum.Enabled;
     }
     public void Disabled()
     {
-        ButtonState = ButtonStateEnum.Disabled;
+        if (ButtonState != ButtonStateEnum.Disabled)
+            ButtonState = ButtonStateEnum.Disabled;
     }
     public void Hide()
     {
-        ButtonState = ButtonStateEnum.Hidden;
+        if (ButtonState != ButtonStateEnum.Hidden)
+            ButtonState = ButtonStateEnum.Hidden;
     }
     private bool _updateUI = false;
     public void UpdateUI()
@@ -167,6 +170,7 @@ public abstract class ButtonBase : Button, IButton
         }
         this._updateUI = false;
     }
+    
     private void ConfigureEnabled()
     {
         base.IsEnabled = true;
