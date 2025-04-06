@@ -3,7 +3,7 @@
 public class CameraFlipButton : ButtonBase
 {
 
-    public CameraFlipButton() : base(ImageResourceEnum.Media_Stop)
+    public CameraFlipButton() : base(ButtonIconEnum.Media_Stop)
     {
 
     }

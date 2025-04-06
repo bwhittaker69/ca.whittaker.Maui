@@ -3,7 +3,7 @@
 public class CameraRecordButton : ButtonBase
 {
 
-    public CameraRecordButton() : base(ImageResourceEnum.Record_Circle)
+    public CameraRecordButton() : base(ButtonIconEnum.Record_Circle)
     {
 
     }

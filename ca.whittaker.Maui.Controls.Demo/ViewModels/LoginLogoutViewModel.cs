@@ -1,186 +1,243 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Net.NetworkInformation;
-using System.Net;
-using System.Linq;
 using System.Net.Sockets;
-using Microsoft.Maui.Devices;
-using Microsoft.Maui.ApplicationModel;
 
+namespace ca.whittaker.Maui.Controls.Demo.ViewModels;
 
-namespace ca.whittaker.Maui.Controls.Demo.ViewModels
+public class LoginLogoutViewModel : ObservableObject
 {
-    public partial class LoginLogoutViewModel : ObservableObject
+    private string _loginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignIn;
+    public string LoginLogoutHeaderText
     {
+        get => _loginLogoutHeaderText;
+        set => SetProperty(ref _loginLogoutHeaderText, value);
+    }
 
-        [ObservableProperty]
-        private string loginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignIn;
+    private FormAccessModeEnum _formState;
+    public FormAccessModeEnum FormState
+    {
+        get => _formState;
+        set => SetProperty(ref _formState, value);
+    }
 
-        [ObservableProperty]
-        private FormFieldsStateEnum formState;
+    private bool _isVisible = false;
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set => SetProperty(ref _isVisible, value);
+    }
 
-        [ObservableProperty]
-        private bool isVisible = false;
+    private string _lastlogin_device = string.Empty;
+    public string Lastlogin_device
+    {
+        get => _lastlogin_device;
+        set => SetProperty(ref _lastlogin_device, value);
+    }
 
-        [ObservableProperty]
-        private string lastlogin_device, lastlogin_ipaddress, lastlogin_date = "";
+    private string _lastlogin_ipaddress = string.Empty;
+    public string Lastlogin_ipaddress
+    {
+        get => _lastlogin_ipaddress;
+        set => SetProperty(ref _lastlogin_ipaddress, value);
+    }
 
-        [ObservableProperty]
-        private ButtonStateEnum loginButtonState, logoutButtonState;
+    private string _lastlogin_date = string.Empty;
+    public string Lastlogin_date
+    {
+        get => _lastlogin_date;
+        set => SetProperty(ref _lastlogin_date, value);
+    }
 
-        [ObservableProperty]
-        private string userprofile_username, userprofile_email, userprofile_nickname, userprofile_website, userprofile_phonenumber, userprofile_bio = String.Empty;
+    private ButtonStateEnum _loginButtonState;
+    public ButtonStateEnum LoginButtonState
+    {
+        get => _loginButtonState;
+        set => SetProperty(ref _loginButtonState, value);
+    }
 
-        [ObservableProperty]
-        private bool userprofile_ispublic = false;
+    private ButtonStateEnum _logoutButtonState;
+    public ButtonStateEnum LogoutButtonState
+    {
+        get => _logoutButtonState;
+        set => SetProperty(ref _logoutButtonState, value);
+    }
 
-        public LoginLogoutViewModel()
+    private string _userprofile_username = string.Empty;
+    public string Userprofile_username
+    {
+        get => _userprofile_username;
+        set => SetProperty(ref _userprofile_username, value);
+    }
+
+    private string _userprofile_email = string.Empty;
+    public string Userprofile_email
+    {
+        get => _userprofile_email;
+        set => SetProperty(ref _userprofile_email, value);
+    }
+
+    private string _userprofile_nickname = string.Empty;
+    public string Userprofile_nickname
+    {
+        get => _userprofile_nickname;
+        set => SetProperty(ref _userprofile_nickname, value);
+    }
+
+    private string _userprofile_website = string.Empty;
+    public string Userprofile_website
+    {
+        get => _userprofile_website;
+        set => SetProperty(ref _userprofile_website, value);
+    }
+
+    private string _userprofile_phonenumber = string.Empty;
+    public string Userprofile_phonenumber
+    {
+        get => _userprofile_phonenumber;
+        set => SetProperty(ref _userprofile_phonenumber, value);
+    }
+
+    private string _userprofile_bio = string.Empty;
+    public string Userprofile_bio
+    {
+        get => _userprofile_bio;
+        set => SetProperty(ref _userprofile_bio, value);
+    }
+
+    private bool _userprofile_ispublic = false;
+    public bool Userprofile_ispublic
+    {
+        get => _userprofile_ispublic;
+        set => SetProperty(ref _userprofile_ispublic, value);
+    }
+
+    public Command FormSaveCommand { get; }
+    public Command<string> LoginCommand { get; }
+    public Command<string> LogoutCommand { get; }
+
+    public LoginLogoutViewModel()
+    {
+        IsVisible = false;
+
+        LoginCommand = new Command<string>(Login);
+        LogoutCommand = new Command<string>(Logout);
+        FormSaveCommand = new Command(Save);
+
+        LoginButtonState = ButtonStateEnum.Enabled;
+        LogoutButtonState = ButtonStateEnum.Hidden;
+    }
+
+    private void Login(string loginscheme)
+    {
+        IsVisible = true;
+        LoginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignOut;
+
+        void UpdateUI() => ProcessLoginLogout(true);
+
+        if (MainThread.IsMainThread)
         {
+            UpdateUI();
+        }
+        else
+        {
+            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+        }
+    }
 
-            IsVisible = false;
+    private void Logout(string loginscheme)
+    {
+        IsVisible = false;
+        LoginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignIn;
 
-            LoginCommand = new Command<string>(Login);
-            LogoutCommand = new Command<string>(Logout);
+        void UpdateUI() => ProcessLoginLogout(false);
 
-            FormSaveCommand = new Command(Save);
+        if (MainThread.IsMainThread)
+        {
+            UpdateUI();
+        }
+        else
+        {
+            MainThread.BeginInvokeOnMainThread(() => UpdateUI());
+        }
+    }
 
+    private void Save()
+    {
+        // Assume save is successful
+        FormState = FormAccessModeEnum.Editable;
+    }
+
+    #region USER PROFILE FORM
+    private void ClearUserProfileForm()
+    {
+        Userprofile_nickname = Userprofile_username = Userprofile_website = Userprofile_phonenumber = Userprofile_bio = string.Empty;
+    }
+
+    public void InitializeForm()
+    {
+        ClearUserProfileForm();
+        FormState = FormAccessModeEnum.Editable;
+    }
+    #endregion
+
+    #region LOGIN LOGOUT BUTTONS
+    private void ProcessLoginLogout(bool isUserLoggedIn)
+    {
+        if (isUserLoggedIn)
+        {
+            // User is logged in: show logout button and enable editing.
+            LoginButtonState = ButtonStateEnum.Hidden;
+            LogoutButtonState = ButtonStateEnum.Enabled;
+            FormState = FormAccessModeEnum.Editable;
+        }
+        else
+        {
+            // User is logged out: show login button and hide form.
             LoginButtonState = ButtonStateEnum.Enabled;
             LogoutButtonState = ButtonStateEnum.Hidden;
-
-
+            FormState = FormAccessModeEnum.Hidden;
         }
 
-        public Command FormSaveCommand { get; }
-
-        public Command<string> LoginCommand { get; }
-
-        public Command<string> LogoutCommand { get; }
-
-        private void Login(string loginscheme)
+        if (isUserLoggedIn)
         {
-            IsVisible = true;
-
-            LoginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignOut;
-
-            void UpdateUI()
-            {
-                ProcessLoginLogout(true);
-            }
-
-            // Check if on the main thread and update UI accordingly
-            if (MainThread.IsMainThread)
-            {
-                UpdateUI();
-            }
-            else
-            {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
-            }
-
+            PopulateLoginDetails();
         }
-
-        private void Logout(string loginscheme)
+        else
         {
-
-            IsVisible = false;
-
-            LoginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignIn;
-
-            void UpdateUI()
-            {
-                ProcessLoginLogout(false);
-            }
-
-            // Check if on the main thread and update UI accordingly
-            if (MainThread.IsMainThread)
-            {
-                UpdateUI();
-            }
-            else
-            {
-                MainThread.BeginInvokeOnMainThread(() => UpdateUI());
-            }
-
-
+            ClearLoginDetails();
         }
-
-        private void Save()
-        {
-            if (true) // savedSuccess
-                //FormFieldsState = 
-                FormState = FormFieldsStateEnum.Editing;
-        }
-
-        #region USER PROFILE FORM
-        private void ClearUserProfileForm()
-        {
-            Userprofile_nickname = Userprofile_username = Userprofile_website = Userprofile_phonenumber = Userprofile_bio = string.Empty;
-        }
-
-        public void InitializeForm()
-        {
-            ClearUserProfileForm();
-            FormState = FormFieldsStateEnum.Editing;
-        }
-        #endregion
-
-        #region LOGIN LOGOUT BUTTONS
-        private void ProcessLoginLogout(bool isUserLoggedIn)
-        {
-            if (isUserLoggedIn)
-            {
-                // we are logged in, show logout button
-                LoginButtonState = ButtonStateEnum.Hidden;
-                LogoutButtonState = ButtonStateEnum.Enabled;
-                FormState = FormFieldsStateEnum.Editing;
-            }
-            else
-            {
-                // we are logged out, show all login buttons
-                LoginButtonState = ButtonStateEnum.Enabled;
-                LogoutButtonState = ButtonStateEnum.Hidden;
-                FormState = FormFieldsStateEnum.Hidden;
-            }
-            if (isUserLoggedIn)
-            {
-                PopulateLoginDetails();
-            }
-            else
-            {
-                ClearLoginDetails();
-            }
-        }
-        #endregion
-
-        #region LOGIN DETAILS TABLE
-        public static string GetLocalIPAddress()
-        {
-            var host = NetworkInterface.GetAllNetworkInterfaces()
-                .OrderByDescending(c => c.Speed)
-                .FirstOrDefault(c => c.NetworkInterfaceType != NetworkInterfaceType.Loopback && c.OperationalStatus == OperationalStatus.Up);
-
-            if (host != null)
-            {
-                var ip = host.GetIPProperties().UnicastAddresses
-                    .FirstOrDefault(ip => ip.Address.AddressFamily == AddressFamily.InterNetwork);
-
-                if (ip != null) return ip.Address.ToString();
-            }
-
-            return String.Empty;
-
-        }
-
-        private void ClearLoginDetails()
-        {
-            Lastlogin_device = Lastlogin_ipaddress = Lastlogin_date = string.Empty;
-        }
-
-        private void PopulateLoginDetails()
-        {
-            Lastlogin_device = DeviceInfo.Platform.ToString(); 
-            Lastlogin_ipaddress = GetLocalIPAddress();
-            Lastlogin_date = DateTime.Now.ToString();
-        }
-        #endregion
     }
+    #endregion
+
+    #region LOGIN DETAILS TABLE
+    public static string GetLocalIPAddress()
+    {
+        var host = NetworkInterface.GetAllNetworkInterfaces()
+            .OrderByDescending(c => c.Speed)
+            .FirstOrDefault(c => c.NetworkInterfaceType != NetworkInterfaceType.Loopback && c.OperationalStatus == OperationalStatus.Up);
+
+        if (host != null)
+        {
+            var ip = host.GetIPProperties().UnicastAddresses
+                .FirstOrDefault(ip => ip.Address.AddressFamily == AddressFamily.InterNetwork);
+
+            if (ip != null)
+                return ip.Address.ToString();
+        }
+
+        return string.Empty;
+    }
+
+    private void ClearLoginDetails()
+    {
+        Lastlogin_device = Lastlogin_ipaddress = Lastlogin_date = string.Empty;
+    }
+
+    private void PopulateLoginDetails()
+    {
+        Lastlogin_device = DeviceInfo.Platform.ToString();
+        Lastlogin_ipaddress = GetLocalIPAddress();
+        Lastlogin_date = DateTime.Now.ToString();
+    }
+    #endregion
 }

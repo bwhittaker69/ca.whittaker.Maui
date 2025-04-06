@@ -11,8 +11,8 @@
 
     <TabBar>
         <Tab Title="Tab1">
-            <ShellContent Title="LoginLogout" ContentTemplate="{DataTemplate views:LoginLogoutPage}"></ShellContent>
             <ShellContent Title="UserProfilePage" ContentTemplate="{DataTemplate views:UserProfilePage}"></ShellContent>
+            <ShellContent Title="LoginLogout" ContentTemplate="{DataTemplate views:LoginLogoutPage}"></ShellContent>
             <ShellContent Title="MauiPage1" ContentTemplate="{DataTemplate views:MauiPage1}"></ShellContent>
             <ShellContent Title="MauiPage2" ContentTemplate="{DataTemplate views:MauiPage2}"></ShellContent>
         </Tab>

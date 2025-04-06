@@ -3,7 +3,7 @@
 public class AlarmClockStopButton : ButtonBase
 {
 
-    public AlarmClockStopButton() : base(ImageResourceEnum.Alarmclock_Stop)
+    public AlarmClockStopButton() : base(ButtonIconEnum.Alarmclock_Stop)
     {
     }
 }

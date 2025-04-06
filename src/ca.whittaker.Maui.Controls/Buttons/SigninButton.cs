@@ -24,25 +24,25 @@ public class SigninButton : ButtonBase
                 switch (newValue)
                 {
                     case SiginButtonTypeEnum.Facebook:
-                        signinButton.ButtonType = ImageResourceEnum.Facebook;
+                        signinButton.ButtonIcon = ButtonIconEnum.Facebook;
                         break;
                     case SiginButtonTypeEnum.Google:
-                        signinButton.ButtonType = ImageResourceEnum.Google;
+                        signinButton.ButtonIcon = ButtonIconEnum.Google;
                         break;
                     case SiginButtonTypeEnum.Linkedin:
-                        signinButton.ButtonType = ImageResourceEnum.Linkedin;
+                        signinButton.ButtonIcon = ButtonIconEnum.Linkedin;
                         break;
                     case SiginButtonTypeEnum.Tiktok:
-                        signinButton.ButtonType = ImageResourceEnum.Tiktok;
+                        signinButton.ButtonIcon = ButtonIconEnum.Tiktok;
                         break;
                     case SiginButtonTypeEnum.Microsoft:
-                        signinButton.ButtonType = ImageResourceEnum.Microsoft;
+                        signinButton.ButtonIcon = ButtonIconEnum.Microsoft;
                         break;
                     case SiginButtonTypeEnum.Apple:
-                        signinButton.ButtonType = ImageResourceEnum.Apple;
+                        signinButton.ButtonIcon = ButtonIconEnum.Apple;
                         break;
                     default:
-                        signinButton.ButtonType = ImageResourceEnum.Signin;
+                        signinButton.ButtonIcon = ButtonIconEnum.Signin;
                         break;
                 }
             }
@@ -54,7 +54,7 @@ public class SigninButton : ButtonBase
         set => SetValue(SigninButtonTypeProperty, value);
     }
 
-    public SigninButton() : base(ImageResourceEnum.Signin)
+    public SigninButton() : base(ButtonIconEnum.Signin)
     {
 
     }

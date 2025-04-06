@@ -3,7 +3,7 @@
 public class MediaStartRecord : ButtonBase
 {
 
-    public MediaStartRecord() : base(ImageResourceEnum.Bullet_Ball_Red)
+    public MediaStartRecord() : base(ButtonIconEnum.Bullet_Ball_Red)
     {
 
     }

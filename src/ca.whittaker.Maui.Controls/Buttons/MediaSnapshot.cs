@@ -3,7 +3,7 @@
 public class MediaSnapshot : ButtonBase
 {
 
-    public MediaSnapshot() : base(ImageResourceEnum.Camera)
+    public MediaSnapshot() : base(ButtonIconEnum.Camera)
     {
 
     }

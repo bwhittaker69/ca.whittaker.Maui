@@ -201,7 +201,7 @@ public class TextBox : BaseFormField
                 {
                     new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
                     new ColumnDefinition { Width = GridLength.Star },
-                    new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute)  },
+                    new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute)  },
                 },
             RowDefinitions =
                 {
@@ -377,7 +377,7 @@ public class TextBox : BaseFormField
                         else
                             grid.ColumnDefinitions[0].Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute);
                         grid.ColumnDefinitions[1].Width = GridLength.Star;
-                        grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2, GridUnitType.Absolute);
+                        grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute);
                     }
                 }
                 grid.HeightRequest = HeightRequest;
@@ -399,7 +399,7 @@ public class TextBox : BaseFormField
                 }
                 if (ButtonUndo != null)
                 {
-                    ButtonUndo.WidthRequest = DeviceHelper.GetImageSizeForDevice(cUndoButtonSize) * 2;
+                    ButtonUndo.WidthRequest = DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2;
                     ButtonUndo.HeightRequest = HeightRequest;
                 }
             }
@@ -470,7 +470,7 @@ public class TextBox : BaseFormField
 
     protected override void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
-        base.OnPropertyChanged(propertyName);
+        base.OnPropertyChanged(propertyName ?? String.Empty);
         RefreshUI();
     }
 
@@ -549,7 +549,7 @@ public class TextBox : BaseFormField
         throw new NotImplementedException();
     }
 
-    protected override bool FieldHasChanged()
+    protected override bool FieldHasChangedFromOriginal()
     {
         throw new NotImplementedException();
     }
@@ -564,63 +564,56 @@ public class TextBox : BaseFormField
         throw new NotImplementedException();
     }
 
-    protected override bool FieldHasValidData()
-    {
-        throw new NotImplementedException();
-    }
-
 
     protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue)
     {
         throw new NotImplementedException();
     }
 
-    public override void FieldClear()
+
+    //protected override void FieldConfigDisabled()
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+    //protected override void FieldConfigEnabled()
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+
+
+    protected override void FieldRefreshUI()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override bool FieldHasChangedFromLast()
     {
         throw new NotImplementedException();
     }
 
 
-    public override void FieldSavedAndMarkAsReadOnly()
+    protected override void FieldOriginalValue_Reset()
     {
         throw new NotImplementedException();
     }
 
-
-    protected override void OnFieldButtonUndoPressed(object? sender, EventArgs e)
+    protected override void FieldOriginalValue_SetToClear()
     {
         throw new NotImplementedException();
     }
 
-    public override void FieldMarkAsEditable()
+    protected override void FieldOriginalValue_SetToCurrentValue()
     {
         throw new NotImplementedException();
     }
 
-    public override void FieldMarkAsReadOnly()
-    {
-        throw new NotImplementedException();
-    }
+    //protected override void FieldConfigAccessModeHidden()
+    //{
+    //    throw new NotImplementedException();
+    //}
 
-    protected override void FieldDisable()
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override void FieldEnable()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void FieldHide()
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override void FieldUnhide()
-    {
-        throw new NotImplementedException();
-    }
 
     #endregion Public Methods
 }

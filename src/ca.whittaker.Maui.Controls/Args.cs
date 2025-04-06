@@ -1,6 +1,12 @@
 ﻿namespace ca.whittaker.Maui.Controls;
 
 
+public class FormSavedEventArgs : EventArgs
+{
+    public FormSavedEventArgs(bool hasChanges) => HasChanges = hasChanges;
+    public bool HasChanges { get; }
+}
+
 public class HasChangesEventArgs : EventArgs
 {
     public HasChangesEventArgs(bool hasChanged) => HasChanged = hasChanged;
@@ -8,8 +14,8 @@ public class HasChangesEventArgs : EventArgs
 }
 public class HasFormChangesEventArgs : EventArgs
 {
-    public HasFormChangesEventArgs(FormFieldsStateEnum formState) => FormState = formState;
-    public FormFieldsStateEnum FormState { get; }
+    public HasFormChangesEventArgs(FormAccessModeEnum formState) => FormState = formState;
+    public FormAccessModeEnum FormState { get; }
 }
 
 public class ValidationDataChangesEventArgs : EventArgs

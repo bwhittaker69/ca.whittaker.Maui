@@ -3,7 +3,7 @@
 public class BookmarkButton : ButtonBase
 {
 
-    public BookmarkButton() : base(ImageResourceEnum.Bookmark)
+    public BookmarkButton() : base(ButtonIconEnum.Bookmark)
     {
     }
 }

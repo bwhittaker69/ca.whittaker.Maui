@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:ca.whittaker.Maui.Controls.Demo"
+             xmlns:vm="clr-namespace:ca.whittaker.Maui.Controls.Demo.ViewModels"
              xmlns:Buttons="clr-namespace:ca.whittaker.Maui.Controls.Buttons;assembly=ca.whittaker.Maui.Controls"
              xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
              xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
@@ -9,7 +9,8 @@
              x:Class="ca.whittaker.Maui.Controls.Demo.Views.SampleCheckBoxPage"
              IsVisible="{Binding IsVisible}" 
              Disappearing="ContentPage_Disappearing"
-             Title="{x:Static strings:AppResources.Page_UserProfile_Title}">
+             Title="{x:Static strings:AppResources.Page_UserProfile_Title}"
+             x:DataType="vm:SampleCheckBoxViewModel">
     
     <VerticalStackLayout>
 
@@ -20,7 +21,7 @@
 
             <Forms:CheckBoxField FieldLabelWidth="150"
                                 x:Name="CheckBox_IsPublic"
-                                FieldDataSource="{Binding Userprofile_ispublic}"
+                                CheckBoxDataSource="{Binding Userprofile_ispublic}"
                                 FieldLabelText="{x:Static strings:AppResources.Field_IsPublic}">
             </Forms:CheckBoxField>
 

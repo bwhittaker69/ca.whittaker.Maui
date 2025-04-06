@@ -3,7 +3,7 @@
 public class CancelButton : ButtonBase
 {
 
-    public CancelButton() : base(ImageResourceEnum.Cancel)
+    public CancelButton() : base(ButtonIconEnum.Cancel)
     {
 
     }

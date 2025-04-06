@@ -4,11 +4,13 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
+    xmlns:vm="clr-namespace:ca.whittaker.Maui.Controls.Demo.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:ca.whittaker.Maui.Controls.Demo.Views"
     xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
     xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    x:DataType="vm:MauiPage1ViewModel">
     <ContentPage.Content>
         <Forms:Form x:Name="UserProfileForm" 
                         FormName="{x:Static strings:AppResources.Form_UserProfile_TItle}"
@@ -19,48 +21,48 @@
                         HorizontalOptions="Fill"
                         CommandParameter="">
             <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Center" HorizontalOptions="Fill">
-                <Entry Text="test"></Entry>
                 <Forms:TextBoxField     HorizontalOptions="Fill"
                                         VerticalOptions="Start"
-                                        FieldDataSource="{Binding Userprofile_nickname}"
+                                        TextBoxDataSource="{Binding Userprofile_nickname}"
                                         FieldLabelText="{x:Static strings:AppResources.Field_Name}"
                                         TextBoxFieldType="Text"
                                         TextBoxAllowWhiteSpace="False"
                                         FieldWidth="300"
                                         TextBoxPlaceholder="{x:Static strings:AppResources.Field_Name_Placeholder}">
                 </Forms:TextBoxField>
-                <Forms:TextBoxField 
-                                        FieldDataSource="{Binding Userprofile_email}"
+                <!--<Forms:TextBoxField 
+                                        TextBoxDataSource="{Binding Userprofile_email}"
                                         TextBoxFieldType="Email"
                                         FieldLabelText="{x:Static strings:AppResources.Field_Email}"
                                         TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
                 </Forms:TextBoxField>
                 <Forms:TextBoxField 
-                                        FieldDataSource="{Binding Userprofile_bio}"
+                                        TextBoxDataSource="{Binding Userprofile_bio}"
                                         TextBoxFieldType="Text"
                                         FieldLabelText="{x:Static strings:AppResources.Field_Bio}"
                                         TextBoxPlaceholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
                 </Forms:TextBoxField>
-                <!--Forms:TextBoxElement 
-                                        LabelWidth="70"
-                                        TextBoxSource="{Binding Userprofile_email}"
-                                        Label="{x:Static strings:AppResources.Field_Email}"
-                                        Mandatory="False"
-                                        MaxLength="40"
-                                        FieldType="Email"
-                                        Placeholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
-                </Forms:TextBoxElement>
-                <Forms:TextBoxElement LabelWidth="70"
-                                        TextBoxSource="{Binding Userprofile_bio}"
-                                        FieldType="Chat"
-                                        Label="{x:Static strings:AppResources.Field_Bio}"
-                                        MaxLength="50"
-                                        Placeholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
-                </Forms:TextBoxElement>
-                <Forms:CheckBoxElement LabelWidth="150"
-                                        CheckBoxSource="{Binding Userprofile_ispublic}"
-                                        Label="{x:Static strings:AppResources.Field_IsPublic}">
-                </Forms:CheckBoxElement-->
+                <Forms:TextBoxField 
+                                        FieldLabelWidth="70"
+                                        TextBoxDataSource="{Binding Userprofile_email}"
+                                        FieldLabelText="{x:Static strings:AppResources.Field_Email}"
+                                        FieldMandatory="False"
+                                        TextBoxMaxLength="40"
+                                        TextBoxFieldType="Email"
+                                        TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}">
+                </Forms:TextBoxField>
+                <Forms:TextBoxField FieldLabelWidth="70"
+                                        TextBoxDataSource="{Binding Userprofile_bio}"
+                                        FieldLabelText="{x:Static strings:AppResources.Field_Bio}"
+                                        TextBoxMaxLength="50"
+                                        TextBoxPlaceholder="{x:Static strings:AppResources.Field_Bio_Placeholder}">
+                </Forms:TextBoxField>-->
+                <Forms:CheckBoxField FieldLabelWidth="150"
+                                     CheckBoxDataSource="{Binding Userprofile_ispublic}"
+                                     CheckBoxType="TriState"
+                                     FieldMandatory="False"
+                                     FieldLabelText="{x:Static strings:AppResources.Field_IsPublic}">
+                </Forms:CheckBoxField>
 
             </VerticalStackLayout>
 

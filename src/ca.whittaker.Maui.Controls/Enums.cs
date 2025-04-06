@@ -8,7 +8,7 @@ namespace ca.whittaker.Maui.Controls
 {
 
     public enum SiginButtonTypeEnum { Generic, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple }
-    public enum ImageResourceEnum { 
+    public enum ButtonIconEnum { 
         Alarmclock, 
         Alarmclock_Stop, 
         Apple, 
@@ -40,13 +40,14 @@ namespace ca.whittaker.Maui.Controls
         Zoom_In, 
         Zoom_Out
     }
+
     public enum TextBoxFieldTypeEnum { Text, Email, Url, Chat, Username }
-    public enum FieldAccessModeEnum { Editable, ReadOnly, Hidden }
+    public enum FieldAccessModeEnum { Editable, Editing, ViewOnly, Hidden }
     public enum ButtonStateEnum { Enabled, Disabled, Pressed, Hidden }
     public enum ChangeStateEnum { Changed, NotChanged }
     public enum ValidationStateEnum { Valid, FormatError, RequiredFieldError }
-    public enum FormAccessModeEnum { Editable, ViewOnly, Hidden }
-    public enum FormFieldsStateEnum { Editing, ReadOnly, Hidden }
+    public enum FormAccessModeEnum { Editable, Editing, ViewOnly, Hidden }
+    public enum ButtonStyleEnum { IconOnly, IconAndText, TextOnly }
     public enum SizeEnum
     {
         XXXSmall = -20,

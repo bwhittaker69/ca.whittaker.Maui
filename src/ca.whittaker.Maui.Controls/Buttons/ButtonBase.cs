@@ -1,6 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
 using Microsoft.Maui;
 using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls.PlatformConfiguration.TizenSpecific;
 
 namespace ca.whittaker.Maui.Controls.Buttons;
 
@@ -34,17 +35,30 @@ public abstract class ButtonBase : Button, IButton
         set => SetValue(ButtonStateProperty, value);
     }
 
-    public static readonly BindableProperty ButtonTypeProperty = BindableProperty.Create(
-        propertyName: nameof(ButtonType),
-        returnType: typeof(ImageResourceEnum?),
+    public static readonly BindableProperty ButtonStyleProperty = BindableProperty.Create(
+    propertyName: nameof(ButtonStyle),
+    returnType: typeof(ButtonStyleEnum?),
+    declaringType: typeof(ButtonBase),
+    defaultValue: ButtonStyleEnum.IconAndText,
+    defaultBindingMode: BindingMode.OneWay);
+
+    public ButtonStyleEnum? ButtonStyle
+    {
+        get => (ButtonStyleEnum?)GetValue(ButtonStyleProperty);
+        set => SetValue(ButtonStyleProperty, value);
+    }
+
+    public static readonly BindableProperty ButtonIconProperty = BindableProperty.Create(
+        propertyName: nameof(ButtonIcon),
+        returnType: typeof(ButtonIconEnum?),
         declaringType: typeof(ButtonBase),
         defaultValue: null,
         defaultBindingMode: BindingMode.OneWay);
 
-    public ImageResourceEnum? ButtonType
+    public ButtonIconEnum? ButtonIcon
     {
-        get => (ImageResourceEnum?)GetValue(ButtonTypeProperty);
-        set => SetValue(ButtonTypeProperty, value);
+        get => (ButtonIconEnum?)GetValue(ButtonIconProperty);
+        set => SetValue(ButtonIconProperty, value);
     }
 
     public new static readonly BindableProperty TextProperty = BindableProperty.Create(
@@ -86,9 +100,9 @@ public abstract class ButtonBase : Button, IButton
         set => SetValue(PressedTextProperty, value);
     }
 
-    public ButtonBase(ImageResourceEnum buttonType) : base()
+    public ButtonBase(ButtonIconEnum buttonType) : base()
     {
-        ButtonType = buttonType;
+        ButtonIcon = buttonType;
         base.PropertyChanged += Button_PropertyChanged;
     }
 
@@ -101,7 +115,7 @@ public abstract class ButtonBase : Button, IButton
     private void Button_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if ((e.PropertyName == nameof(ButtonState))
-            || (e.PropertyName == nameof(ButtonType))
+            || (e.PropertyName == nameof(ButtonIcon))
             || (e.PropertyName == nameof(ButtonSize))
             || (e.PropertyName == nameof(WidthRequest))
             || (e.PropertyName == nameof(HeightRequest))
@@ -179,14 +193,25 @@ public abstract class ButtonBase : Button, IButton
         if (ButtonSize != null)
         {
             base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
-            if (ButtonType != null)
+            if (ButtonStyle != ButtonStyleEnum.TextOnly)
             {
-                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
+                if (ButtonIcon != null)
+                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
             }
-            if (!string.IsNullOrEmpty(Text))
+            else
+                base.ImageSource = null;
+
+            if ((ButtonStyle == ButtonStyleEnum.IconAndText || ButtonStyle == ButtonStyleEnum.TextOnly)
+                && !string.IsNullOrEmpty(Text))
             {
                 base.Text = Text;
             }
+
+            if (ButtonStyle == ButtonStyleEnum.IconAndText && !string.IsNullOrEmpty(Text))
+            {
+                base.ContentLayout = new ButtonContentLayout(ButtonContentLayout.ImagePosition.Left, 10);
+            }
+
         }
     }
     private void ConfigureDisabled()
@@ -197,13 +222,18 @@ public abstract class ButtonBase : Button, IButton
         if (ButtonSize != null)
         {
             base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
-            if (ButtonType != null)
+            if (ButtonStyle != ButtonStyleEnum.TextOnly)
             {
-                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
+                if (ButtonIcon != null)
+                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
             }
-            if (!string.IsNullOrEmpty(DisabledText))
+            else
+                base.ImageSource = null;
+
+            if ((ButtonStyle == ButtonStyleEnum.IconAndText || ButtonStyle == ButtonStyleEnum.TextOnly)
+                && !string.IsNullOrEmpty(Text))
             {
-                base.Text = DisabledText;
+                base.Text = Text;
             }
         }
     }
@@ -212,9 +242,9 @@ public abstract class ButtonBase : Button, IButton
         if (ButtonSize != null)
         {
             base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
-            if (ButtonType != null)
+            if (ButtonIcon != null)
             {
-                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ImageResourceEnum)ButtonType, (SizeEnum)ButtonSize);
+                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
             }
         }
     }

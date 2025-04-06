@@ -3,7 +3,7 @@
 public class RefreshButton : ButtonBase
 {
 
-    public RefreshButton() : base(ImageResourceEnum.Replace2)
+    public RefreshButton() : base(ButtonIconEnum.Replace2)
     {
 
     }

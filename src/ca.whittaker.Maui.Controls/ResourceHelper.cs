@@ -1,12 +1,6 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui;
-using Microsoft.Maui.ApplicationModel;
-using System.Reflection;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System;
+﻿//#define DEBUGOUT
 using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace ca.whittaker.Maui.Controls
 {
@@ -29,7 +23,7 @@ namespace ca.whittaker.Maui.Controls
         }
 
         // Retrieves an ImageSource based on button state, resource type, and size with caching.
-        public ImageSource? GetImageSource(ButtonStateEnum buttonState, ImageResourceEnum baseButtonType, SizeEnum sizeEnum, CancellationToken cancellationToken = default)
+        public ImageSource? GetImageSource(ButtonStateEnum buttonState, ButtonIconEnum baseButtonType, SizeEnum sizeEnum, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -44,18 +38,23 @@ namespace ca.whittaker.Maui.Controls
             int size = DeviceHelper.GetImageSizeForDevice(sizeEnum);
 
             string resourceName = $"{assemblyName}.Resources.Images.{baseButtonType.ToString().ToLowerInvariant()}_{size}{theme}{state}.png";
+#if DEBUGOUT
             Debug.WriteLine($"Attempting to load resource: {resourceName}");
+#endif
             cancellationToken.ThrowIfCancellationRequested();
 
             // Return cached ImageSource if available.
             if (_cache.TryGetValue(resourceName, out var cachedImage))
             {
+#if DEBUGOUT
                 Debug.WriteLine($"Returning cached resource: {resourceName}");
+#endif
                 return cachedImage;
             }
 
             if (ResourceExists(resourceName, assembly))
             {
+#pragma warning disable CS0168 // Variable is declared but never used
                 try
                 {
                     var imageSource = ImageSource.FromResource(resourceName, assembly);
@@ -64,13 +63,18 @@ namespace ca.whittaker.Maui.Controls
                 }
                 catch (Exception ex)
                 {
+#if DEBUGOUT
                     Debug.WriteLine($"Error loading image resource: {ex}");
+#endif
                     return null;
                 }
+#pragma warning restore CS0168 // Variable is declared but never used
             }
             else
             {
+#if DEBUGOUT
                 Debug.WriteLine($"Resource not found: {resourceName}");
+#endif
                 return null;
             }
         }
@@ -88,15 +92,19 @@ namespace ca.whittaker.Maui.Controls
 
         private static AppTheme GetCurrentTheme()
         {
+#pragma warning disable CS0168 // Variable is declared but never used
             try
             {
                 return Application.Current?.RequestedTheme ?? AppTheme.Unspecified;
             }
             catch (Exception ex)
             {
+#if DEBUGOUT
                 Debug.WriteLine($"Error retrieving current theme: {ex}");
+#endif
                 return AppTheme.Unspecified;
             }
+#pragma warning restore CS0168 // Variable is declared but never used
         }
 
         public void Dispose()

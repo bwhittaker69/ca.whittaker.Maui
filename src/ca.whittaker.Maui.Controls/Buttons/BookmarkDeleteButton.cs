@@ -3,7 +3,7 @@
 public class BookmarkDeleteButton : ButtonBase
 {
 
-    public BookmarkDeleteButton() : base(ImageResourceEnum.Bookmark_Delete)
+    public BookmarkDeleteButton() : base(ButtonIconEnum.Bookmark_Delete)
     {
     }
 }
