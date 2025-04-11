@@ -7,12 +7,64 @@ using System.Threading.Tasks;
 
 namespace ca.whittaker.Maui.Controls.Demo.ViewModels;
 
+public class TestUser
+{
+    public Guid UserId { get; set; }
+    public string Nickname { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Bio { get; set; } = string.Empty;
+    public bool IsPublic { get; set; } = false;
+}
+
+
 public class MauiPage1ViewModel : ObservableObject
 {
 
+    private List<TestUser>? GenerateTestUsers(int count)
+    {
+        var testUsers = new List<TestUser>();
+
+        for (int i = 1; i <= count; i++)
+        {
+            var user = new TestUser
+            {
+                UserId = Guid.NewGuid(),
+                Nickname = $"TestUser{i}",
+                Email = $"testuser{i}@example.com",
+                Bio = $"This is the bio for TestUser{i}.",
+                IsPublic = (i % 2 == 0)
+            };
+
+            testUsers.Add(user);
+        }
+
+        return testUsers;
+    }
 
 
-    private string _userprofile_nickname = string.Empty;
+
+    private List<TestUser>? _userprofile_users; 
+    public List<TestUser>? Userprofile_users
+    {
+        get => _userprofile_users;
+        set => SetProperty(ref _userprofile_users, value);
+    }
+
+    private Object? _userprofile_userid;
+    public Object? Userprofile_userid
+    {
+        get =>
+            _userprofile_userid;
+        set
+        {
+            if (SetProperty(ref _userprofile_userid, value))
+            {
+                System.Diagnostics.Debug.WriteLine($"Userprofile_userid changed to: {value}");
+            }
+        }
+    }
+ 
+    private string _userprofile_nickname = "Nickname value";
     public string Userprofile_nickname
     {
         get => _userprofile_nickname;
@@ -33,6 +85,26 @@ public class MauiPage1ViewModel : ObservableObject
         set => SetProperty(ref _userprofile_bio, value);
     }
 
+    private string _userprofile_country = String.Empty;
+    public string Userprofile_country
+    {
+        get => _userprofile_country;
+        set
+        {
+            if (SetProperty(ref _userprofile_country, value))
+            {
+                System.Diagnostics.Debug.WriteLine($"Userprofile_country changed to: {value}");
+            }
+        }
+    }
+
+    private List<string> _userprofile_country_items = [];
+    public List<string> Userprofile_country_items
+    {
+        get => _userprofile_country_items;
+        set => SetProperty(ref _userprofile_country_items, value);
+    }
+
     private bool _userprofile_ispublic = false;
     public bool Userprofile_ispublic
     {
@@ -45,6 +117,9 @@ public class MauiPage1ViewModel : ObservableObject
     public MauiPage1ViewModel()
     {
         FormSaveCommand = new Command(OnFormSave);
+
+        // Populate Userprofile_users with TestUser objects.
+        Userprofile_users = GenerateTestUsers(6);
     }
 
     private void OnFormSave()

@@ -2,10 +2,40 @@
 using Microsoft.Maui;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls.PlatformConfiguration.TizenSpecific;
+using System.Reflection;
 
 namespace ca.whittaker.Maui.Controls.Buttons;
+public static class TypeHelper
+{
+    public static List<Type> GetNonAbstractClasses()
+    {
+        return Assembly.GetExecutingAssembly()
+                       .GetTypes()
+                       .Where(t => t.IsClass
+                                && !t.IsAbstract
+                                && t.Namespace == "ca.whittaker.Maui.Controls.Buttons"
+                                && typeof(IButtonBase).IsAssignableFrom(t))
+                       .ToList();
+    }
+}
 
-public abstract class ButtonBase : Button, IButton
+public interface IButtonBase : IButton
+{
+    ButtonIconEnum? ButtonIcon { get; set; }
+    SizeEnum? ButtonSize { get; set; }
+    ButtonStateEnum? ButtonState { get; set; }
+    ButtonStyleEnum? ButtonStyle { get; set; }
+    string DisabledText { get; set; }
+    string PressedText { get; set; }
+    string Text { get; set; }
+
+    void Disabled();
+    void Enabled();
+    void Hide();
+    void UpdateUI();
+}
+
+public abstract class ButtonBase : Button, IButtonBase
 {
     private double heightMultiplier => DeviceInfo.Platform == DevicePlatform.WinUI ? 2.8 : 1.0;
 
@@ -174,6 +204,9 @@ public abstract class ButtonBase : Button, IButton
             }
         }
 
+#if !IOS && !ANDROID && !MACCATALYST && !WINDOWS
+        _update();
+#else
         if (MainThread.IsMainThread)
         {
             _update();
@@ -182,9 +215,10 @@ public abstract class ButtonBase : Button, IButton
         {
             MainThread.BeginInvokeOnMainThread(() => _update());
         }
+#endif
         this._updateUI = false;
     }
-    
+
     private void ConfigureEnabled()
     {
         base.IsEnabled = true;

@@ -272,10 +272,10 @@ namespace ca.whittaker.Maui.Controls.Forms
             foreach (BaseFormField field in this.GetVisualTreeDescendants().OfType<BaseFormField>())
             {
                 if (field is TextBoxField textBox)
-                    textBox.FieldClear();
+                    textBox.Field_Clear();
                 if (field is CheckBoxField checkBox)
-                    checkBox.FieldClear();
-                field.FieldUnfocus();
+                    checkBox.Field_Clear();
+                field.Field_Unfocus();
             }
         }
 
@@ -319,8 +319,18 @@ namespace ca.whittaker.Maui.Controls.Forms
             _formStatusEvaluating = false;
         }
 
-        private bool FormFieldsCheckArePristine() =>
-                    this.GetVisualTreeDescendants().OfType<BaseFormField>().All(field => field.FieldChangeState != ChangeStateEnum.Changed);
+        private bool FormFieldsCheckArePristine()
+        {
+            foreach (var field in this.GetVisualTreeDescendants().OfType<BaseFormField>())
+            {
+                if (field.FieldChangeState == ChangeStateEnum.Changed)
+                {
+                    return false;
+                }
+            }
+            return true;
+            // => return this.GetVisualTreeDescendants().OfType<BaseFormField>().All(field => field.FieldChangeState != ChangeStateEnum.Changed);
+        }
 
         private bool FormFieldsCheckAreValid() =>
                     this.GetVisualTreeDescendants().OfType<BaseFormField>().All(field => field.FieldValidationState == ValidationStateEnum.Valid);
@@ -367,7 +377,7 @@ namespace ca.whittaker.Maui.Controls.Forms
         private void FormFieldsMarkAsSaved()
         {
             foreach (BaseFormField t in this.GetVisualTreeDescendants().OfType<BaseFormField>())
-                t.FieldSaveAndMarkAsReadOnly(); 
+                t.Field_SaveAndMarkAsReadOnly(); 
         }
 
         private void FormFieldsWireUp()
@@ -523,12 +533,13 @@ namespace ca.whittaker.Maui.Controls.Forms
                 Command.Execute(CommandParameter);
 
 
-            bool hasChanges = FormFieldsCheckArePristine();
+            bool hasChanges = !FormFieldsCheckArePristine();
 
             //
             // loop over each field, set original value to datasource value
             // 
-            FormFieldsMarkAsSaved();
+            if (hasChanges)
+                FormFieldsMarkAsSaved();
 
             //
             // set form state to "editable"

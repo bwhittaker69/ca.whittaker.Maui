@@ -41,7 +41,8 @@ namespace ca.whittaker.Maui.Controls
         Zoom_Out
     }
 
-    public enum TextBoxFieldTypeEnum { Text, Email, Url, Chat, Username }
+    public enum TextBoxDataTypeEnum { Plaintext, Email, Url, Richtext, Username, Integer, Numeric, Currency }
+    public enum EditorDataTypeEnum { Plaintext, Richtext }
     public enum FieldAccessModeEnum { Editable, Editing, ViewOnly, Hidden }
     public enum ButtonStateEnum { Enabled, Disabled, Pressed, Hidden }
     public enum ChangeStateEnum { Changed, NotChanged }

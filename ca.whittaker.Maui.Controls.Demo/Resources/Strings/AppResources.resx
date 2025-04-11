@@ -132,50 +132,38 @@
   <data name="Button_SignInWithApple" xml:space="preserve">
     <value>signin with apple</value>
   </data>
-  <data name="Field_Bio" xml:space="preserve">
+	<data name="Button_SignOut" xml:space="preserve">
+    <value>sign-out</value>
+  </data>
+	<data name="Field_Bio" xml:space="preserve">
     <value>bio</value>
   </data>
   <data name="Field_Bio_Placeholder" xml:space="preserve">
     <value>about you</value>
   </data>
-  <data name="Button_SignOut" xml:space="preserve">
-    <value>sign-out</value>
+	<data name="Field_Country_Items" xml:space="preserve">
+    <value>Canada, United States, United Kingdom, China</value>
   </data>
-  <data name="Table_LoginDetails_TextCell_Device" xml:space="preserve">
-    <value>Device</value>
+	<data name="Field_Country" xml:space="preserve">
+    <value>Country</value>
   </data>
-  <data name="Field_Email" xml:space="preserve">
+	<data name="Field_Country_Placeholder" xml:space="preserve">
+    <value>your country</value>
+  </data>
+	<data name="Field_Email" xml:space="preserve">
     <value>email</value>
   </data>
   <data name="Field_Email_Placeholder" xml:space="preserve">
     <value>your email</value>
   </data>
-  <data name="Page_UserProfile_Title" xml:space="preserve">
-    <value>user profile</value>
-  </data>
-  <data name="Table_LoginDetails_TextCell_LastLoginDate" xml:space="preserve">
-    <value>Last Login Date</value>
-  </data>
-  <data name="Table_LoginDetails_TextCell_Location" xml:space="preserve">
-    <value>Location</value>
-  </data>
-  <data name="Table_LoginDetails_Title" xml:space="preserve">
-    <value>Login Details</value>
-  </data>
-  <data name="Page_LoginLogout_Title_SignIn" xml:space="preserve">
-    <value>welcome</value>
-  </data>
-  <data name="Field_Name" xml:space="preserve">
+	<data name="Field_Name" xml:space="preserve">
     <value>name</value>
   </data>
-  <data name="Field_Name_Placeholder" xml:space="preserve">
+	<data name="Field_Name_Placeholder" xml:space="preserve">
     <value>your name</value>
   </data>
   <data name="Form_UserProfile_TItle" xml:space="preserve">
     <value>about you</value>
-  </data>
-  <data name="Tab_LoginLogout" xml:space="preserve">
-    <value>security</value>
   </data>
   <data name="Form_UserProfile_Button_Cancel" xml:space="preserve">
     <value>cancel</value>
@@ -186,7 +174,13 @@
   <data name="Form_UserProfile_Button_Undo" xml:space="preserve">
     <value>undo</value>
   </data>
-  <data name="Page_LoginLogout_Title_SignOut" xml:space="preserve">
+	<data name="Page_UserProfile_Title" xml:space="preserve">
+    <value>user profile</value>
+  </data>
+	<data name="Page_LoginLogout_Title_SignIn" xml:space="preserve">
+    <value>welcome</value>
+  </data>
+	<data name="Page_LoginLogout_Title_SignOut" xml:space="preserve">
     <value>sign-out</value>
   </data>
   <data name="Tab_UserProfile" xml:space="preserve">
@@ -200,5 +194,20 @@
   </data>
   <data name="Tab_TextBox" xml:space="preserve">
     <value>TextBox</value>
+  </data>
+	<data name="Tab_LoginLogout" xml:space="preserve">
+    <value>security</value>
+  </data>
+	<data name="Table_LoginDetails_TextCell_LastLoginDate" xml:space="preserve">
+    <value>Last Login Date</value>
+  </data>
+	<data name="Table_LoginDetails_TextCell_Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="Table_LoginDetails_Title" xml:space="preserve">
+    <value>Login Details</value>
+  </data>
+  <data name="Table_LoginDetails_TextCell_Device" xml:space="preserve">
+    <value>Device</value>
   </data>
 </root>

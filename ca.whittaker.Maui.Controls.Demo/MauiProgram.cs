@@ -18,7 +18,7 @@ namespace ca.whittaker.Maui.Controls.Demo
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            //builder.Logging.AddDebug();
 #endif
 
             builder.Services.AddSingleton<LoginLogoutViewModel>();

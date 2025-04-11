@@ -79,21 +79,14 @@ public partial class CheckBoxField : BaseFormField
         declaringType: typeof(CheckBoxField),
         defaultValue: null,
         defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: (bindable, oldValue, newValue) => { ((CheckBoxField)bindable).OnFieldDataSourcePropertyChanged(newValue, oldValue); });
+        propertyChanged: (bindable, oldValue, newValue) => { ((CheckBoxField)bindable).OnDataSourcePropertyChanged(newValue, oldValue); });
 
-
-    public static readonly BindableProperty CheckBoxTypeSourceProperty = BindableProperty.Create(
-        propertyName: nameof(CheckBoxType),
-        returnType: typeof(CheckBoxTypeEnum),
+    public static readonly BindableProperty CheckBoxDataTypeSourceProperty = BindableProperty.Create(
+        propertyName: nameof(CheckBoxDataType),
+        returnType: typeof(CheckBoxDataTypeEnum),
         declaringType: typeof(CheckBoxField),
-        defaultValue: CheckBoxTypeEnum.TriState,
+        defaultValue: CheckBoxDataTypeEnum.TriState,
         defaultBindingMode: BindingMode.OneWay);
-
-    public CheckBoxTypeEnum CheckBoxType
-    {
-        get => (CheckBoxTypeEnum)GetValue(CheckBoxTypeSourceProperty);
-        set => SetValue(CheckBoxTypeSourceProperty, value);
-    }
 
     #endregion Fields
 
@@ -122,7 +115,7 @@ public partial class CheckBoxField : BaseFormField
             VerticalOptions = LayoutOptions.Fill
         };
         _checkBoxOverlay = new TapGestureRecognizer();
-        _checkBoxOverlay!.Tapped += OnCheckBox_Tapped;
+        _checkBoxOverlay!.Tapped += OnCheckBoxTapped;
         _checkBoxTapOverlay.GestureRecognizers.Add(_checkBoxOverlay);
 
         InitializeLayout();
@@ -132,7 +125,7 @@ public partial class CheckBoxField : BaseFormField
 
     #region Enums
 
-    public enum CheckBoxTypeEnum
+    public enum CheckBoxDataTypeEnum
     {
         Boolean,
         TriState,
@@ -155,64 +148,17 @@ public partial class CheckBoxField : BaseFormField
         set => SetValue(CheckBoxDataSourceProperty, value);
     }
 
+    public CheckBoxDataTypeEnum CheckBoxDataType
+    {
+        get => (CheckBoxDataTypeEnum)GetValue(CheckBoxDataTypeSourceProperty);
+        set => SetValue(CheckBoxDataTypeSourceProperty, value);
+    }
+
     #endregion Properties
 
     #region Private Methods
 
-    private void CheckBoxToggleValue()
-    {
-        if (_checkBoxOverlay != null)
-        {
-            if (CheckBoxType == CheckBoxTypeEnum.Boolean)
-            {
-                switch (GetCheckBoxSate())
-                {
-                    case CheckedStateEnum.UnChecked:
-                        // UnChecked => Checked
-                        SetChecked();
-                        break;
-
-                    case CheckedStateEnum.Checked:
-                    case CheckedStateEnum.NotSet:
-                        // Checked or NotSet => UnChecked
-                        SetUnChecked();
-                        break;
-                }
-            }
-            else if (CheckBoxType == CheckBoxTypeEnum.TriState)
-            {
-                switch (GetCheckBoxSate())
-                {
-                    case CheckedStateEnum.UnChecked:
-                        if (FieldMandatory == true)
-                        {
-                            // mandatory?
-                            // UnChecked => Checked
-                            SetChecked();
-                        }
-                        else
-                        {
-                            // Not mandatory?
-                            // unchecked => NotSet
-                            SetNotSet();
-                        }
-                        break;
-
-                    case CheckedStateEnum.Checked:
-                        // Checked => NotSet
-                        SetUnChecked();
-                        break;
-
-                    case CheckedStateEnum.NotSet:
-                        // NotSet => UnChecked
-                        SetChecked();
-                        break;
-                }
-            }
-        }
-    }
-
-    private CheckedStateEnum GetCheckBoxSate()
+    private CheckedStateEnum CheckBox_GetState()
     {
         if (_checkBox!.IsEnabled == false
             && FieldMandatory == false)
@@ -221,53 +167,7 @@ public partial class CheckBoxField : BaseFormField
             return _checkBox.IsChecked ? CheckedStateEnum.Checked : CheckedStateEnum.UnChecked;
     }
 
-    private void OnCheckBox_Tapped(object? sender, TappedEventArgs e)
-    {
-        Debug.WriteLine($"OnCheckBox_Tapped");
-        if (FieldAccessMode == FieldAccessModeEnum.Editing)
-        {
-            CheckBoxToggleValue();
-            FieldUpdateValidationAndChangedState();
-            FieldUpdateNotificationMessage();
-        }
-    }
-
-    private void SetCheckBoxValue(CheckedStateEnum value)
-    {
-        if (CheckBoxType == CheckBoxTypeEnum.Boolean)
-        {
-            switch (value)
-            {
-                case CheckedStateEnum.Checked:
-                    SetChecked();
-                    break;
-
-                case CheckedStateEnum.NotSet:
-                case CheckedStateEnum.UnChecked:
-                    SetUnChecked();
-                    break;
-            }
-        }
-        else if (CheckBoxType == CheckBoxTypeEnum.TriState)
-        {
-            switch (value)
-            {
-                case CheckedStateEnum.NotSet:
-                    SetNotSet();
-                    break;
-
-                case CheckedStateEnum.Checked:
-                    SetChecked();
-                    break;
-
-                case CheckedStateEnum.UnChecked:
-                    SetUnChecked();
-                    break;
-            }
-        }
-    }
-
-    private void SetChecked()
+    private void CheckBox_SetChecked()
     {
         void _updateUI()
         {
@@ -284,7 +184,7 @@ public partial class CheckBoxField : BaseFormField
             MainThread.BeginInvokeOnMainThread(_updateUI);
     }
 
-    private void SetNotSet()
+    private void CheckBox_SetNotSet()
     {
         void _updateUI()
         {
@@ -301,7 +201,42 @@ public partial class CheckBoxField : BaseFormField
             MainThread.BeginInvokeOnMainThread(_updateUI);
     }
 
-    private void SetUnChecked()
+    private void CheckBox_SetState(CheckedStateEnum value)
+    {
+        if (CheckBoxDataType == CheckBoxDataTypeEnum.Boolean)
+        {
+            switch (value)
+            {
+                case CheckedStateEnum.Checked:
+                    CheckBox_SetChecked();
+                    break;
+
+                case CheckedStateEnum.NotSet:
+                case CheckedStateEnum.UnChecked:
+                    CheckBox_SetUnChecked();
+                    break;
+            }
+        }
+        else if (CheckBoxDataType == CheckBoxDataTypeEnum.TriState)
+        {
+            switch (value)
+            {
+                case CheckedStateEnum.NotSet:
+                    CheckBox_SetNotSet();
+                    break;
+
+                case CheckedStateEnum.Checked:
+                    CheckBox_SetChecked();
+                    break;
+
+                case CheckedStateEnum.UnChecked:
+                    CheckBox_SetUnChecked();
+                    break;
+            }
+        }
+    }
+
+    private void CheckBox_SetUnChecked()
     {
         void _updateUI()
         {
@@ -318,11 +253,75 @@ public partial class CheckBoxField : BaseFormField
             MainThread.BeginInvokeOnMainThread(_updateUI);
     }
 
+    private void CheckBox_Toggle()
+    {
+        if (_checkBoxOverlay != null)
+        {
+            if (CheckBoxDataType == CheckBoxDataTypeEnum.Boolean)
+            {
+                switch (CheckBox_GetState())
+                {
+                    case CheckedStateEnum.UnChecked:
+                        // UnChecked => Checked
+                        CheckBox_SetChecked();
+                        break;
+
+                    case CheckedStateEnum.Checked:
+                    case CheckedStateEnum.NotSet:
+                        // Checked or NotSet => UnChecked
+                        CheckBox_SetUnChecked();
+                        break;
+                }
+            }
+            else if (CheckBoxDataType == CheckBoxDataTypeEnum.TriState)
+            {
+                switch (CheckBox_GetState())
+                {
+                    case CheckedStateEnum.UnChecked:
+                        if (FieldMandatory == true)
+                        {
+                            // mandatory?
+                            // UnChecked => Checked
+                            CheckBox_SetChecked();
+                        }
+                        else
+                        {
+                            // Not mandatory?
+                            // unchecked => NotSet
+                            CheckBox_SetNotSet();
+                        }
+                        break;
+
+                    case CheckedStateEnum.Checked:
+                        // Checked => NotSet
+                        CheckBox_SetUnChecked();
+                        break;
+
+                    case CheckedStateEnum.NotSet:
+                        // NotSet => UnChecked
+                        CheckBox_SetChecked();
+                        break;
+                }
+            }
+        }
+    }
+
+    private void OnCheckBoxTapped(object? sender, TappedEventArgs e)
+    {
+        Debug.WriteLine($"OnCheckBox_Tapped");
+        if (FieldAccessMode == FieldAccessModeEnum.Editing)
+        {
+            CheckBox_Toggle();
+            Field_UpdateValidationAndChangedState();
+            Field_UpdateNotificationMessage();
+        }
+    }
+
     #endregion Private Methods
 
     #region Protected Methods
 
-    protected override Grid FieldCreateLayoutGrid()
+    protected override Grid Field_CreateLayoutGrid()
     {
         var grid = new Grid
         {
@@ -354,149 +353,114 @@ public partial class CheckBoxField : BaseFormField
         return grid;
     }
 
-    protected override string FieldGetFormatErrorMessage()
+    protected override string Field_GetFormatErrorMessage()
     {
         throw new Exception("checkbox should not trigger format error");
     }
 
-    protected override bool FieldHasChangedFromLast()
+    protected override bool Field_HasChangedFromLast()
     {
-        return _lastValue != GetCheckBoxSate();
+        return _lastValue != CheckBox_GetState();
     }
 
-    protected override bool FieldHasChangedFromOriginal()
+    protected override bool Field_HasChangedFromOriginal()
     {
-        return _originalValue != GetCheckBoxSate();
+        return _originalValue != CheckBox_GetState();
     }
 
-    protected override bool FieldHasFormatError()
+    protected override bool Field_HasFormatError()
     {
         return false;
     }
 
-    protected override bool FieldHasRequiredError()
+    protected override bool Field_HasRequiredError()
     {
-        if (FieldMandatory && GetCheckBoxSate() == CheckedStateEnum.NotSet)
+        if (FieldMandatory && CheckBox_GetState() == CheckedStateEnum.NotSet)
             return true;
-        else if (CheckBoxType == CheckBoxTypeEnum.Boolean && GetCheckBoxSate() == CheckedStateEnum.NotSet)
+        else if (CheckBoxDataType == CheckBoxDataTypeEnum.Boolean && CheckBox_GetState() == CheckedStateEnum.NotSet)
             return true;
         else
             return false;
     }
 
-    protected override void FieldOriginalValue_Reset()
+    protected override void Field_OriginalValue_Reset()
     {
-        SetCheckBoxValue(_originalValue);
+        CheckBox_SetState(_originalValue);
     }
-    protected override void FieldOriginalValue_SetToCurrentValue()
-    {
-        _originalValue = GetCurrentValue().FromNullableBoolean();
-    }
-    protected override void FieldOriginalValue_SetToClear()
+
+    protected override void Field_OriginalValue_SetToClear()
     {
         _originalValue = FieldMandatory ? CheckedStateEnum.UnChecked : CheckedStateEnum.NotSet;
     }
 
-    protected override void FieldRefreshUI()
+    protected override void Field_OriginalValue_SetToCurrentValue()
     {
-        void _fieldRefreshUI()
+        _originalValue = GetCurrentValue().FromNullableBoolean();
+    }
+
+    protected override void OnDataSourcePropertyChanged(object newValue, object oldValue)
+    {
+    }
+
+    protected override void OnParentSet()
+    {
+        base.OnParentSet();
+        CheckBox_SetState(CheckBoxDataSource.FromNullableBoolean());
+    }
+
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+    {
+        base.OnPropertyChanged(propertyName);
+    }
+
+    // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
+    protected override void UpdateRow0Layout()
+    {
+        void _updateRow0Layout()
         {
             BatchBegin();
-            if (Content is Grid grid)
+            if (_checkBoxTapOverlay!.Parent is Grid grid)
             {
-                if (grid.ColumnDefinitions?.Count == 3)
+                bool isFieldLabelVisible = FieldLabelVisible;
+                bool isButtonUndoVisible = FieldUndoButtonVisible;
+
+                if (isFieldLabelVisible && isButtonUndoVisible)
                 {
-                    grid.ColumnDefinitions[0].Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute);
-                    grid.ColumnDefinitions[1].Width = GridLength.Star;
-                    grid.ColumnDefinitions[2].Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute);
+                    Grid.SetColumn(_checkBoxTapOverlay!, 1);
+                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 1);
                 }
-                grid.HeightRequest = HeightRequest;
-                grid.WidthRequest = WidthRequest;
-                FieldLabel!.HeightRequest = HeightRequest;
-                FieldLabel.WidthRequest = FieldLabelWidth;
-                _checkBox!.WidthRequest = -1;
-                _checkBox!.HeightRequest = HeightRequest;
-                if (ButtonUndo != null)
+                else if (isFieldLabelVisible && !isButtonUndoVisible)
                 {
-                    ButtonUndo.WidthRequest = DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2;
-                    ButtonUndo.HeightRequest = HeightRequest;
+                    Grid.SetColumn(_checkBoxTapOverlay!, 1);
+                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
+                }
+                else if (!isFieldLabelVisible && isButtonUndoVisible)
+                {
+                    Grid.SetColumn(_checkBoxTapOverlay!, 0);
+                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
+                }
+                else // both not visible
+                {
+                    Grid.SetColumn(_checkBoxTapOverlay!, 0);
+                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 3);
                 }
             }
             BatchCommit();
         }
 
         if (MainThread.IsMainThread)
-            _fieldRefreshUI();
+            _updateRow0Layout();
         else
-            MainThread.BeginInvokeOnMainThread(_fieldRefreshUI);
-    }
-
-    //void FieldSetOriginalValueToDataSourceValue()
-    //protected override void FieldSetOriginalValue(object? originalValue = null)
-    //{
-    //    _fieldIsOriginalValueSet = true;
-    //    _originalValue = (bool?)originalValue == true ? CheckedStateEnum.Checked
-    //                    : (bool?)originalValue == false ? CheckedStateEnum.UnChecked
-    //                    : CheckedStateEnum.NotSet;
-    //    SetCheckBoxValue(_originalValue);
-    //}
-    //protected override void FieldUnhide()
-    //{
-    //    if (FieldAccessMode != FieldAccessModeEnum.Hidden)
-    //    {
-    //        void _updateUI()
-    //        {
-    //            BatchBegin();
-    //            Content.IsVisible = true;
-    //            BatchCommit();
-    //        }
-
-    //        if (MainThread.IsMainThread)
-    //            _updateUI();
-    //        else
-    //            MainThread.BeginInvokeOnMainThread(_updateUI);
-    //    }
-    //}
-
-    protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue)
-    {
-        //if (!_fieldIsOriginalValueSet)
-        //{
-        //    // prevent loop back
-        //    if (!_onFieldDataSourcePropertyChanging)
-        //    {
-        //        _onFieldDataSourcePropertyChanging = true;
-        //        if (_checkBox != null)
-        //        {
-        //            _checkBox.CheckedChanged -= CheckBox_CheckedChanged;
-        //            _checkBox.IsChecked = (bool)newValue;
-        //            _checkBox.CheckedChanged += CheckBox_CheckedChanged;
-        //        }
-        //        _onFieldDataSourcePropertyChanging = false;
-        //    }
-        //}
-    }
-
-    protected override void OnParentSet()
-    {
-        base.OnParentSet();
-        SetCheckBoxValue(CheckBoxDataSource.FromNullableBoolean());
-        FieldRefreshUI();
-    }
-
-    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
-    {
-        base.OnPropertyChanged(propertyName);
-        FieldRefreshUI();
+            MainThread.BeginInvokeOnMainThread(_updateRow0Layout);
     }
 
     #endregion Protected Methods
 
     #region Public Methods
 
-    public override void FieldUnfocus()
+    public override void Field_Unfocus()
     {
-        base.FieldUnfocus();
+        base.Field_Unfocus();
         _checkBox?.Unfocus();
     }
 

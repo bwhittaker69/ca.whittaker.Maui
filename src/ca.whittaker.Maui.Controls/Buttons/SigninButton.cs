@@ -5,7 +5,7 @@ using Microsoft.Maui.ApplicationModel;
 
 namespace ca.whittaker.Maui.Controls.Buttons;
 
-public class SigninButton : ButtonBase
+public class SigninButton : ButtonBase, IButtonBase
 {
 
     public static readonly BindableProperty SigninButtonTypeProperty = BindableProperty.Create(

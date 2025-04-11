@@ -133,6 +133,33 @@ namespace ca.whittaker.Maui.Controls.Demo.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Country.
+        /// </summary>
+        internal static string Field_Country {
+            get {
+                return ResourceManager.GetString("Field_Country", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Canada, United States, United Kingdom, China.
+        /// </summary>
+        internal static string Field_Country_Items {
+            get {
+                return ResourceManager.GetString("Field_Country_Items", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to your country.
+        /// </summary>
+        internal static string Field_Country_Placeholder {
+            get {
+                return ResourceManager.GetString("Field_Country_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to email.
         /// </summary>
         internal static string Field_Email {
