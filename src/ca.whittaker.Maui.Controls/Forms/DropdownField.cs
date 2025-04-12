@@ -24,11 +24,6 @@ namespace ca.whittaker.Maui.Controls.Forms
         private Picker _pickerControl;
         private Entry _pickerControlPlaceholder;
         private DataSourceTypeEnum dataSourceType;
-        private enum DataSourceTypeEnum
-        {
-            delimitedstring,
-            complexobject
-        }
 
         // Bindable property for the selected item.
         public static readonly BindableProperty DropdownDataSourceProperty = BindableProperty.Create(
@@ -38,6 +33,20 @@ namespace ca.whittaker.Maui.Controls.Forms
             defaultBindingMode: BindingMode.TwoWay,
             propertyChanged: (bindable, oldValue, newValue) =>
                 ((DropdownField)bindable).OnDropdownDataSourcePropertyChanged(newValue));
+
+        // Bindable property for DropdownItemsSourceDisplayPath
+        public static readonly BindableProperty DropdownItemsSourceDisplayPathProperty = BindableProperty.Create(
+            propertyName: nameof(DropdownItemsSourceDisplayPath),
+            returnType: typeof(string),
+            declaringType: typeof(DropdownField),
+            defaultValue: string.Empty);
+
+        // Bindable property for DropdownItemsSourcePrimaryKey
+        public static readonly BindableProperty DropdownItemsSourcePrimaryKeyProperty = BindableProperty.Create(
+            propertyName: nameof(DropdownItemsSourcePrimaryKey),
+            returnType: typeof(string),
+            declaringType: typeof(DropdownField),
+            defaultValue: string.Empty);
 
         /// <summary>Bindable property for <see cref="DropdownItemsSource"/>.</summary>
         public static readonly BindableProperty DropdownItemsSourceProperty =
@@ -59,20 +68,6 @@ namespace ca.whittaker.Maui.Controls.Forms
             propertyChanged: (bindable, oldValue, newValue) =>
                 ((DropdownField)bindable).OnDropdownPlaceholderPropertyChanged(newValue));
 
-        // Bindable property for DropdownItemsSourceDisplayPath
-        public static readonly BindableProperty DropdownItemsSourceDisplayPathProperty = BindableProperty.Create(
-            propertyName: nameof(DropdownItemsSourceDisplayPath),
-            returnType: typeof(string),
-            declaringType: typeof(DropdownField),
-            defaultValue: string.Empty);
-
-        // Bindable property for DropdownItemsSourcePrimaryKey
-        public static readonly BindableProperty DropdownItemsSourcePrimaryKeyProperty = BindableProperty.Create(
-            propertyName: nameof(DropdownItemsSourcePrimaryKey),
-            returnType: typeof(string),
-            declaringType: typeof(DropdownField),
-            defaultValue: string.Empty);
-
         #endregion Fields
 
         #region Public Constructors
@@ -81,7 +76,6 @@ namespace ca.whittaker.Maui.Controls.Forms
         {
             _pickerContainer = new Grid
             {
-
             };
             _pickerControlPlaceholder = new Entry
             {
@@ -105,7 +99,7 @@ namespace ca.whittaker.Maui.Controls.Forms
             // Use ItemDisplayBinding instead of custom DisplayMemberPath
             _pickerControl.SetBinding(Picker.ItemsSourceProperty, new Binding(nameof(DropdownItemsSource), source: this));
 
-            if (!String.IsNullOrEmpty(DropdownItemsSourceDisplayPath)) 
+            if (!String.IsNullOrEmpty(DropdownItemsSourceDisplayPath))
                 _pickerControl.ItemDisplayBinding = new Binding(DropdownItemsSourceDisplayPath);
 
             // Initialize layout of this control.
@@ -113,6 +107,16 @@ namespace ca.whittaker.Maui.Controls.Forms
         }
 
         #endregion Public Constructors
+
+        #region Enums
+
+        private enum DataSourceTypeEnum
+        {
+            delimitedstring,
+            complexobject
+        }
+
+        #endregion Enums
 
         #region Properties
 
@@ -134,14 +138,13 @@ namespace ca.whittaker.Maui.Controls.Forms
             set => SetValue(DropdownItemsSourceProperty, value);
         }
 
-
         /// <summary>
-        /// Gets or sets the placeholder (title) of the dropdown.
+        /// Gets or sets the property name to display in the dropdown when binding to complex objects.
         /// </summary>
-        public string DropdownPlaceholder
+        public string DropdownItemsSourceDisplayPath
         {
-            get => (string)GetValue(DropdownPlaceholderProperty);
-            set => SetValue(DropdownPlaceholderProperty, value);
+            get => (string)GetValue(DropdownItemsSourceDisplayPathProperty);
+            set => SetValue(DropdownItemsSourceDisplayPathProperty, value);
         }
 
         /// <summary>
@@ -154,12 +157,12 @@ namespace ca.whittaker.Maui.Controls.Forms
         }
 
         /// <summary>
-        /// Gets or sets the property name to display in the dropdown when binding to complex objects.
+        /// Gets or sets the placeholder (title) of the dropdown.
         /// </summary>
-        public string DropdownItemsSourceDisplayPath
+        public string DropdownPlaceholder
         {
-            get => (string)GetValue(DropdownItemsSourceDisplayPathProperty);
-            set => SetValue(DropdownItemsSourceDisplayPathProperty, value);
+            get => (string)GetValue(DropdownPlaceholderProperty);
+            set => SetValue(DropdownPlaceholderProperty, value);
         }
 
         #endregion Properties
@@ -176,7 +179,7 @@ namespace ca.whittaker.Maui.Controls.Forms
                 if (newValue is System.Collections.IList itemSource)
                 {
                     // ***************************
-                    //   list of complex objects 
+                    //   list of complex objects
                     // ***************************
                     dataSourceType = DataSourceTypeEnum.complexobject;
 
@@ -205,7 +208,7 @@ namespace ca.whittaker.Maui.Controls.Forms
                 else if (newValue is string str)
                 {
                     // *************************************
-                    //   string of delimited list of items 
+                    //   string of delimited list of items
                     // *************************************
                     dataSourceType = DataSourceTypeEnum.delimitedstring;
                     _pickerControl.Items.Clear();
@@ -229,15 +232,8 @@ namespace ca.whittaker.Maui.Controls.Forms
             else
                 MainThread.BeginInvokeOnMainThread(_dropdown_SetItems);
         }
-        private string GetProperty(object instance, string propertyName)
-        {
-            if (instance == null) return String.Empty;
-            PropertyInfo? property = instance!.GetType().GetProperty(propertyName);
-            if (property == null) return String.Empty;
-            var valueAsObject = property.GetValue(instance) ?? throw new Exception($"property {propertyName} does not exist"); 
-            return valueAsObject.ToString() ?? String.Empty;
-        }
-        private void Dropdown_SetSelectedItem(object selectedItem)
+
+        private void Dropdown_SetSelectedItem(object? selectedItem)
         {
             Debug.WriteLine($"Dropdown_SetSelectedItem ({selectedItem})");
 
@@ -259,13 +255,10 @@ namespace ca.whittaker.Maui.Controls.Forms
                                 if (_pickerControl!.SelectedIndex > -1 && DropdownDataSource != selectedItem)
                                     DropdownDataSource = selectedItem?.ToString() ?? String.Empty;
                                 break;
+
                             case DataSourceTypeEnum.complexobject:
-                                // already set, we can skip this line
-                                //      _pickerControl.SelectedItem = selectedItem;
                                 _pickerControlPlaceholder.IsVisible = false;
-                                //      _pickerControl.SelectedItem = selectedItem;
-                                DropdownDataSource = selectedItem;//.ToString() ?? String.Empty; //GetProperty(selectedItem, DropdownItemsSourcePrimaryKey);
-                                    //selectedItem?.ToString() ?? String.Empty;
+                                DropdownDataSource = selectedItem;
                                 break;
                         }
                     }
@@ -281,6 +274,7 @@ namespace ca.whittaker.Maui.Controls.Forms
                             case DataSourceTypeEnum.delimitedstring:
                                 _pickerControl.SelectedIndex = -1;
                                 break;
+
                             case DataSourceTypeEnum.complexobject:
                                 _pickerControl.SelectedItem = null;
                                 break;
@@ -296,8 +290,14 @@ namespace ca.whittaker.Maui.Controls.Forms
                 MainThread.BeginInvokeOnMainThread(_dropdown_SetSelectedItem);
         }
 
-        private void OnDropdownItemsSourceChanged(object newValue)
-            => Dropdown_SetItems(newValue);
+        private string GetProperty(object instance, string propertyName)
+        {
+            if (instance == null) return String.Empty;
+            PropertyInfo? property = instance!.GetType().GetProperty(propertyName);
+            if (property == null) return String.Empty;
+            var valueAsObject = property.GetValue(instance) ?? throw new Exception($"property {propertyName} does not exist");
+            return valueAsObject.ToString() ?? String.Empty;
+        }
 
         private void OnDropdownDataSourcePropertyChanged(object newValue)
         {
@@ -305,8 +305,8 @@ namespace ca.whittaker.Maui.Controls.Forms
             Dropdown_SetSelectedItem(newValue);
         }
 
-
-
+        private void OnDropdownItemsSourceChanged(object newValue)
+                    => Dropdown_SetItems(newValue);
 
         private void OnDropdownPlaceholderPropertyChanged(object newValue)
         {
@@ -342,6 +342,7 @@ namespace ca.whittaker.Maui.Controls.Forms
                         else
                             DropdownDataSource = String.Empty;
                         break;
+
                     case DataSourceTypeEnum.complexobject:
                         if (_pickerControl.SelectedItem != null)
                         {
@@ -350,7 +351,6 @@ namespace ca.whittaker.Maui.Controls.Forms
                         }
                         else
                             DropdownDataSource = String.Empty;
-                            //_pickerControlPlaceholder.IsVisible = (_pickerControl.SelectedItem == null);
                         break;
                 }
 
@@ -373,16 +373,16 @@ namespace ca.whittaker.Maui.Controls.Forms
             _pickerContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
 
             // Set the Picker to row 0, column 0.
-            Grid.SetRow(_pickerControl, 0); 
-            Grid.SetColumn(_pickerControl, 0); 
+            Grid.SetRow(_pickerControl, 0);
+            Grid.SetColumn(_pickerControl, 0);
             _pickerContainer.Children.Add(_pickerControl);
 
             // Set the placeholder Label to row 0, column 0 as well.
-            Grid.SetRow(_pickerControlPlaceholder, 0); 
-            Grid.SetColumn(_pickerControlPlaceholder, 0); 
-            
+            Grid.SetRow(_pickerControlPlaceholder, 0);
+            Grid.SetColumn(_pickerControlPlaceholder, 0);
+
             // Make sure the Label is transparent to input and background.
-            _pickerControlPlaceholder.InputTransparent = true; 
+            _pickerControlPlaceholder.InputTransparent = true;
             _pickerControlPlaceholder.BackgroundColor = Colors.Transparent;
             _pickerControlPlaceholder.HorizontalOptions = LayoutOptions.Fill;
             _pickerControlPlaceholder.VerticalOptions = LayoutOptions.Center;
@@ -434,12 +434,6 @@ namespace ca.whittaker.Maui.Controls.Forms
             Dropdown_SetSelectedItem(_originalValue);
         }
 
-
-        protected override void OnDataSourcePropertyChanged(object newValue, object oldValue)
-        {
-        }
-
-
         protected override void Field_OriginalValue_SetToClear()
         {
             Debug.WriteLine($"Field_OriginalValue_SetToClear()");
@@ -452,6 +446,10 @@ namespace ca.whittaker.Maui.Controls.Forms
             Debug.WriteLine($"Field_OriginalValue_SetToCurrentValue()");
             _originalValue = GetCurrentValue();
             Dropdown_SetSelectedItem(_originalValue);
+        }
+
+        protected override void OnDataSourcePropertyChanged(object newValue, object oldValue)
+        {
         }
 
         protected override void OnParentSet()
@@ -503,10 +501,9 @@ namespace ca.whittaker.Maui.Controls.Forms
 
             if (DropdownItemsSource != null)
             {
-                if (_pickerControl.SelectedIndex < 0) 
+                if (_pickerControl.SelectedIndex < 0)
                     Dropdown_SetItems(DropdownItemsSource);
             }
-
         }
 
         #endregion Protected Methods
@@ -536,17 +533,22 @@ namespace ca.whittaker.Maui.Controls.Forms
             _pickerControl?.Unfocus();
         }
 
-        public object GetCurrentValue() => DropdownDataSource;
+        public object? GetCurrentValue() => DropdownDataSource;
 
         #endregion Public Methods
     }
-
 
     // Converter to extract the primary key from the selected item.
     // Converter to extract the primary key from the selected item.
     public class SelectedItemPrimaryKeyConverter : IValueConverter
     {
+        #region Properties
+
         public string? PrimaryKeyName { get; set; }
+
+        #endregion Properties
+
+        #region Public Methods
 
         // Convert from SelectedItem (the whole object) to its primary key.
         public object? Convert(object? value, Type? targetType, object? parameter, CultureInfo? culture)
@@ -596,6 +598,7 @@ namespace ca.whittaker.Maui.Controls.Forms
             }
             return null;
         }
-    }
 
+        #endregion Public Methods
+    }
 }

@@ -7,18 +7,14 @@ using StackLayout = Microsoft.Maui.Controls.StackLayout;
 
 namespace ca.whittaker.Maui.Controls.Forms
 {
-    /// <summary>
-    /// Custom control for selecting a Year and Month (day is fixed to 1).
-    /// </summary>
     public partial class DateMonthYearField : BaseFormField
     {
         #region Fields
 
         private DateTimeOffset? _lastValue = null;
         private DateTimeOffset? _originalValue = null;
-
-        public Picker MonthPicker { get; private set; }
-        public Picker YearPicker { get; private set; }
+        private Picker _pickerMonth;
+        private Picker _pickerYear;
 
         public static readonly BindableProperty DateDataSourceProperty = BindableProperty.Create(
             propertyName: nameof(DateDataSource),
@@ -35,32 +31,35 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         public DateMonthYearField()
         {
-            MonthPicker = new Picker
+            _pickerMonth = new Picker
             {
                 Title = "Month",
                 VerticalOptions = LayoutOptions.Center
             };
-            YearPicker = new Picker
+            _pickerYear = new Picker
             {
                 Title = "Year",
                 VerticalOptions = LayoutOptions.Center
             };
 
             // Populate MonthPicker with month names.
+            if (!FieldMandatory)
+                _pickerMonth.Items.Add(String.Empty);
             for (int i = 1; i <= 12; i++)
             {
-                MonthPicker.Items.Add(new DateTime(2000, i, 1).ToString("MMMM"));
+                _pickerMonth.Items.Add(new DateTime(2000, i, 1).ToString("MMMM"));
             }
 
             // Populate YearPicker with a range of years (e.g., last 100 years up to current year).
             int currentYear = DateTime.Today.Year;
-            for (int year = currentYear - 100; year <= currentYear; year++)
-            {
-                YearPicker.Items.Add(year.ToString());
-            }
 
-            MonthPicker.SelectedIndexChanged += OnPickerSelectionChanged;
-            YearPicker.SelectedIndexChanged += OnPickerSelectionChanged;
+            if (!FieldMandatory) _pickerYear.Items.Add(String.Empty);
+
+            for (int year = currentYear - 100; year <= currentYear; year++)
+                _pickerYear.Items.Add(year.ToString());
+
+            _pickerMonth.SelectedIndexChanged += OnPickerSelectionChanged;
+            _pickerYear.SelectedIndexChanged += OnPickerSelectionChanged;
 
             InitializeLayout();
         }
@@ -79,55 +78,78 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         #region Private Methods
 
-
-        private void OnPickerSelectionChanged(object? sender, EventArgs e)
-        {
-            if (MonthPicker.SelectedIndex < 0 || YearPicker.SelectedIndex < 0)
-                return;
-
-            int month = MonthPicker.SelectedIndex + 1;
-            int year = int.Parse(YearPicker?.SelectedItem?.ToString() ?? String.Empty);
-            try
-            {
-                // Create a new DateTime with the day fixed to 1.
-                DateTime newDate = new DateTime(year, month, 1);
-                DateDataSource = new DateTimeOffset(newDate, TimeSpan.Zero);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error setting date: {ex.Message}");
-            }
-        }
-
-        private void Date_ProcessAndSet(DateTimeOffset newDateOffset)
-        {
-            DateTime newDate = new DateTime(newDateOffset.Year, newDateOffset.Month, 1);
-            DateDataSource = new DateTimeOffset(newDate, TimeSpan.Zero);
-        }
-
         private void Date_SetValue(DateTimeOffset? value)
         {
             if (value.HasValue)
             {
                 int month = value.Value.Month;
                 int year = value.Value.Year;
-                MonthPicker.SelectedIndex = month - 1;
+                _pickerMonth.SelectedIndex = month - 1 + (FieldMandatory ? 1 : 0);
 
                 // Set the YearPicker based on the year.
                 string yearStr = year.ToString();
-                for (int i = 0; i < YearPicker.Items.Count; i++)
+                for (int i = 0; i < _pickerYear.Items.Count; i++)
                 {
-                    if (YearPicker.Items[i] == yearStr)
+                    if (_pickerYear.Items[i] == yearStr)
                     {
-                        YearPicker.SelectedIndex = i;
+                        _pickerYear.SelectedIndex = i;
                         break;
                     }
                 }
             }
             else
             {
-                MonthPicker.SelectedIndex = -1;
-                YearPicker.SelectedIndex = -1;
+                if (FieldMandatory)
+                {
+                    _pickerMonth.SelectedIndex = 0;
+                    _pickerYear.SelectedIndex = 0;
+                }
+                else
+                {
+                    _pickerMonth.SelectedIndex = -1;
+                    _pickerYear.SelectedIndex = -1;
+                }
+
+            }
+        }
+
+        private DateTimeOffset? Date_GetValue()
+        {
+            DateTimeOffset? currentDateTimeOffset = null;
+            bool isMonthBlank = _pickerMonth.SelectedIndex == 0 && FieldMandatory;
+            bool isYearBlank = _pickerYear.SelectedIndex == 0 && FieldMandatory;
+
+            if (isMonthBlank || isYearBlank)
+                return currentDateTimeOffset;
+
+            int month = _pickerMonth.SelectedIndex - (FieldMandatory ? 0 : 1);
+            if (!int.TryParse(_pickerYear?.SelectedItem?.ToString() ?? String.Empty, out int year))
+                year = 0;
+
+            if (year > 0 && month > 0)
+            {
+                try
+                {
+                    // Create a new DateTime with the day fixed to 1.
+                    DateTime newDate = new DateTime(year, month, 1);
+                    currentDateTimeOffset = new DateTimeOffset(newDate, TimeSpan.Zero);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error setting date: {ex.Message}");
+                }
+            }
+            return currentDateTimeOffset;
+        }
+
+        private void OnPickerSelectionChanged(object? sender, EventArgs e)
+        {
+            Debug.WriteLine($"OnPickerSelectionChanged");
+            if (FieldAccessMode == FieldAccessModeEnum.Editing)
+            {
+                DateDataSource = Date_GetValue();
+                Field_UpdateValidationAndChangedState();
+                Field_UpdateNotificationMessage();
             }
         }
 
@@ -161,7 +183,7 @@ namespace ca.whittaker.Maui.Controls.Forms
                 Orientation = StackOrientation.Horizontal,
                 VerticalOptions = LayoutOptions.Center,
                 Spacing = 10,
-                Children = { MonthPicker, YearPicker }
+                Children = { _pickerMonth, _pickerYear }
             };
 
             grid.Add(pickerLayout, 1, 0);
@@ -199,25 +221,24 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         protected override void OnDataSourcePropertyChanged(object newValue, object oldValue)
         {
-            if (newValue is DateTimeOffset dto)
-            {
-                Date_SetValue(dto);
-                _lastValue = dto;
-            }
-            else
-            {
-                Date_SetValue(null);
-            }
+            //if (newValue is DateTimeOffset dto)
+            //{
+            //    Date_SetValue(dto);
+            //    _lastValue = dto;
+            //}
+            //else
+            //{
+            //    Date_SetValue(null);
+            //}
         }
 
         protected override void UpdateRow0Layout()
         {
             void _updateRow0Layout()
             {
-                
                 BatchBegin();
 #pragma warning disable CS0618 // Type or member is obsolete
-                if (MonthPicker.Parent is Layout<View> pickerLayout)
+                if (_pickerMonth.Parent is Layout<View> pickerLayout)
                 {
                     bool isFieldLabelVisible = FieldLabelVisible;
                     bool isButtonUndoVisible = FieldUndoButtonVisible;
@@ -251,6 +272,7 @@ namespace ca.whittaker.Maui.Controls.Forms
                 _updateRow0Layout();
             else
                 MainThread.BeginInvokeOnMainThread(_updateRow0Layout);
+
         }
 
         #endregion Protected Methods
@@ -260,8 +282,8 @@ namespace ca.whittaker.Maui.Controls.Forms
         public override void Field_Unfocus()
         {
             base.Field_Unfocus();
-            MonthPicker?.Unfocus();
-            YearPicker?.Unfocus();
+            _pickerMonth?.Unfocus();
+            _pickerYear?.Unfocus();
         }
 
         public DateTimeOffset? GetCurrentValue() => DateDataSource;

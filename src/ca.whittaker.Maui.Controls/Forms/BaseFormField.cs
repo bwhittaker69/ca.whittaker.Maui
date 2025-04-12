@@ -25,9 +25,13 @@ namespace ca.whittaker.Maui.Controls.Forms
         ChangeStateEnum FieldChangeState { get; set; }
         ICommand FieldCommand { get; set; }
         object FieldCommandParameter { get; set; }
+        bool FieldEnabled { get; set; }
         string FieldLabelText { get; set; }
+        bool FieldLabelVisible { get; set; }
         double FieldLabelWidth { get; set; }
         bool FieldMandatory { get; set; }
+        bool FieldReadOnly { get; set; }
+        bool FieldUndoButtonVisible { get; set; }
         ValidationStateEnum FieldValidationState { get; set; }
         double FieldWidth { get; set; }
         LayoutOptions HorizontalOptions { get; set; }
@@ -63,7 +67,6 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         private bool _fieldEvaluateToRaiseHasChangesEventing = false;
         private bool _fieldUndoing = false;
-        private bool _fieldUpdating = false;
         private bool _previousFieldHasInvalidData = false;
         private ValidationStateEnum _previousFieldValidationState;
 
@@ -117,15 +120,8 @@ namespace ca.whittaker.Maui.Controls.Forms
             defaultValue: string.Empty,
             propertyChanged: OnFieldLabelTextPropertyChanged);
 
-        public static readonly BindableProperty FieldUndoButtonVisibleProperty = BindableProperty.Create(
-            propertyName: nameof(FieldUndoButtonVisible),
-            returnType: typeof(bool),
-            declaringType: typeof(BaseFormField),
-            defaultValue: true,
-            propertyChanged: OnFieldUndoButtonVisiblePropertyChanged);
-
         public static readonly BindableProperty FieldLabelVisibleProperty = BindableProperty.Create(
-                    propertyName: nameof(FieldLabelVisible),
+            propertyName: nameof(FieldLabelVisible),
             returnType: typeof(bool),
             declaringType: typeof(BaseFormField),
             defaultValue: true,
@@ -151,6 +147,13 @@ namespace ca.whittaker.Maui.Controls.Forms
             declaringType: typeof(BaseFormField),
             defaultValue: false,
             defaultBindingMode: BindingMode.OneWay);
+
+        public static readonly BindableProperty FieldUndoButtonVisibleProperty = BindableProperty.Create(
+                                            propertyName: nameof(FieldUndoButtonVisible),
+            returnType: typeof(bool),
+            declaringType: typeof(BaseFormField),
+            defaultValue: true,
+            propertyChanged: OnFieldUndoButtonVisiblePropertyChanged);
 
         public static readonly BindableProperty FieldValidationStateProperty = BindableProperty.Create(
             propertyName: nameof(FieldValidationState),
@@ -231,6 +234,12 @@ namespace ca.whittaker.Maui.Controls.Forms
             set => SetValue(FieldLabelTextProperty, value);
         }
 
+        public bool FieldLabelVisible
+        {
+            get => (bool)GetValue(FieldLabelVisibleProperty);
+            set => SetValue(FieldLabelVisibleProperty, value);
+        }
+
         public double FieldLabelWidth
         {
             get => (double)GetValue(FieldLabelWidthProperty);
@@ -253,12 +262,6 @@ namespace ca.whittaker.Maui.Controls.Forms
         {
             get => (bool)GetValue(FieldUndoButtonVisibleProperty);
             set => SetValue(FieldUndoButtonVisibleProperty, value);
-        } 
-
-        public bool FieldLabelVisible
-        {
-            get => (bool)GetValue(FieldLabelVisibleProperty);
-            set => SetValue(FieldLabelVisibleProperty, value);
         }
 
         public ValidationStateEnum FieldValidationState
@@ -334,13 +337,40 @@ namespace ca.whittaker.Maui.Controls.Forms
             {
                 if (!oldValue.Equals(newValue))
                 {
-                    Debug.WriteLine($"{element.FieldLabelText} : private static void OnFieldEnabledPropertyChanged(BindableObject bindable, object oldValue, object newValue)\r\n({newValue})");
+                    Debug.WriteLine($"{element.FieldLabelText} : OnFieldEnabledPropertyChanged({newValue})");
                     if (newEnabledState)
                         element.Field_ConfigEnabled();
                     else
                         element.Field_ConfigDisabled();
                 }
             }
+        }
+
+        private static void OnFieldLabelTextPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is BaseFormField element && element.FieldLabel != null)
+                element.FieldLabel.Text = newValue?.ToString() ?? "";
+        }
+
+        private static void OnFieldLabelVisiblePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is BaseFormField element && newValue is bool fieldLabelVisible)
+            {
+                if (!oldValue.Equals(newValue))
+                {
+                    Debug.WriteLine($"OnFieldLabelVisiblePropertyChanged({newValue})");
+                    if (fieldLabelVisible)
+                        element.FieldLabel!.IsVisible = true;
+                    else
+                        element.FieldLabel!.IsVisible = false;
+                }
+            }
+        }
+
+        private static void OnFieldLabelWidthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is BaseFormField element && element.Content is Grid)
+                element.Field_UpdateLabelWidth((double)newValue);
         }
 
         private static void OnFieldUndoButtonVisiblePropertyChanged(BindableObject bindable, object oldValue, object newValue)
@@ -357,45 +387,11 @@ namespace ca.whittaker.Maui.Controls.Forms
                 }
             }
         }
-        private static void OnFieldLabelVisiblePropertyChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is BaseFormField element && newValue is bool fieldLabelVisible)
-            {
-                if (!oldValue.Equals(newValue))
-                {
-                    Debug.WriteLine($"OnFieldLabelVisiblePropertyChanged({newValue})");
-                    if (fieldLabelVisible)
-                        element.FieldLabel!.IsVisible = true;
-                    else
-                        element.FieldLabel!.IsVisible = false;
-                }
-            }
-        }
-
-        private static void OnFieldLabelTextPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is BaseFormField element && element.FieldLabel != null)
-                element.FieldLabel.Text = newValue?.ToString() ?? "";
-        }
-
-        private static void OnFieldLabelWidthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is BaseFormField element && element.Content is Grid)
-                element.Field_UpdateLabelWidth((double)newValue);
-        }
 
         private static void OnFieldWidthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (bindable is BaseFormField element && element.Content is Grid)
                 element.Field_UpdateWidth((double)newValue);
-        }
-
-        private static void RunOnMainThread(Action action)
-        {
-            if (MainThread.IsMainThread)
-                action();
-            else
-                MainThread.BeginInvokeOnMainThread(action);
         }
 
         private void EvaluateToRaiseHasChangesEvent()
@@ -450,278 +446,126 @@ namespace ca.whittaker.Maui.Controls.Forms
             var currentFieldValidationState = currentFieldHasInvalidData ? ValidationStateEnum.FormatError : ValidationStateEnum.Valid;
             if (_previousFieldHasInvalidData != currentFieldHasInvalidData || forceRaise || _previousFieldValidationState != currentFieldValidationState)
             {
-                Debug.WriteLine($"{FieldLabelText} : EvaluateToRaiseValidationChangesEvent(forceRaise: {forceRaise})");
+                Debug.WriteLine($"{FieldLabelText} : EvaluateToRaiseValidationChangesEvent( {currentFieldHasInvalidData} )");
+                _previousFieldHasInvalidData = currentFieldHasInvalidData;
+                _previousFieldValidationState = currentFieldValidationState;
                 FieldValidationState = currentFieldValidationState;
-                Field_NotifyValidationChanges(currentFieldHasInvalidData);
-                //FieldRefreshUI();
+                Field_NotifyValidationChanges(!currentFieldHasInvalidData);
             }
-            _previousFieldHasInvalidData = currentFieldHasInvalidData;
-            _previousFieldValidationState = currentFieldValidationState;
             _fieldEvaluateToRaiseValidationChangesEventing = false;
+        }
+
+        private void OnFieldButtonUndoPressed(object? sender, EventArgs e)
+        {
+            Debug.WriteLine($"{FieldLabelText} : OnFieldButtonUndoPressed() - attempt revert");
+            if (FieldAccessMode == FieldAccessModeEnum.Editing)
+            {
+                _fieldUndoing = true;
+                try
+                {
+                    Field_OriginalValue_Reset();
+                    Field_UpdateValidationAndChangedState(true);
+                    Field_UpdateNotificationMessage();
+                }
+                finally
+                {
+                    _fieldUndoing = false;
+                }
+            }
         }
 
         #endregion Private Methods
 
         #region Protected Methods
 
-        protected static Label Field_CreateNotificationLabel() =>
-                            new Label
-                            {
-                                HorizontalOptions = LayoutOptions.Center,
-                                VerticalOptions = LayoutOptions.Center,
-                                IsVisible = false,
-                                TextColor = Colors.Red
-                            };
-
-        protected static UndoButton Field_CreateUndoButton(bool fieldHasUndo, FieldAccessModeEnum fieldAccessMode) =>
-            new UndoButton
-            {
-                Text = "",
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                BackgroundColor = Colors.Transparent,
-                ButtonSize = DefaultButtonSize,
-                WidthRequest = -1,
-                ButtonState = ButtonStateEnum.Hidden,
-                ButtonStyle = ButtonStyleEnum.IconOnly,
-                ButtonIcon = ButtonIconEnum.Undo,
-                BorderWidth = 0,
-                Margin = new Thickness(0),
-                Padding = new Thickness(5, 0, 0, 0),
-                IsVisible = (fieldAccessMode == FieldAccessModeEnum.Editing && fieldHasUndo)
-            };
-
-        protected void Field_Focused(object? sender, FocusEventArgs e)
-        { }
-
-        protected void Field_Unfocused(object? sender, FocusEventArgs e) =>
-            Field_UpdateNotificationMessage();
-
-        protected ValidationStateEnum FieldCalculateValidationState() =>
-            Field_HasRequiredError() ? ValidationStateEnum.RequiredFieldError :
-            Field_HasFormatError() ? ValidationStateEnum.FormatError : ValidationStateEnum.Valid;
-
-        protected void Field_ConfigAccessModeEditable()
+        protected virtual void Field_ApplyEnabled()
         {
-            Field_OriginalValue_Reset();
-            Field_UpdateValidationAndChangedState();
-            FieldEnabled = false;
+            ControlVisualHelper.EnableDescendantControls(this, FieldLabelVisible);
         }
 
-        protected void Field_ConfigAccessModeEditing()
+        protected virtual void Field_ApplyReadOnly()
         {
-            Field_UpdateValidationAndChangedState();
-            FieldEnabled = true;
+            ControlVisualHelper.DisableDescendantControls(this, FieldLabelVisible);
         }
 
-        protected void FieldConfigAccessModeHidden() =>
-            RunOnMainThread(() =>
-            {
-                BatchBegin();
-                Content.IsVisible = false;
-                BatchCommit();
-            });
-
-        protected void Field_ConfigAccessModeViewOnly() =>
-            RunOnMainThread(() =>
-            {
-                BatchBegin();
-                Content.IsVisible = true;
-                FieldEnabled = false;
-                BatchCommit();
-            });
-
-        protected abstract void UpdateRow0Layout();
-
-        // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
-        protected void UpdateRow1Layout()
+        protected virtual void Field_ConfigAccessModeEditable()
         {
-        }
-        private void SetupVisibilityHandlers()
-        {
-            FieldLabel!.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(FieldLabel.IsVisible))
-                {
-                    Debug.WriteLine($"FieldLabel.IsVisible={FieldLabel.IsVisible}");
-                    UpdateRow0Layout();
-                }
-            };
-
-            ButtonUndo!.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(ButtonUndo.IsVisible))
-                {
-                    Debug.WriteLine($"ButtonUndo.IsVisible={ButtonUndo.IsVisible}");
-                    UpdateRow0Layout();
-                }
-            };
-
-            FieldNotification!.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(FieldNotification.IsVisible))
-                {
-                    Debug.WriteLine($"FieldNotification.IsVisible={FieldNotification.IsVisible}");
-                    UpdateRow1Layout();
-                }
-            };
-
+            Debug.WriteLine($"{FieldLabelText} : Field_ConfigAccessModeEditable()");
+            Field_ApplyReadOnly();
+            if (ButtonUndo != null) ButtonUndo.Hide();
         }
 
-
-        // Disable the field and hide the undo button
-        protected void Field_ConfigDisabled()
+        protected virtual void Field_ConfigAccessModeEditing()
         {
+            Debug.WriteLine($"{FieldLabelText} : Field_ConfigAccessModeEditing()");
+            Field_ApplyEnabled();
+            EvaluateToRaiseHasChangesEvent();
+        }
+
+        protected virtual void Field_ConfigAccessModeViewOnly()
+        {
+            Debug.WriteLine($"{FieldLabelText} : Field_ConfigAccessModeViewOnly()");
+            Field_ApplyReadOnly();
+            if (ButtonUndo != null) ButtonUndo.Hide();
+        }
+
+        protected virtual void Field_ConfigDisabled()
+        {
+            Debug.WriteLine($"{FieldLabelText} : Field_ConfigDisabled()");
             if (_fieldDisabling) return;
             _fieldDisabling = true;
-            void _hideUndoButton()
-            {
-                ButtonUndo!.IsVisible = false;
-            }
-            void _showUndoButton()
-            {
-                ButtonUndo!.IsVisible = true;
-            }
-            void _unfocus()
-            {
-                BatchBegin();
-                Content.Unfocus();
-
-                ControlVisualHelper.DisableDescendantControls(this, FieldLabelVisible);
-
-                //foreach (var c in this.GetVisualTreeDescendants())
-                //{
-                //    // ****************************************
-                //    //  one for every implimented control type
-                //    // ****************************************
-                //    if (c is Entry e) e.IsEnabled = false;
-                //    if (c is Picker p) p.IsEnabled = false;
-                //    if (c is Editor ed) ed.IsEnabled = false;
-                //    if (c is ContentView cv) cv.IsEnabled = false;
-
-                //    // if label is visible, label always remains enabled
-                //    if (c is Label l && FieldLabelVisible) l.IsEnabled = true;
-                //}
-                BatchCommit();
-            }
-
-            if (FieldUndoButtonVisible)
-            {
-                if (FieldAccessMode == FieldAccessModeEnum.Editable)
-                {
-                    RunOnMainThread(_hideUndoButton);
-                }
-                else if (FieldAccessMode == FieldAccessModeEnum.Editing)
-                {
-                    if (FieldReadOnly == true)
-                    {
-                        RunOnMainThread(_showUndoButton);
-                    }
-                    else
-                    {
-                        RunOnMainThread(_showUndoButton);
-                        ButtonUndo?.Disabled();
-                    }
-                }
-                else
-                {
-                    RunOnMainThread(_hideUndoButton);
-                }
-            }
-            else
-                RunOnMainThread(_hideUndoButton);
-
-
-            UpdateRow0Layout();
-
-            if (MainThread.IsMainThread)
-                _unfocus();
-            else
-                MainThread.BeginInvokeOnMainThread(_unfocus);
-
+            Field_ApplyReadOnly();
             _fieldDisabling = false;
         }
 
-        protected void Field_ConfigEnabled()
+        protected virtual void Field_ConfigEnabled()
         {
-            if (_fieldEnabling)
-                return;
-
+            Debug.WriteLine($"{FieldLabelText} : Field_ConfigEnabled()");
+            if (_fieldEnabling) return;
             _fieldEnabling = true;
-            void _hideUndoButton()
-            {
-                ButtonUndo!.IsVisible = false; 
-            }
-            void _showUndoButton()
-            {
-                ButtonUndo!.IsVisible = true;
-            }
-
-            void UnfocusIfNotChanged()
-            {
-                if (FieldChangeState == ChangeStateEnum.NotChanged)
-                    Content.Unfocus();
-
-                ControlVisualHelper.EnableDescendantControls(this, FieldLabelVisible);
-
-                //foreach (var c in this.GetVisualTreeDescendants())
-                //{
-                //    // ****************************************
-                //    //  one for every implimented control type
-                //    // ****************************************
-                //    if (c is Entry e) e.IsEnabled = true;
-                //    if (c is Editor ed) ed.IsEnabled = true;
-                //    if (c is ContentView cv) cv.IsEnabled = true;
-
-                //    // if label is visible, label always remains enabled
-                //    if (c is Label l && FieldLabelVisible) l.IsEnabled = true;
-                //}
-            }
-            if (FieldUndoButtonVisible)
-            {
-                if (FieldAccessMode == FieldAccessModeEnum.Editable)
-                {
-                    RunOnMainThread(_hideUndoButton);
-                }
-                else if (FieldAccessMode == FieldAccessModeEnum.Editing)
-                {
-                    if (FieldChangeState == ChangeStateEnum.NotChanged)
-                    {
-                        RunOnMainThread(_showUndoButton);
-                        if (FieldUndoButtonVisible) ButtonUndo?.Disabled();
-                    }
-                    else
-                    {
-                        RunOnMainThread(_showUndoButton);
-                        if (FieldUndoButtonVisible) ButtonUndo?.Enabled();
-                    }
-                }
-                else
-                {
-                    RunOnMainThread(_hideUndoButton);
-                }
-            }
-            else
-                RunOnMainThread(_hideUndoButton);
-
-            UpdateRow0Layout();
-
-            RunOnMainThread(UnfocusIfNotChanged);
+            Field_ApplyEnabled();
             _fieldEnabling = false;
         }
 
-        protected Label Field_CreateLabel(bool fieldLabelVisible) =>
-                                            new Label
-                                            {
-                                                Text = FieldLabelText,
-                                                HorizontalOptions = LayoutOptions.Start,
-                                                BackgroundColor = Colors.Transparent,
-                                                VerticalOptions = LayoutOptions.Center,
-                                                HeightRequest = -1,
-                                                IsVisible = fieldLabelVisible
-                                            };
+        protected virtual Label Field_CreateLabel(bool fieldLabelVisible)
+        {
+            var label = new Label
+            {
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Start,
+                IsVisible = fieldLabelVisible
+            };
+            return label;
+        }
 
+        /// <summary>
+        /// Deriving classes must implement a layout in row 0 for label, data-input control, and undo button
+        /// plus row 1 for notifications. Some fields place multiple controls in row 0.
+        /// </summary>
+        /// <returns></returns>
         protected abstract Grid Field_CreateLayoutGrid();
+
+        protected virtual Label Field_CreateNotificationLabel()
+        {
+            var label = new Label
+            {
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Start,
+                IsVisible = false
+            };
+            return label;
+        }
+
+        protected virtual UndoButton Field_CreateUndoButton(bool fieldHasUndo, FieldAccessModeEnum fieldAccessMode)
+        {
+            var btn = new UndoButton
+            {
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.End
+            };
+            btn.IsVisible = fieldHasUndo;
+            return btn;
+        }
 
         protected abstract string Field_GetFormatErrorMessage();
 
@@ -733,9 +577,11 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         protected abstract bool Field_HasRequiredError();
 
-        protected bool Field_HasValidData()
+        protected virtual bool Field_HasValidData()
         {
-            return !Field_HasFormatError() && !Field_HasRequiredError();
+            // Evaluate all error conditions and return false if any found.
+            bool fail = Field_HasFormatError() || Field_HasRequiredError();
+            return !fail;
         }
 
         protected abstract void Field_OriginalValue_Reset();
@@ -744,80 +590,70 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         protected abstract void Field_OriginalValue_SetToCurrentValue();
 
-
-        protected void Field_Reset()
+        protected virtual void Field_UpdateNotificationMessage()
         {
-            Field_OriginalValue_Reset();
-            Field_UpdateValidationAndChangedState();
-            Field_ConfigDisabled();
-        }
-
-        protected void Field_UpdateNotificationMessage()
-        {
-            var validationState = FieldCalculateValidationState();
-            string notificationMessage = validationState switch
+            if (FieldNotification == null) return;
+            if (Field_HasFormatError())
             {
-                ValidationStateEnum.RequiredFieldError => "Field is required.",
-                ValidationStateEnum.FormatError => Field_GetFormatErrorMessage(),
-                _ => ""
-            };
-            bool isNotificationVisible = validationState != ValidationStateEnum.Valid;
-            if (FieldNotification != null)
-            {
-                FieldNotification.Text = notificationMessage;
-                FieldNotification.IsVisible = isNotificationVisible;
+                FieldNotification.Text = Field_GetFormatErrorMessage();
+                FieldNotification.IsVisible = true;
             }
-            FieldValidationState = validationState;
+            else if (Field_HasRequiredError())
+            {
+                FieldNotification.Text = "Required.";
+                FieldNotification.IsVisible = true;
+            }
+            else
+            {
+                FieldNotification.Text = string.Empty;
+                FieldNotification.IsVisible = false;
+            }
         }
 
-        // set datasource value
-        protected void Field_UpdateValidationAndChangedState()
+        protected void Field_UpdateValidationAndChangedState(bool forceRaiseValidationChangesEvent = false)
         {
-            if (_fieldUpdateValidationAndChangedStating) return;
+            if (_fieldUpdateValidationAndChangedStating)
+                return;
             _fieldUpdateValidationAndChangedStating = true;
+
             EvaluateToRaiseHasChangesEvent();
-            EvaluateToRaiseValidationChangesEvent();
+            EvaluateToRaiseValidationChangesEvent(forceRaiseValidationChangesEvent);
+
             _fieldUpdateValidationAndChangedStating = false;
         }
 
-        protected void InitializeLayout()
+        protected virtual void FieldConfigAccessModeHidden()
         {
-            Content = Field_CreateLayoutGrid();
-            SetupVisibilityHandlers();
-            UpdateRow0Layout();
+            Debug.WriteLine($"{FieldLabelText} : FieldConfigAccessModeHidden()");
+            Field_ApplyReadOnly();
+            if (ButtonUndo != null) ButtonUndo.Hide();
         }
 
+        /// <summary>
+        /// Called whenever the data source for a derived field changes. Derived classes typically handle type-specific logic here.
+        /// </summary>
+        /// <param name="newValue"></param>
+        /// <param name="oldValue"></param>
         protected abstract void OnDataSourcePropertyChanged(object newValue, object oldValue);
-
-        protected void OnFieldButtonUndoPressed(object? sender, EventArgs e)
-        {
-            Debug.WriteLine($"{FieldLabelText} : OnFieldButtonUndoPressed");
-            if (_fieldUndoing)
-                return;
-
-            _fieldUndoing = true;
-            if (FieldChangeState == ChangeStateEnum.Changed)
-            {
-                Field_OriginalValue_Reset();
-                EvaluateToRaiseHasChangesEvent();
-            }
-            _fieldUndoing = false;
-        }
-
-        protected void OnFieldSizeRequestChanged(double newValue)
-        {
-            HeightRequest = newValue;
-            WidthRequest = newValue;
-        }
 
         protected override void OnParentSet()
         {
             base.OnParentSet();
+            if (!_fieldIsOriginalValueSet)
+            {
+                _fieldIsOriginalValueSet = true;
+                Field_OriginalValue_SetToCurrentValue();
+            }
+            Content = Field_CreateLayoutGrid();
         }
 
-        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        /// <summary>
+        /// Called by derived classes to update the layout constraints of row 0
+        /// whenever the label or button might become hidden or shown. This method typically calls
+        /// Grid.SetColumnSpan on the data-input control.
+        /// </summary>
+        protected virtual void UpdateRow0Layout()
         {
-            base.OnPropertyChanged(propertyName);
         }
 
         #endregion Protected Methods

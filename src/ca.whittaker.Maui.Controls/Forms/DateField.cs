@@ -11,10 +11,9 @@ namespace ca.whittaker.Maui.Controls.Forms
     {
         #region Fields
 
-        private DateTimeOffset? _lastValue = null;
-
-        private DateTimeOffset? _originalValue = null;
         private DatePicker _datePicker;
+        private DateTimeOffset? _lastValue = null;
+        private DateTimeOffset? _originalValue = null;
 
         public static readonly BindableProperty DateDataSourceProperty = BindableProperty.Create(
             propertyName: nameof(DateDataSource),
@@ -53,17 +52,15 @@ namespace ca.whittaker.Maui.Controls.Forms
             set => SetValue(DateDataSourceProperty, value);
         }
 
-
         #endregion Properties
 
         #region Private Methods
-
 
         private void Date_ProcessAndSet(DateTimeOffset? newDate)
         {
             if (_datePicker.Date != newDate)
                 _datePicker.Date = newDate.HasValue ? newDate.Value.DateTime : DateTime.MinValue;
-            DateDataSource = new DateTimeOffset(_datePicker.Date, TimeSpan.Zero); 
+            DateDataSource = new DateTimeOffset(_datePicker.Date, TimeSpan.Zero);
         }
 
         private void Date_SetValue(DateTimeOffset? value)

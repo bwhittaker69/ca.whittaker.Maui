@@ -158,18 +158,9 @@ public partial class CheckBoxField : BaseFormField
 
     #region Private Methods
 
-    private CheckedStateEnum CheckBox_GetState()
+    private void CheckBox_ConfigureAsChecked()
     {
-        if (_checkBox!.IsEnabled == false
-            && FieldMandatory == false)
-            return CheckedStateEnum.NotSet;
-        else
-            return _checkBox.IsChecked ? CheckedStateEnum.Checked : CheckedStateEnum.UnChecked;
-    }
-
-    private void CheckBox_SetChecked()
-    {
-        void _updateUI()
+        void _configureAsChecked()
         {
             BatchBegin();
             _checkBox!.IsEnabled = true;
@@ -179,14 +170,14 @@ public partial class CheckBoxField : BaseFormField
         }
 
         if (MainThread.IsMainThread)
-            _updateUI();
+            _configureAsChecked();
         else
-            MainThread.BeginInvokeOnMainThread(_updateUI);
+            MainThread.BeginInvokeOnMainThread(_configureAsChecked);
     }
 
-    private void CheckBox_SetNotSet()
+    private void CheckBox_ConfigureAsNotSet()
     {
-        void _updateUI()
+        void _configureAsNotSet()
         {
             BatchBegin();
             _checkBox!.IsEnabled = false;
@@ -196,49 +187,14 @@ public partial class CheckBoxField : BaseFormField
         }
 
         if (MainThread.IsMainThread)
-            _updateUI();
+            _configureAsNotSet();
         else
-            MainThread.BeginInvokeOnMainThread(_updateUI);
+            MainThread.BeginInvokeOnMainThread(_configureAsNotSet);
     }
 
-    private void CheckBox_SetState(CheckedStateEnum value)
+    private void CheckBox_ConfigureAsUnChecked()
     {
-        if (CheckBoxDataType == CheckBoxDataTypeEnum.Boolean)
-        {
-            switch (value)
-            {
-                case CheckedStateEnum.Checked:
-                    CheckBox_SetChecked();
-                    break;
-
-                case CheckedStateEnum.NotSet:
-                case CheckedStateEnum.UnChecked:
-                    CheckBox_SetUnChecked();
-                    break;
-            }
-        }
-        else if (CheckBoxDataType == CheckBoxDataTypeEnum.TriState)
-        {
-            switch (value)
-            {
-                case CheckedStateEnum.NotSet:
-                    CheckBox_SetNotSet();
-                    break;
-
-                case CheckedStateEnum.Checked:
-                    CheckBox_SetChecked();
-                    break;
-
-                case CheckedStateEnum.UnChecked:
-                    CheckBox_SetUnChecked();
-                    break;
-            }
-        }
-    }
-
-    private void CheckBox_SetUnChecked()
-    {
-        void _updateUI()
+        void _configureAsUnChecked()
         {
             BatchBegin();
             _checkBox!.IsEnabled = true;
@@ -248,9 +204,53 @@ public partial class CheckBoxField : BaseFormField
         }
 
         if (MainThread.IsMainThread)
-            _updateUI();
+            _configureAsUnChecked();
         else
-            MainThread.BeginInvokeOnMainThread(_updateUI);
+            MainThread.BeginInvokeOnMainThread(_configureAsUnChecked);
+    }
+
+    private CheckedStateEnum CheckBox_GetState()
+    {
+        if (_checkBox!.IsEnabled == false
+            && FieldMandatory == false)
+            return CheckedStateEnum.NotSet;
+        else
+            return _checkBox.IsChecked ? CheckedStateEnum.Checked : CheckedStateEnum.UnChecked;
+    }
+
+    private void CheckBox_SetState(CheckedStateEnum value)
+    {
+        if (CheckBoxDataType == CheckBoxDataTypeEnum.Boolean)
+        {
+            switch (value)
+            {
+                case CheckedStateEnum.Checked:
+                    CheckBox_ConfigureAsChecked();
+                    break;
+
+                case CheckedStateEnum.NotSet:
+                case CheckedStateEnum.UnChecked:
+                    CheckBox_ConfigureAsUnChecked();
+                    break;
+            }
+        }
+        else if (CheckBoxDataType == CheckBoxDataTypeEnum.TriState)
+        {
+            switch (value)
+            {
+                case CheckedStateEnum.NotSet:
+                    CheckBox_ConfigureAsNotSet();
+                    break;
+
+                case CheckedStateEnum.Checked:
+                    CheckBox_ConfigureAsChecked();
+                    break;
+
+                case CheckedStateEnum.UnChecked:
+                    CheckBox_ConfigureAsUnChecked();
+                    break;
+            }
+        }
     }
 
     private void CheckBox_Toggle()
@@ -263,13 +263,13 @@ public partial class CheckBoxField : BaseFormField
                 {
                     case CheckedStateEnum.UnChecked:
                         // UnChecked => Checked
-                        CheckBox_SetChecked();
+                        CheckBox_ConfigureAsChecked();
                         break;
 
                     case CheckedStateEnum.Checked:
                     case CheckedStateEnum.NotSet:
                         // Checked or NotSet => UnChecked
-                        CheckBox_SetUnChecked();
+                        CheckBox_ConfigureAsUnChecked();
                         break;
                 }
             }
@@ -282,24 +282,24 @@ public partial class CheckBoxField : BaseFormField
                         {
                             // mandatory?
                             // UnChecked => Checked
-                            CheckBox_SetChecked();
+                            CheckBox_ConfigureAsChecked();
                         }
                         else
                         {
                             // Not mandatory?
                             // unchecked => NotSet
-                            CheckBox_SetNotSet();
+                            CheckBox_ConfigureAsNotSet();
                         }
                         break;
 
                     case CheckedStateEnum.Checked:
                         // Checked => NotSet
-                        CheckBox_SetUnChecked();
+                        CheckBox_ConfigureAsUnChecked();
                         break;
 
                     case CheckedStateEnum.NotSet:
                         // NotSet => UnChecked
-                        CheckBox_SetChecked();
+                        CheckBox_ConfigureAsChecked();
                         break;
                 }
             }
@@ -308,7 +308,7 @@ public partial class CheckBoxField : BaseFormField
 
     private void OnCheckBoxTapped(object? sender, TappedEventArgs e)
     {
-        Debug.WriteLine($"OnCheckBox_Tapped");
+        Debug.WriteLine($"OnCheckBoxTapped");
         if (FieldAccessMode == FieldAccessModeEnum.Editing)
         {
             CheckBox_Toggle();
