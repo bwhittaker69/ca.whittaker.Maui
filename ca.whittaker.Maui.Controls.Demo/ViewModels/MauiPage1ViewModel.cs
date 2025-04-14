@@ -63,7 +63,15 @@ public class MauiPage1ViewModel : ObservableObject
             }
         }
     }
- 
+    //
+    private DateTimeOffset? _userprofile_date = new DateTimeOffset(new DateTime(1969, 7, 25));
+    public DateTimeOffset? Userprofile_date
+    {
+        get => _userprofile_date;
+        set => SetProperty(ref _userprofile_date, value);
+    }
+
+
     private string _userprofile_nickname = "Nickname value";
     public string Userprofile_nickname
     {

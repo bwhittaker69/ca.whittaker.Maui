@@ -168,37 +168,33 @@ public class Form : ContentView
 
 
     #region Private Methods
-
-    private static void OnFormAccessModeChanged(BindableObject bindable, object oldValue, object newValue)
+    private static void OnFormAccessModeChanged(BindableObject bindable, object? oldValue, object? newValue)
     {
         if (bindable is Form form && newValue is FormAccessModeEnum newAccessMode)
         {
-            RunOnMainThread(() =>
+            if (oldValue == null || !oldValue.Equals(newValue))
             {
-                if (!oldValue.Equals(newValue))
+                Debug.WriteLine($"OnFormAccessModeChanged({newAccessMode.ToString()})");
+                switch (newAccessMode)
                 {
-                    Debug.WriteLine($"OnFormAccessModeChanged({newAccessMode.ToString()})");
-                    switch (newAccessMode)
-                    {
-                        case FormAccessModeEnum.Editable:
-                            form.FormFieldsConfigAccessEditable();
-                            break;
+                    case FormAccessModeEnum.Editable:
+                        form.FormFieldsConfigAccessEditable();
+                        break;
 
-                        case FormAccessModeEnum.Editing:
-                            form.FormFieldsConfigAccessEditing();
-                            break;
+                    case FormAccessModeEnum.Editing:
+                        form.FormFieldsConfigAccessEditing();
+                        break;
 
-                        case FormAccessModeEnum.ViewOnly:
-                            form.FormFieldsConfigViewOnlyMode();
-                            break;
+                    case FormAccessModeEnum.ViewOnly:
+                        form.FormFieldsConfigViewOnlyMode();
+                        break;
 
-                        case FormAccessModeEnum.Hidden:
-                            form.FormFieldsConfigAccessHidden();
-                            break;
-                    }
-                    form.FormConfigButtonStates();
+                    case FormAccessModeEnum.Hidden:
+                        form.FormFieldsConfigAccessHidden();
+                        break;
                 }
-            });
+                form.FormConfigButtonStates();
+            }
         }
     }
 
@@ -206,7 +202,7 @@ public class Form : ContentView
     {
         if (bindable is Form form && newValue is string newText)
         {
-            RunOnMainThread(() =>
+            UiThreadHelper.RunOnMainThread(() =>
             {
                 if (form._formButtonCancel != null)
                     form._formButtonCancel.Text = newText;
@@ -218,7 +214,7 @@ public class Form : ContentView
     {
         if (bindable is Form form && newValue is string newText)
         {
-            RunOnMainThread(() =>
+            UiThreadHelper.RunOnMainThread(() =>
             {
                 if (form._formButtonEdit != null)
                     form._formButtonEdit.Text = newText;
@@ -230,14 +226,12 @@ public class Form : ContentView
     {
         if (bindable is Form form && newValue is string newName)
         {
-            RunOnMainThread(() =>
-            {
-                if (form._formLabel != null)
+            if (form._formLabel != null)
+                UiThreadHelper.RunOnMainThread(() =>
                 {
                     form._formLabel.Text = newName;
                     form._formLabel.IsVisible = !string.IsNullOrEmpty(newName);
-                }
-            });
+                });
         }
     }
 
@@ -245,21 +239,11 @@ public class Form : ContentView
     {
         if (bindable is Form form && newValue is string newText)
         {
-            RunOnMainThread(() =>
-            {
-                if (form._formButtonSave != null)
-                    form._formButtonSave.Text = newText;
-            });
+            if (form._formButtonSave != null)
+                UiThreadHelper.RunOnMainThread(() => { form._formButtonSave.Text = newText; });
         }
     }
 
-    private static void RunOnMainThread(Action action)
-    {
-        if (MainThread.IsMainThread)
-            action();
-        else
-            MainThread.BeginInvokeOnMainThread(action);
-    }
 
     private void FormClear()
     {
@@ -278,25 +262,34 @@ public class Form : ContentView
         if (FormAccessMode == FormAccessModeEnum.Editable)
         {
             // Editable: show only the edit button
-            _formButtonSave!.ButtonState = ButtonStateEnum.Hidden;
-            _formButtonCancel!.ButtonState = ButtonStateEnum.Hidden;
-            _formButtonEdit!.ButtonState = ButtonStateEnum.Enabled;
+            if (_formButtonSave != null)
+                _formButtonSave.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonCancel != null)
+                _formButtonCancel.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonEdit != null)
+                _formButtonEdit.ButtonState = ButtonStateEnum.Enabled;
         }
         else if (FormAccessMode == FormAccessModeEnum.Editing)
         {
             // Editing: show save and cancel buttons
-            _formButtonSave!.ButtonState = FormHasChanges
-                ? (FormHasErrors ? ButtonStateEnum.Disabled : ButtonStateEnum.Enabled)
-                : ButtonStateEnum.Disabled;
-            _formButtonCancel!.ButtonState = ButtonStateEnum.Enabled;
-            _formButtonEdit!.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonSave != null)
+                _formButtonSave.ButtonState = FormHasChanges
+                    ? (FormHasErrors ? ButtonStateEnum.Disabled : ButtonStateEnum.Enabled)
+                    : ButtonStateEnum.Disabled;
+            if (_formButtonCancel != null)
+                _formButtonCancel.ButtonState = ButtonStateEnum.Enabled;
+            if (_formButtonEdit != null)
+                _formButtonEdit.ButtonState = ButtonStateEnum.Hidden;
         }
         else if (FormAccessMode == FormAccessModeEnum.ViewOnly || FormAccessMode == FormAccessModeEnum.Hidden)
         {
             // ViewOnly/Hidden: hide all buttons
-            _formButtonSave!.ButtonState = ButtonStateEnum.Hidden;
-            _formButtonCancel!.ButtonState = ButtonStateEnum.Hidden;
-            _formButtonEdit!.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonSave != null)
+                _formButtonSave.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonCancel != null)
+                _formButtonCancel.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonEdit != null)
+                _formButtonEdit.ButtonState = ButtonStateEnum.Hidden;
         }
     }
 
@@ -318,12 +311,9 @@ public class Form : ContentView
         foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
         {
             if (field.FieldChangeState == ChangeStateEnum.Changed)
-            {
                 return false;
-            }
         }
         return true;
-        // => return this.GetVisualTreeDescendants().OfType<BaseFormField>().All(field => field.FieldChangeState != ChangeStateEnum.Changed);
     }
 
     private bool FormFieldsCheckAreValid() =>
@@ -389,7 +379,7 @@ public class Form : ContentView
 
     private void FormInitialize()
     {
-        void InitializeUI()
+        void _initializeUI()
         {
             _formButtonEdit = new EditButton
             {
@@ -501,7 +491,7 @@ public class Form : ContentView
             }
         }
 
-        RunOnMainThread(InitializeUI);
+        UiThreadHelper.RunOnMainThread(_initializeUI);
         FormFieldsWireUp();
     }
 
@@ -553,8 +543,8 @@ public class Form : ContentView
     {
         base.OnParentSet();
         FormInitialize();
-        FormFieldsWireUp();
         FormEvaluateStatus();
+        OnFormAccessModeChanged(bindable: this, oldValue: null, newValue: FormAccessMode);
     }
 
     #endregion Protected Methods

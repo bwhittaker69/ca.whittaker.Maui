@@ -5,8 +5,34 @@ using Microsoft.Maui.Controls.PlatformConfiguration.TizenSpecific;
 using System.Reflection;
 
 namespace ca.whittaker.Maui.Controls.Buttons;
+public interface IButtonBase : IButton
+{
+    #region Properties
+
+    ButtonIconEnum? ButtonIcon { get; set; }
+    SizeEnum? ButtonSize { get; set; }
+    ButtonStateEnum? ButtonState { get; set; }
+    ButtonStyleEnum? ButtonStyle { get; set; }
+    string DisabledText { get; set; }
+    string PressedText { get; set; }
+    string Text { get; set; }
+
+    #endregion Properties
+
+    #region Public Methods
+
+    void Disabled();
+    void Enabled();
+    void Hide();
+    void UpdateUI();
+
+    #endregion Public Methods
+}
+
 public static class TypeHelper
 {
+    #region Public Methods
+
     public static List<Type> GetNonAbstractClasses()
     {
         return Assembly.GetExecutingAssembly()
@@ -17,27 +43,20 @@ public static class TypeHelper
                                 && typeof(IButtonBase).IsAssignableFrom(t))
                        .ToList();
     }
+
+    #endregion Public Methods
 }
-
-public interface IButtonBase : IButton
-{
-    ButtonIconEnum? ButtonIcon { get; set; }
-    SizeEnum? ButtonSize { get; set; }
-    ButtonStateEnum? ButtonState { get; set; }
-    ButtonStyleEnum? ButtonStyle { get; set; }
-    string DisabledText { get; set; }
-    string PressedText { get; set; }
-    string Text { get; set; }
-
-    void Disabled();
-    void Enabled();
-    void Hide();
-    void UpdateUI();
-}
-
 public abstract class ButtonBase : Button, IButtonBase
 {
-    private double heightMultiplier => DeviceInfo.Platform == DevicePlatform.WinUI ? 2.8 : 1.0;
+    #region Fields
+
+    private bool _updateUI = false;
+    public static readonly BindableProperty ButtonIconProperty = BindableProperty.Create(
+        propertyName: nameof(ButtonIcon),
+        returnType: typeof(ButtonIconEnum?),
+        declaringType: typeof(ButtonBase),
+        defaultValue: null,
+        defaultBindingMode: BindingMode.OneWay);
 
     public static readonly BindableProperty ButtonSizeProperty = BindableProperty.Create(
         propertyName: nameof(ButtonSize),
@@ -46,24 +65,12 @@ public abstract class ButtonBase : Button, IButtonBase
         defaultValue: SizeEnum.Normal,
         defaultBindingMode: BindingMode.OneWay);
 
-    public SizeEnum? ButtonSize
-    {
-        get => (SizeEnum?)GetValue(ButtonSizeProperty);
-        set => SetValue(ButtonSizeProperty, value);
-    }
-
     public static readonly BindableProperty ButtonStateProperty = BindableProperty.Create(
         propertyName: nameof(ButtonState),
         returnType: typeof(ButtonStateEnum?),
         declaringType: typeof(ButtonBase),
         defaultValue: ButtonStateEnum.Enabled,
         defaultBindingMode: BindingMode.OneWay);
-
-    public ButtonStateEnum? ButtonState
-    {
-        get => (ButtonStateEnum?)GetValue(ButtonStateProperty);
-        set => SetValue(ButtonStateProperty, value);
-    }
 
     public static readonly BindableProperty ButtonStyleProperty = BindableProperty.Create(
     propertyName: nameof(ButtonStyle),
@@ -72,50 +79,12 @@ public abstract class ButtonBase : Button, IButtonBase
     defaultValue: ButtonStyleEnum.IconAndText,
     defaultBindingMode: BindingMode.OneWay);
 
-    public ButtonStyleEnum? ButtonStyle
-    {
-        get => (ButtonStyleEnum?)GetValue(ButtonStyleProperty);
-        set => SetValue(ButtonStyleProperty, value);
-    }
-
-    public static readonly BindableProperty ButtonIconProperty = BindableProperty.Create(
-        propertyName: nameof(ButtonIcon),
-        returnType: typeof(ButtonIconEnum?),
-        declaringType: typeof(ButtonBase),
-        defaultValue: null,
-        defaultBindingMode: BindingMode.OneWay);
-
-    public ButtonIconEnum? ButtonIcon
-    {
-        get => (ButtonIconEnum?)GetValue(ButtonIconProperty);
-        set => SetValue(ButtonIconProperty, value);
-    }
-
-    public new static readonly BindableProperty TextProperty = BindableProperty.Create(
-        propertyName: nameof(Text),
-        returnType: typeof(string),
-        declaringType: typeof(ButtonBase),
-        defaultValue: "",
-        defaultBindingMode: BindingMode.OneWay);
-
-    public new string Text
-    {
-        get => (string)GetValue(TextProperty);
-        set => SetValue(TextProperty, value);
-    }
-
     public static readonly BindableProperty DisabledTextProperty = BindableProperty.Create(
         propertyName: nameof(DisabledText),
         returnType: typeof(string),
         declaringType: typeof(ButtonBase),
         defaultValue: "",
         defaultBindingMode: BindingMode.OneWay);
-
-    public string DisabledText
-    {
-        get => (string)GetValue(DisabledTextProperty);
-        set => SetValue(DisabledTextProperty, value);
-    }
 
     public static readonly BindableProperty PressedTextProperty = BindableProperty.Create(
         propertyName: nameof(PressedText),
@@ -124,11 +93,16 @@ public abstract class ButtonBase : Button, IButtonBase
         defaultValue: "",
         defaultBindingMode: BindingMode.OneWay);
 
-    public string PressedText
-    {
-        get => (string)GetValue(PressedTextProperty);
-        set => SetValue(PressedTextProperty, value);
-    }
+    public new static readonly BindableProperty TextProperty = BindableProperty.Create(
+        propertyName: nameof(Text),
+        returnType: typeof(string),
+        declaringType: typeof(ButtonBase),
+        defaultValue: "",
+        defaultBindingMode: BindingMode.OneWay);
+
+    #endregion Fields
+
+    #region Public Constructors
 
     public ButtonBase(ButtonIconEnum buttonType) : base()
     {
@@ -136,11 +110,53 @@ public abstract class ButtonBase : Button, IButtonBase
         base.PropertyChanged += Button_PropertyChanged;
     }
 
-    protected override void OnParentSet()
+    #endregion Public Constructors
+
+    #region Properties
+
+    private double heightMultiplier => DeviceInfo.Platform == DevicePlatform.WinUI ? 2.8 : 1.0;
+    public ButtonIconEnum? ButtonIcon
     {
-        base.OnParentSet();
-        UpdateUI();
+        get => (ButtonIconEnum?)GetValue(ButtonIconProperty);
+        set => SetValue(ButtonIconProperty, value);
     }
+
+    public SizeEnum? ButtonSize
+    {
+        get => (SizeEnum?)GetValue(ButtonSizeProperty);
+        set => SetValue(ButtonSizeProperty, value);
+    }
+    public ButtonStateEnum? ButtonState
+    {
+        get => (ButtonStateEnum?)GetValue(ButtonStateProperty);
+        set => SetValue(ButtonStateProperty, value);
+    }
+    public ButtonStyleEnum? ButtonStyle
+    {
+        get => (ButtonStyleEnum?)GetValue(ButtonStyleProperty);
+        set => SetValue(ButtonStyleProperty, value);
+    }
+    public string DisabledText
+    {
+        get => (string)GetValue(DisabledTextProperty);
+        set => SetValue(DisabledTextProperty, value);
+    }
+
+    public string PressedText
+    {
+        get => (string)GetValue(PressedTextProperty);
+        set => SetValue(PressedTextProperty, value);
+    }
+
+    public new string Text
+    {
+        get => (string)GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
+    }
+
+    #endregion Properties
+
+    #region Private Methods
 
     private void Button_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -152,140 +168,166 @@ public abstract class ButtonBase : Button, IButtonBase
             || (e.PropertyName == nameof(Text)))
             UpdateUI();
     }
-    public void Enabled()
+
+    private void ConfigureDisabled()
     {
-        if (ButtonState != ButtonStateEnum.Enabled)
-            ButtonState = ButtonStateEnum.Enabled;
+        void _update()
+        {
+            base.BatchBegin();
+            base.IsEnabled = false;
+            base.IsVisible = true;
+
+            if (ButtonSize != null)
+            {
+                base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
+                if (ButtonStyle != ButtonStyleEnum.TextOnly)
+                {
+                    if (ButtonIcon != null)
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
+                }
+                else
+                    base.ImageSource = null;
+
+                if ((ButtonStyle == ButtonStyleEnum.IconAndText || ButtonStyle == ButtonStyleEnum.TextOnly)
+                    && !string.IsNullOrEmpty(Text))
+                {
+                    base.Text = Text;
+                }
+            }
+            base.BatchCommit();
+        }
+        UiThreadHelper.RunOnMainThread(_update);
     }
+
+    private void ConfigureEnabled()
+    {
+        void _update()
+        {
+            base.BatchBegin();
+            base.IsEnabled = true;
+            base.IsVisible = true;
+
+            if (ButtonSize != null)
+            {
+                base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
+                if (ButtonStyle != ButtonStyleEnum.TextOnly)
+                {
+                    if (ButtonIcon != null)
+                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
+                }
+                else
+                    base.ImageSource = null;
+
+                if ((ButtonStyle == ButtonStyleEnum.IconAndText || ButtonStyle == ButtonStyleEnum.TextOnly)
+                    && !string.IsNullOrEmpty(Text))
+                {
+                    base.Text = Text;
+                }
+
+                if (ButtonStyle == ButtonStyleEnum.IconAndText && !string.IsNullOrEmpty(Text))
+                {
+                    base.ContentLayout = new ButtonContentLayout(ButtonContentLayout.ImagePosition.Left, 10);
+                }
+
+            }
+            base.BatchCommit();
+        }
+        UiThreadHelper.RunOnMainThread(_update);
+
+    }
+
+    private void ConfigureHidden()
+    {
+        void _update()
+        {
+            base.BatchBegin();
+            base.IsEnabled = true;
+            base.IsVisible = false;
+            base.BatchCommit();
+        }
+        UiThreadHelper.RunOnMainThread(_update);
+    }
+
+    private void ConfigurePressed()
+    {
+        if (ButtonSize != null)
+        {
+            void _update()
+            {
+                base.BatchBegin();
+                base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
+                if (ButtonIcon != null)
+                {
+                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
+                }
+                base.BatchCommit();
+            }
+            UiThreadHelper.RunOnMainThread(_update);
+        }
+    }
+
+    #endregion Private Methods
+
+    #region Protected Methods
+
+    protected override void OnParentSet()
+    {
+        base.OnParentSet();
+        UpdateUI();
+    }
+
+    #endregion Protected Methods
+
+    #region Public Methods
+
     public void Disabled()
     {
         if (ButtonState != ButtonStateEnum.Disabled)
             ButtonState = ButtonStateEnum.Disabled;
+    }
+
+    public void Enabled()
+    {
+        if (ButtonState != ButtonStateEnum.Enabled)
+            ButtonState = ButtonStateEnum.Enabled;
     }
     public void Hide()
     {
         if (ButtonState != ButtonStateEnum.Hidden)
             ButtonState = ButtonStateEnum.Hidden;
     }
-    private bool _updateUI = false;
     public void UpdateUI()
     {
         if (this._updateUI) return;
         this._updateUI = true;
-        void _update()
+        if (ButtonState != null)
         {
-            if (ButtonState != null)
+            switch (ButtonState)
             {
-                base.BatchBegin();
-                switch (ButtonState)
-                {
-                    case ButtonStateEnum.Enabled:
-                        {
-                            ConfigureEnabled();
-                            break;
-                        }
-                    case ButtonStateEnum.Disabled:
-                        {
-                            ConfigureDisabled();
-                            break;
-                        }
-                    case ButtonStateEnum.Pressed:
-                        {
-                            ConfigurePressed();
-                            break;
-                        }
-                    case ButtonStateEnum.Hidden:
-                        {
-                            ConfigureHidden();
-                            break;
-                        }
-                }
-                base.BatchCommit();
+                case ButtonStateEnum.Enabled:
+                    {
+                        ConfigureEnabled();
+                        break;
+                    }
+                case ButtonStateEnum.Disabled:
+                    {
+                        ConfigureDisabled();
+                        break;
+                    }
+                case ButtonStateEnum.Pressed:
+                    {
+                        ConfigurePressed();
+                        break;
+                    }
+                case ButtonStateEnum.Hidden:
+                    {
+                        ConfigureHidden();
+                        break;
+                    }
             }
         }
-
-#if !IOS && !ANDROID && !MACCATALYST && !WINDOWS
-        _update();
-#else
-        if (MainThread.IsMainThread)
-        {
-            _update();
-        }
-        else
-        {
-            MainThread.BeginInvokeOnMainThread(() => _update());
-        }
-#endif
         this._updateUI = false;
     }
 
-    private void ConfigureEnabled()
-    {
-        base.IsEnabled = true;
-        base.IsVisible = true;
-
-        if (ButtonSize != null)
-        {
-            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
-            if (ButtonStyle != ButtonStyleEnum.TextOnly)
-            {
-                if (ButtonIcon != null)
-                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
-            }
-            else
-                base.ImageSource = null;
-
-            if ((ButtonStyle == ButtonStyleEnum.IconAndText || ButtonStyle == ButtonStyleEnum.TextOnly)
-                && !string.IsNullOrEmpty(Text))
-            {
-                base.Text = Text;
-            }
-
-            if (ButtonStyle == ButtonStyleEnum.IconAndText && !string.IsNullOrEmpty(Text))
-            {
-                base.ContentLayout = new ButtonContentLayout(ButtonContentLayout.ImagePosition.Left, 10);
-            }
-
-        }
-    }
-    private void ConfigureDisabled()
-    {
-        base.IsEnabled = false;
-        base.IsVisible = true;
-
-        if (ButtonSize != null)
-        {
-            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
-            if (ButtonStyle != ButtonStyleEnum.TextOnly)
-            {
-                if (ButtonIcon != null)
-                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
-            }
-            else
-                base.ImageSource = null;
-
-            if ((ButtonStyle == ButtonStyleEnum.IconAndText || ButtonStyle == ButtonStyleEnum.TextOnly)
-                && !string.IsNullOrEmpty(Text))
-            {
-                base.Text = Text;
-            }
-        }
-    }
-    private void ConfigurePressed()
-    {
-        if (ButtonSize != null)
-        {
-            base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
-            if (ButtonIcon != null)
-            {
-                base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
-            }
-        }
-    }
-
-    private void ConfigureHidden()
-    {
-        base.IsEnabled = true;
-        base.IsVisible = false;
-    }
+    #endregion Public Methods
 }

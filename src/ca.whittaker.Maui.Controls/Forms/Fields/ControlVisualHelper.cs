@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace ca.whittaker.Maui.Controls.Forms;
 
 public static class ControlVisualHelper
@@ -8,7 +10,7 @@ public static class ControlVisualHelper
     {
         foreach (var c in root.GetVisualTreeDescendants())
         {
-//                Debug.WriteLine($"{c.ToString()}");
+            Debug.WriteLine($"{c.ToString()}");
             if (c is Entry e)
                 e.IsEnabled = false;
             if (c is StackLayout sl)
@@ -33,6 +35,7 @@ public static class ControlVisualHelper
     {
         foreach (var c in root.GetVisualTreeDescendants())
         {
+            Debug.WriteLine($"{c.ToString()}");
             if (c is Entry e)
                 e.IsEnabled = true;
             if (c is StackLayout sl)

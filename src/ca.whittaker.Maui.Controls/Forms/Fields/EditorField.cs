@@ -9,7 +9,6 @@ public partial class EditorField : BaseFormField<string>
 {
     #region Fields
 
-
     private Editor _editorBox;
 
     public static readonly BindableProperty EditorDataTypeProperty = BindableProperty.Create(
@@ -28,14 +27,6 @@ public partial class EditorField : BaseFormField<string>
         propertyChanged: (bindable, oldValue, newValue) =>
             ((EditorField)bindable).OnEditorMaxSizePropertyChanged(newValue));
 
-    public static readonly BindableProperty EditorRowCountProperty = BindableProperty.Create(
-        propertyName: nameof(EditorRowCount),
-        returnType: typeof(int),
-        declaringType: typeof(EditorField),
-        defaultValue: 5,
-        propertyChanged: (bindable, oldValue, newValue) =>
-            ((EditorField)bindable).OnEditorRowCountPropertyChanged(newValue));
-
     public static readonly BindableProperty EditorPlaceholderProperty = BindableProperty.Create(
         propertyName: nameof(EditorPlaceholder),
         returnType: typeof(string),
@@ -43,6 +34,14 @@ public partial class EditorField : BaseFormField<string>
         defaultValue: string.Empty,
         propertyChanged: (bindable, oldValue, newValue) =>
             ((EditorField)bindable).OnEditorPlaceholderPropertyChanged(newValue));
+
+    public static readonly BindableProperty EditorRowCountProperty = BindableProperty.Create(
+            propertyName: nameof(EditorRowCount),
+        returnType: typeof(int),
+        declaringType: typeof(EditorField),
+        defaultValue: 5,
+        propertyChanged: (bindable, oldValue, newValue) =>
+            ((EditorField)bindable).OnEditorRowCountPropertyChanged(newValue));
 
     #endregion Fields
 
@@ -56,11 +55,13 @@ public partial class EditorField : BaseFormField<string>
         };
         _editorBox.IsEnabled = false;
         _editorBox.TextChanged += Editor_TextChanged;
-        _editorBox.Focused += Field_Focused;
-        _editorBox.Unfocused += Field_Unfocused;
+
+        Field_WireFocusEvents(_editorBox);
 
         Editor_SetPlaceholderText(EditorPlaceholder);
         Editor_SetMaxSize(EditorMaxSize);
+
+        Field_InitializeDataSource();
 
         InitializeLayout();
     }
@@ -68,7 +69,6 @@ public partial class EditorField : BaseFormField<string>
     #endregion Public Constructors
 
     #region Properties
-
 
     public EditorDataTypeEnum EditorDataType
     {
@@ -78,12 +78,6 @@ public partial class EditorField : BaseFormField<string>
             SetValue(EditorDataTypeProperty, value);
             Editor_ConfigureKeyboard();
         }
-    }
-
-    public int EditorRowCount
-    {
-        get => (int)GetValue(EditorRowCountProperty);
-        set => SetValue(EditorRowCountProperty, value);
     }
 
     public int EditorMaxSize
@@ -98,37 +92,26 @@ public partial class EditorField : BaseFormField<string>
         set => SetValue(EditorPlaceholderProperty, value);
     }
 
+    public int EditorRowCount
+    {
+        get => (int)GetValue(EditorRowCountProperty);
+        set => SetValue(EditorRowCountProperty, value);
+    }
+
     #endregion Properties
 
     #region Private Methods
 
-    private void OnEditorDataTypeChanged(object newValue) =>
-        _editorBox.Keyboard = Editor_GetKeyboardForFieldType((EditorDataTypeEnum)newValue);
-
-    private void OnEditorRowCountPropertyChanged(object newValue) =>
-        _editorBox.HeightRequest = (int)newValue * DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 1.1;
-
-    private void OnEditorMaxSizePropertyChanged(object newValue) =>
-        _editorBox.MaxLength = (int)newValue;
-
-    private void OnEditorPlaceholderPropertyChanged(object newValue) =>
-        _editorBox.Placeholder = newValue?.ToString() ?? "";
-
-    private void SetEditorValue(string? value)
+    private void Editor_ConfigureKeyboard()
     {
-        _editorBox.Text = value ?? String.Empty;
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _editorBox.Keyboard = Editor_GetKeyboardForFieldType(EditorDataType);
+            });
+        });
     }
-
-    private void Editor_TextChanged(object? sender, TextChangedEventArgs e)
-    {
-        Editor_ProcessAndSetText(e.NewTextValue);
-        Field_UpdateValidationAndChangedState();
-        Field_UpdateNotificationMessage();
-        FieldLastValue = e.NewTextValue;
-    }
-
-    private void Editor_ConfigureKeyboard() =>
-        _editorBox.Keyboard = Editor_GetKeyboardForFieldType(EditorDataType);
 
     private Keyboard Editor_GetKeyboardForFieldType(EditorDataTypeEnum fieldType) =>
         fieldType switch
@@ -138,15 +121,14 @@ public partial class EditorField : BaseFormField<string>
             _ => Keyboard.Default,
         };
 
-
     private void Editor_ProcessAndSetText(string newText)
     {
         string filteredValue = InputValidator.FilterPlaintext(EditorDataType == EditorDataTypeEnum.Plaintext,
                                     InputValidator.FilterRichtext(EditorDataType == EditorDataTypeEnum.Richtext, newText)
-                               ); 
+                               );
         if (_editorBox.Text != filteredValue)
             _editorBox.Text = filteredValue;
-        FieldDataSource = filteredValue;
+        Field_SetDataSourceValue(filteredValue);
     }
 
     private void Editor_SetMaxSize(object newValue)
@@ -157,6 +139,69 @@ public partial class EditorField : BaseFormField<string>
 
     private void Editor_SetPlaceholderText(object newValue) =>
         _editorBox.Placeholder = newValue == null ? "" : (string)newValue;
+
+    private void Editor_TextChanged(object? sender, TextChangedEventArgs e)
+    {
+        Editor_ProcessAndSetText(e.NewTextValue);
+        Field_UpdateValidationAndChangedState();
+        Field_UpdateNotificationMessage();
+        FieldLastValue = e.NewTextValue;
+    }
+
+    private void OnEditorDataTypeChanged(object newValue)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _editorBox.Keyboard = Editor_GetKeyboardForFieldType((EditorDataTypeEnum)newValue);
+            });
+        });
+    }
+
+    private void OnEditorMaxSizePropertyChanged(object newValue)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _editorBox.MaxLength = (int)newValue;
+            });
+        });
+    }
+
+    private void OnEditorPlaceholderPropertyChanged(object newValue)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _editorBox.Placeholder = newValue?.ToString() ?? "";
+            });
+        });
+    }
+
+    private void OnEditorRowCountPropertyChanged(object newValue)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _editorBox.HeightRequest = (int)newValue * DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 1.1;
+            });
+        });
+    }
+
+    private void SetEditorValue(string? value)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _editorBox.Text = value ?? String.Empty;
+            });
+        });
+    }
 
     #endregion Private Methods
 
@@ -181,11 +226,13 @@ public partial class EditorField : BaseFormField<string>
         };
         grid.Add(FieldLabel, 0, 0);
         grid.Add(_editorBox, 1, 0);
-        grid.Add(ButtonUndo, 2, 0);
+        grid.Add(FieldButtonUndo, 2, 0);
         grid.Add(FieldNotification, 0, 1);
         grid.SetColumnSpan(FieldNotification, 3);
         return grid;
     }
+
+    protected override string Field_GetCurrentValue() => _editorBox.Text;
 
     protected override string Field_GetFormatErrorMessage() =>
         EditorDataType switch
@@ -213,69 +260,64 @@ public partial class EditorField : BaseFormField<string>
     protected override bool Field_HasRequiredError() =>
         FieldMandatory && string.IsNullOrEmpty(_editorBox.Text);
 
-    protected override void Field_OriginalValue_Reset()
-    {
-        SetEditorValue(FieldOriginalValue);
-    }
-    protected override void Field_OriginalValue_SetToCurrentValue()
-    {
-        FieldOriginalValue = GetCurrentValue();
-    }
+
     protected override void Field_OriginalValue_SetToClear()
     {
         FieldOriginalValue = String.Empty;
         SetEditorValue(FieldOriginalValue);
     }
 
-    protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue) { }
-
-    // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
-    protected override void UpdateRow0Layout()
+    protected override void Field_SetValue(string? value)
     {
-        void _updateRow0Layout()
+        UiThreadHelper.RunOnMainThread(() =>
         {
-            BatchBegin();
-            if (_editorBox!.Parent is Grid grid)
+            Field_PerformBatchUpdate(() =>
             {
-                bool isFieldLabelVisible = FieldLabelVisible;
-                bool isButtonUndoVisible = FieldUndoButtonVisible;
-
-                if (isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_editorBox!, 1);
-                    Grid.SetColumnSpan(_editorBox!, 1);
-                }
-                else if (isFieldLabelVisible && !isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_editorBox!, 1);
-                    Grid.SetColumnSpan(_editorBox!, 2);
-                }
-                else if (!isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_editorBox!, 0);
-                    Grid.SetColumnSpan(_editorBox!, 2);
-                }
-                else // both not visible
-                {
-                    Grid.SetColumn(_editorBox!, 0);
-                    Grid.SetColumnSpan(_editorBox!, 3);
-                }
-            }
-            BatchCommit();
-        }
-
-        if (MainThread.IsMainThread)
-            _updateRow0Layout();
-        else
-            MainThread.BeginInvokeOnMainThread(_updateRow0Layout);
-
+                _editorBox.Text = value ?? String.Empty;
+            });
+        });
     }
-
-
 
     protected override void OnParentSet()
     {
         base.OnParentSet();
+    }
+
+    // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
+    protected override void UpdateRow0Layout()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                if (_editorBox!.Parent is Grid grid)
+                {
+                    bool isFieldLabelVisible = FieldLabelVisible;
+                    bool isButtonUndoVisible = FieldUndoButtonVisible;
+
+                    if (isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_editorBox!, 1);
+                        Grid.SetColumnSpan(_editorBox!, 1);
+                    }
+                    else if (isFieldLabelVisible && !isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_editorBox!, 1);
+                        Grid.SetColumnSpan(_editorBox!, 2);
+                    }
+                    else if (!isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_editorBox!, 0);
+                        Grid.SetColumnSpan(_editorBox!, 2);
+                    }
+                    else // both not visible
+                    {
+                        Grid.SetColumn(_editorBox!, 0);
+                        Grid.SetColumnSpan(_editorBox!, 3);
+                    }
+                }
+            });
+        });
     }
 
     #endregion Protected Methods
@@ -284,11 +326,15 @@ public partial class EditorField : BaseFormField<string>
 
     public override void Field_Unfocus()
     {
-        base.Field_Unfocus();
-        _editorBox?.Unfocus();
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                base.Field_Unfocus();
+                _editorBox?.Unfocus();
+            });
+        });
     }
-
-    public string GetCurrentValue() => _editorBox.Text;
 
     #endregion Public Methods
 }

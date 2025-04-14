@@ -10,101 +10,79 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
 {
-    #region Fields
-
-    public Picker MonthPicker { get; private set; }
-    public Picker YearPicker { get; private set; }
-
-    #endregion Fields
-
     #region Public Constructors
 
     public DateMonthYearField()
     {
-        MonthPicker = new Picker
+        _monthPicker = new Picker
         {
             Title = "Month",
             VerticalOptions = LayoutOptions.Center
         };
-        YearPicker = new Picker
+        // Populate MonthPicker with month names.
+        for (int i = 1; i <= 12; i++)
+        {
+            _monthPicker.Items.Add(new DateTime(2000, i, 1).ToString("MMMM"));
+        }
+        _monthPicker.IsEnabled = false;
+
+        _yearPicker = new Picker
         {
             Title = "Year",
             VerticalOptions = LayoutOptions.Center
         };
-
-        // Populate MonthPicker with month names.
-        for (int i = 1; i <= 12; i++)
-        {
-            MonthPicker.Items.Add(new DateTime(2000, i, 1).ToString("MMMM"));
-        }
-
         // Populate YearPicker with a range of years (e.g., last 100 years up to current year).
         int currentYear = DateTime.Today.Year;
         for (int year = currentYear - 100; year <= currentYear; year++)
         {
-            YearPicker.Items.Add(year.ToString());
+            _yearPicker.Items.Add(year.ToString());
         }
+        _yearPicker.IsEnabled = false;
 
-        MonthPicker.SelectedIndexChanged += OnPickerSelectionChanged;
-        YearPicker.SelectedIndexChanged += OnPickerSelectionChanged;
+        _monthPicker.SelectedIndexChanged += OnPickerSelectionChanged;
+        _yearPicker.SelectedIndexChanged += OnPickerSelectionChanged;
+
+        Field_WireFocusEvents(_monthPicker);
+        Field_WireFocusEvents(_yearPicker);
+
+        Field_InitializeDataSource();
 
         InitializeLayout();
     }
 
     #endregion Public Constructors
 
+    #region Properties
+
+    public Picker _monthPicker { get; private set; }
+    public Picker _yearPicker { get; private set; }
+
+    #endregion Properties
 
     #region Private Methods
 
+    //private void Date_ProcessAndSet(DateTimeOffset newDateOffset)
+    //{
+    //    DateTime newDate = new DateTime(newDateOffset.Year, newDateOffset.Month, 1);
+    //    Field_SetDataSourceValue(new DateTimeOffset(newDate, TimeSpan.Zero));
+    //}
 
     private void OnPickerSelectionChanged(object? sender, EventArgs e)
     {
-        if (MonthPicker.SelectedIndex < 0 || YearPicker.SelectedIndex < 0)
+        if (_monthPicker.SelectedIndex < 0 || _yearPicker.SelectedIndex < 0)
             return;
 
-        int month = MonthPicker.SelectedIndex + 1;
-        int year = int.Parse(YearPicker?.SelectedItem?.ToString() ?? String.Empty);
+        int month = _monthPicker.SelectedIndex + 1;
+        int year = int.Parse(_yearPicker?.SelectedItem?.ToString() ?? String.Empty);
         try
         {
             // Create a new DateTime with the day fixed to 1.
             DateTime newDate = new DateTime(year, month, 1);
-            FieldDataSource = new DateTimeOffset(newDate, TimeSpan.Zero);
+            Field_SetDataSourceValue(new DateTimeOffset(newDate, TimeSpan.Zero));
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error setting date: {ex.Message}");
-        }
-    }
-
-    private void Date_ProcessAndSet(DateTimeOffset newDateOffset)
-    {
-        DateTime newDate = new DateTime(newDateOffset.Year, newDateOffset.Month, 1);
-        FieldDataSource = new DateTimeOffset(newDate, TimeSpan.Zero);
-    }
-
-    private void Date_SetValue(DateTimeOffset? value)
-    {
-        if (value.HasValue)
-        {
-            int month = value.Value.Month;
-            int year = value.Value.Year;
-            MonthPicker.SelectedIndex = month - 1;
-
-            // Set the YearPicker based on the year.
-            string yearStr = year.ToString();
-            for (int i = 0; i < YearPicker.Items.Count; i++)
-            {
-                if (YearPicker.Items[i] == yearStr)
-                {
-                    YearPicker.SelectedIndex = i;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            MonthPicker.SelectedIndex = -1;
-            YearPicker.SelectedIndex = -1;
         }
     }
 
@@ -138,15 +116,17 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
             Orientation = StackOrientation.Horizontal,
             VerticalOptions = LayoutOptions.Center,
             Spacing = 10,
-            Children = { MonthPicker, YearPicker }
+            Children = { _monthPicker, _yearPicker }
         };
 
         grid.Add(pickerLayout, 1, 0);
-        grid.Add(ButtonUndo, 2, 0);
+        grid.Add(FieldButtonUndo, 2, 0);
         grid.Add(FieldNotification, 0, 1);
         Grid.SetColumnSpan(FieldNotification, 3);
         return grid;
     }
+
+    protected override DateTimeOffset? Field_GetCurrentValue() => FieldDataSource;
 
     protected override string Field_GetFormatErrorMessage() => String.Empty;
 
@@ -161,73 +141,81 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
     protected override bool Field_HasRequiredError() =>
         FieldMandatory && FieldDataSource == null;
 
-    protected override void Field_OriginalValue_Reset() => Date_SetValue(FieldOriginalValue);
-
-    protected override void Field_OriginalValue_SetToClear()
+    protected override void Field_SetValue(DateTimeOffset? value)
     {
-        FieldOriginalValue = null;
-        Date_SetValue(FieldOriginalValue);
-    }
+        if (value.HasValue)
+        {
+            int month = value.Value.Month;
+            int year = value.Value.Year;
+            _monthPicker.SelectedIndex = month - 1;
 
-    protected override void Field_OriginalValue_SetToCurrentValue()
-    {
-        FieldOriginalValue = GetCurrentValue();
+            // Set the YearPicker based on the year.
+            string yearStr = year.ToString();
+            for (int i = 0; i < _yearPicker.Items.Count; i++)
+            {
+                if (_yearPicker.Items[i] == yearStr)
+                {
+                    _yearPicker.SelectedIndex = i;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            _monthPicker.SelectedIndex = -1;
+            _yearPicker.SelectedIndex = -1;
+        }
     }
 
     protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue)
     {
         if (newValue is DateTimeOffset dto)
         {
-            Date_SetValue(dto);
+            Field_SetValue(dto);
             FieldLastValue = dto;
         }
         else
         {
-            Date_SetValue(null);
+            Field_SetValue(null);
         }
     }
 
     protected override void UpdateRow0Layout()
     {
-        void _updateRow0Layout()
+        UiThreadHelper.RunOnMainThread(() =>
         {
-            
-            BatchBegin();
-#pragma warning disable CS0618 // Type or member is obsolete
-            if (MonthPicker.Parent is Layout<View> pickerLayout)
+            Field_PerformBatchUpdate(() =>
             {
-                bool isFieldLabelVisible = FieldLabelVisible;
-                bool isButtonUndoVisible = FieldUndoButtonVisible;
+#pragma warning disable CS0618 // Type or member is obsolete
+                if (_monthPicker.Parent is Layout<View> pickerLayout)
+                {
+                    bool isFieldLabelVisible = FieldLabelVisible;
+                    bool isButtonUndoVisible = FieldUndoButtonVisible;
 
-                if (isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(pickerLayout, 1);
-                    Grid.SetColumnSpan(pickerLayout, 1);
+                    if (isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(pickerLayout, 1);
+                        Grid.SetColumnSpan(pickerLayout, 1);
+                    }
+                    else if (isFieldLabelVisible && !isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(pickerLayout, 1);
+                        Grid.SetColumnSpan(pickerLayout, 2);
+                    }
+                    else if (!isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(pickerLayout, 0);
+                        Grid.SetColumnSpan(pickerLayout, 2);
+                    }
+                    else
+                    {
+                        Grid.SetColumn(pickerLayout, 0);
+                        Grid.SetColumnSpan(pickerLayout, 3);
+                    }
                 }
-                else if (isFieldLabelVisible && !isButtonUndoVisible)
-                {
-                    Grid.SetColumn(pickerLayout, 1);
-                    Grid.SetColumnSpan(pickerLayout, 2);
-                }
-                else if (!isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(pickerLayout, 0);
-                    Grid.SetColumnSpan(pickerLayout, 2);
-                }
-                else
-                {
-                    Grid.SetColumn(pickerLayout, 0);
-                    Grid.SetColumnSpan(pickerLayout, 3);
-                }
-            }
 #pragma warning restore CS0618 // Type or member is obsolete
-            BatchCommit();
-        }
-
-        if (MainThread.IsMainThread)
-            _updateRow0Layout();
-        else
-            MainThread.BeginInvokeOnMainThread(_updateRow0Layout);
+            });
+        });
     }
 
     #endregion Protected Methods
@@ -236,12 +224,16 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
 
     public override void Field_Unfocus()
     {
-        base.Field_Unfocus();
-        MonthPicker?.Unfocus();
-        YearPicker?.Unfocus();
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                base.Field_Unfocus();
+                _monthPicker?.Unfocus();
+                _yearPicker?.Unfocus();
+            });
+        });
     }
-
-    public DateTimeOffset? GetCurrentValue() => FieldDataSource;
 
     #endregion Public Methods
 }

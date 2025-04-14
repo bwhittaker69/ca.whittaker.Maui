@@ -6,6 +6,7 @@ namespace ca.whittaker.Maui.Controls.Forms;
 
 public static class CheckedStateEnumExtensions
 {
+
     #region Public Methods
 
     public static CheckedStateEnum FromNullableBoolean(this bool? value) =>
@@ -25,6 +26,7 @@ public static class CheckedStateEnumExtensions
         };
 
     #endregion Public Methods
+
 }
 
 /// <summary>
@@ -56,6 +58,7 @@ public static class CheckedStateEnumExtensions
 /// </summary>
 public partial class CheckBoxField : BaseFormField<bool?>
 {
+
     #region Fields
 
     private Microsoft.Maui.Controls.CheckBox? _checkBox;
@@ -84,8 +87,7 @@ public partial class CheckBoxField : BaseFormField<bool?>
             HorizontalOptions = LayoutOptions.Fill,
             VerticalOptions = LayoutOptions.Center
         };
-        _checkBox.Focused += Field_Focused;
-        _checkBox.Unfocused += Field_Unfocused;
+        Field_WireFocusEvents(_checkBox);
 
         // ***************
         //   TAP OVERLAY
@@ -100,9 +102,10 @@ public partial class CheckBoxField : BaseFormField<bool?>
         _checkBoxOverlay!.Tapped += OnCheckBoxTapped;
         _checkBoxTapOverlay.GestureRecognizers.Add(_checkBoxOverlay);
 
+        Field_InitializeDataSource();
+
         InitializeLayout();
     }
-
 
     #endregion Public Constructors
 
@@ -125,7 +128,6 @@ public partial class CheckBoxField : BaseFormField<bool?>
 
     #region Properties
 
-
     public CheckBoxDataTypeEnum CheckBoxDataType
     {
         get => (CheckBoxDataTypeEnum)GetValue(CheckBoxDataTypeSourceProperty);
@@ -147,36 +149,30 @@ public partial class CheckBoxField : BaseFormField<bool?>
 
     private void CheckBox_SetChecked()
     {
-        void _updateUI()
+        UiThreadHelper.RunOnMainThread(() =>
         {
-            BatchBegin();
-            _checkBox!.IsEnabled = true;
-            _checkBox!.IsChecked = true;
-            if (FieldDataSource != true) FieldDataSource = true;
-            BatchCommit();
-        }
-
-        if (MainThread.IsMainThread)
-            _updateUI();
-        else
-            MainThread.BeginInvokeOnMainThread(_updateUI);
+            Field_PerformBatchUpdate(() =>
+            {
+                _checkBox!.IsEnabled = true;
+                _checkBox!.IsChecked = true;
+            });
+        });
+        if (FieldDataSource != true)
+            Field_SetDataSourceValue(true);
     }
 
     private void CheckBox_SetNotSet()
     {
-        void _updateUI()
+        UiThreadHelper.RunOnMainThread(() =>
         {
-            BatchBegin();
-            _checkBox!.IsEnabled = false;
-            _checkBox!.IsChecked = false;
-            if (FieldDataSource != null) FieldDataSource = null;
-            BatchCommit();
-        }
-
-        if (MainThread.IsMainThread)
-            _updateUI();
-        else
-            MainThread.BeginInvokeOnMainThread(_updateUI);
+            Field_PerformBatchUpdate(() =>
+            {
+                _checkBox!.IsEnabled = false;
+                _checkBox!.IsChecked = false;
+            });
+        });
+        if (FieldDataSource != null)
+            Field_SetDataSourceValue(null);
     }
 
     private void CheckBox_SetState(CheckedStateEnum value)
@@ -216,19 +212,16 @@ public partial class CheckBoxField : BaseFormField<bool?>
 
     private void CheckBox_SetUnChecked()
     {
-        void _updateUI()
+        UiThreadHelper.RunOnMainThread(() =>
         {
-            BatchBegin();
-            _checkBox!.IsEnabled = true;
-            _checkBox!.IsChecked = false;
-            if (FieldDataSource != false) FieldDataSource = false;
-            BatchCommit();
-        }
-
-        if (MainThread.IsMainThread)
-            _updateUI();
-        else
-            MainThread.BeginInvokeOnMainThread(_updateUI);
+            Field_PerformBatchUpdate(() =>
+            {
+                _checkBox!.IsEnabled = true;
+                _checkBox!.IsChecked = false;
+            });
+        });
+        if (FieldDataSource != false)
+            Field_SetDataSourceValue(false);
     }
 
     private void CheckBox_Toggle()
@@ -290,8 +283,6 @@ public partial class CheckBoxField : BaseFormField<bool?>
         if (FieldAccessMode == FieldAccessModeEnum.Editing)
         {
             CheckBox_Toggle();
-            Field_UpdateValidationAndChangedState();
-            Field_UpdateNotificationMessage();
         }
     }
 
@@ -304,21 +295,21 @@ public partial class CheckBoxField : BaseFormField<bool?>
         var grid = new Grid
         {
             ColumnDefinitions =
-        {
-            new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-            new ColumnDefinition { Width = GridLength.Star },
-            new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-        },
+            {
+                new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
+            },
             RowDefinitions =
-        {
-            new RowDefinition { Height = GridLength.Auto },
-            new RowDefinition { Height = GridLength.Auto }
-        }
+            {
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto }
+            }
         };
 
         grid.Add(FieldLabel, 0, 0);
         grid.Add(_checkBox, 1, 0);
-        grid.Add(ButtonUndo, 2, 0);
+        grid.Add(FieldButtonUndo, 2, 0);
         grid.Add(FieldNotification, 0, 1);
         Grid.SetColumnSpan(FieldNotification, 3);
 
@@ -330,6 +321,8 @@ public partial class CheckBoxField : BaseFormField<bool?>
 
         return grid;
     }
+
+    protected override bool? Field_GetCurrentValue() => _checkBox?.IsChecked == true ? true : _checkBox?.IsEnabled == false ? null : false;
 
     protected override string Field_GetFormatErrorMessage()
     {
@@ -361,25 +354,16 @@ public partial class CheckBoxField : BaseFormField<bool?>
             return false;
     }
 
-    protected override void Field_OriginalValue_Reset()
-    {
-        CheckBox_SetState(FieldOriginalValue.FromNullableBoolean());
-    }
-
     protected override void Field_OriginalValue_SetToClear()
     {
         FieldOriginalValue = (FieldMandatory ? CheckedStateEnum.UnChecked : CheckedStateEnum.NotSet).ToNullableBoolean();
     }
 
-    protected override void Field_OriginalValue_SetToCurrentValue()
-    {
-        FieldOriginalValue = GetCurrentValue();
-    }
 
-    protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue)
+    protected override void Field_SetValue(bool? newValue)
     {
+        CheckBox_SetState(newValue.FromNullableBoolean());
     }
-
     protected override void OnParentSet()
     {
         base.OnParentSet();
@@ -394,42 +378,39 @@ public partial class CheckBoxField : BaseFormField<bool?>
     // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
     protected override void UpdateRow0Layout()
     {
-        void _updateRow0Layout()
+        UiThreadHelper.RunOnMainThread(() =>
         {
-            BatchBegin();
-            if (_checkBoxTapOverlay!.Parent is Grid grid)
+            Field_PerformBatchUpdate(() =>
             {
-                bool isFieldLabelVisible = FieldLabelVisible;
-                bool isButtonUndoVisible = FieldUndoButtonVisible;
+                if (_checkBoxTapOverlay!.Parent is Grid grid)
+                {
+                    bool isFieldLabelVisible = FieldLabelVisible;
+                    bool isButtonUndoVisible = FieldUndoButtonVisible;
 
-                if (isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_checkBoxTapOverlay!, 1);
-                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 1);
+                    if (isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_checkBoxTapOverlay!, 1);
+                        Grid.SetColumnSpan(_checkBoxTapOverlay!, 1);
+                    }
+                    else if (isFieldLabelVisible && !isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_checkBoxTapOverlay!, 1);
+                        Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
+                    }
+                    else if (!isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_checkBoxTapOverlay!, 0);
+                        Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
+                    }
+                    else // both not visible
+                    {
+                        Grid.SetColumn(_checkBoxTapOverlay!, 0);
+                        Grid.SetColumnSpan(_checkBoxTapOverlay!, 3);
+                    }
                 }
-                else if (isFieldLabelVisible && !isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_checkBoxTapOverlay!, 1);
-                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
-                }
-                else if (!isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_checkBoxTapOverlay!, 0);
-                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
-                }
-                else // both not visible
-                {
-                    Grid.SetColumn(_checkBoxTapOverlay!, 0);
-                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 3);
-                }
-            }
-            BatchCommit();
-        }
+            });
+        });
 
-        if (MainThread.IsMainThread)
-            _updateRow0Layout();
-        else
-            MainThread.BeginInvokeOnMainThread(_updateRow0Layout);
     }
 
     #endregion Protected Methods
@@ -438,11 +419,15 @@ public partial class CheckBoxField : BaseFormField<bool?>
 
     public override void Field_Unfocus()
     {
-        base.Field_Unfocus();
-        _checkBox?.Unfocus();
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                base.Field_Unfocus();
+                _checkBox?.Unfocus();
+            });
+        });
     }
-
-    public bool? GetCurrentValue() => _checkBox?.IsChecked == true ? true : _checkBox?.IsEnabled == false ? null : false;
 
     #endregion Public Methods
 }

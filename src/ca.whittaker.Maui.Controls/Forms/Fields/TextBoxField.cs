@@ -9,7 +9,6 @@ public partial class TextBoxField : BaseFormField<string>
 {
     #region Fields
 
-
     private Entry _textBox;
 
     public static readonly BindableProperty TextBoxAllLowerCaseProperty = BindableProperty.Create(
@@ -61,11 +60,13 @@ public partial class TextBoxField : BaseFormField<string>
         _textBox.IsEnabled = false;
         _textBox.ReturnCommand = new Command(TextBox_ReturnPressedCommand);
         _textBox.TextChanged += TextBox_TextChanged;
-        _textBox.Focused += Field_Focused;
-        _textBox.Unfocused += Field_Unfocused;
+
+        Field_WireFocusEvents(_textBox);
 
         TextBox_SetPlaceholderText(TextBoxPlaceholder);
         TextBox_SetMaxLength(TextBoxMaxLength);
+
+        Field_InitializeDataSource();
 
         InitializeLayout();
     }
@@ -85,7 +86,6 @@ public partial class TextBoxField : BaseFormField<string>
         get => (bool)GetValue(TextBoxAllowWhiteSpaceProperty);
         set => SetValue(TextBoxAllowWhiteSpaceProperty, value);
     }
-
 
     public TextBoxDataTypeEnum TextBoxDataType
     {
@@ -113,17 +113,49 @@ public partial class TextBoxField : BaseFormField<string>
 
     #region Private Methods
 
-    private void OnTextBoxDataTypeChanged(object newValue) =>
-        _textBox.Keyboard = TextBox_GetKeyboardForFieldType((TextBoxDataTypeEnum)newValue);
+    private void OnTextBoxDataTypeChanged(object newValue)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _textBox.Keyboard = TextBox_GetKeyboardForFieldType((TextBoxDataTypeEnum)newValue);
+            });
+        });
+    }
 
-    private void OnTextBoxMaxLengthPropertyChanged(object newValue) =>
-        _textBox.MaxLength = (int)newValue;
+    private void OnTextBoxMaxLengthPropertyChanged(object newValue)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _textBox.MaxLength = (int)newValue;
+            });
+        });
+    }
 
-    private void OnTextBoxPlaceholderPropertyChanged(object newValue) =>
-        _textBox.Placeholder = newValue?.ToString() ?? "";
+    private void OnTextBoxPlaceholderPropertyChanged(object newValue)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _textBox.Placeholder = newValue?.ToString() ?? "";
+            });
+        });
+    }
 
-    private void TextBox_ConfigureKeyboard() =>
-        _textBox.Keyboard = TextBox_GetKeyboardForFieldType(TextBoxDataType);
+    private void TextBox_ConfigureKeyboard()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _textBox.Keyboard = TextBox_GetKeyboardForFieldType(TextBoxDataType);
+            });
+        });
+    }
 
     private Keyboard TextBox_GetKeyboardForFieldType(TextBoxDataTypeEnum fieldType) =>
         fieldType switch
@@ -160,8 +192,16 @@ public partial class TextBoxField : BaseFormField<string>
                                     )
                                 );
         if (_textBox.Text != filteredValue)
-            _textBox.Text = filteredValue;
-        FieldDataSource = filteredValue;
+        {
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    _textBox.Text = filteredValue;
+                });
+            });
+        }
+        Field_SetDataSourceValue(filteredValue);
     }
 
     private void TextBox_ReturnPressedCommand(object obj)
@@ -172,16 +212,25 @@ public partial class TextBoxField : BaseFormField<string>
 
     private void TextBox_SetMaxLength(object newValue)
     {
-        if (newValue != null)
-            _textBox.MaxLength = (int)newValue;
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                if (newValue != null)
+                    _textBox.MaxLength = (int)newValue;
+            });
+        });
     }
 
-    private void TextBox_SetPlaceholderText(object newValue) =>
-        _textBox.Placeholder = newValue == null ? "" : (string)newValue;
-
-    private void TextBox_SetValue(string? value)
+    private void TextBox_SetPlaceholderText(object newValue)
     {
-        _textBox.Text = value ?? String.Empty;
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _textBox.Placeholder = newValue == null ? "" : (string)newValue;
+            });
+        });
     }
 
     private void TextBox_TextChanged(object? sender, TextChangedEventArgs e)
@@ -215,11 +264,13 @@ public partial class TextBoxField : BaseFormField<string>
         };
         grid.Add(FieldLabel, 0, 0);
         grid.Add(_textBox, 1, 0);
-        grid.Add(ButtonUndo, 2, 0);
+        grid.Add(FieldButtonUndo, 2, 0);
         grid.Add(FieldNotification, 0, 1);
         grid.SetColumnSpan(FieldNotification, 3);
         return grid;
     }
+
+    protected override string? Field_GetCurrentValue() => _textBox.Text;
 
     protected override string Field_GetFormatErrorMessage() =>
                 TextBoxDataType switch
@@ -243,7 +294,7 @@ public partial class TextBoxField : BaseFormField<string>
 
     protected override bool Field_HasFormatError()
     {
-        if (String.IsNullOrEmpty(GetCurrentValue()))
+        if (String.IsNullOrEmpty(Field_GetCurrentValue()))
             return Field_HasRequiredError();
         if (TextBoxDataType == TextBoxDataTypeEnum.Email && !InputValidator.IsValidEmail(_textBox.Text))
             return true;
@@ -264,27 +315,25 @@ public partial class TextBoxField : BaseFormField<string>
         return false;
     }
 
-    protected override bool Field_HasRequiredError() =>
-                FieldMandatory && string.IsNullOrEmpty(_textBox.Text);
-
-    protected override void Field_OriginalValue_Reset()
-    {
-        TextBox_SetValue(FieldOriginalValue);
-    }
+    protected override bool Field_HasRequiredError() => FieldMandatory && string.IsNullOrEmpty(_textBox.Text);
 
     protected override void Field_OriginalValue_SetToClear()
     {
         FieldOriginalValue = String.Empty;
-        TextBox_SetValue(FieldOriginalValue);
+        Field_SetValue(FieldOriginalValue);
     }
 
-    protected override void Field_OriginalValue_SetToCurrentValue()
+
+    protected override void Field_SetValue(string? value)
     {
-        FieldOriginalValue = GetCurrentValue();
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                _textBox.Text = value ?? String.Empty;
+            });
+        });
     }
-
-    protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue)
-    { }
 
     protected override void OnParentSet()
     {
@@ -294,42 +343,38 @@ public partial class TextBoxField : BaseFormField<string>
     // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
     protected override void UpdateRow0Layout()
     {
-        void _updateRow0Layout()
+        UiThreadHelper.RunOnMainThread(() =>
         {
-            BatchBegin();
-            if (_textBox!.Parent is Grid grid)
+            Field_PerformBatchUpdate(() =>
             {
-                bool isFieldLabelVisible = FieldLabelVisible;
-                bool isButtonUndoVisible = FieldUndoButtonVisible;
+                if (_textBox!.Parent is Grid grid)
+                {
+                    bool isFieldLabelVisible = FieldLabelVisible;
+                    bool isButtonUndoVisible = FieldUndoButtonVisible;
 
-                if (isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_textBox!, 1);
-                    Grid.SetColumnSpan(_textBox!, 1);
+                    if (isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_textBox!, 1);
+                        Grid.SetColumnSpan(_textBox!, 1);
+                    }
+                    else if (isFieldLabelVisible && !isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_textBox!, 1);
+                        Grid.SetColumnSpan(_textBox!, 2);
+                    }
+                    else if (!isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_textBox!, 0);
+                        Grid.SetColumnSpan(_textBox!, 2);
+                    }
+                    else // both not visible
+                    {
+                        Grid.SetColumn(_textBox!, 0);
+                        Grid.SetColumnSpan(_textBox!, 3);
+                    }
                 }
-                else if (isFieldLabelVisible && !isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_textBox!, 1);
-                    Grid.SetColumnSpan(_textBox!, 2);
-                }
-                else if (!isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_textBox!, 0);
-                    Grid.SetColumnSpan(_textBox!, 2);
-                }
-                else // both not visible
-                {
-                    Grid.SetColumn(_textBox!, 0);
-                    Grid.SetColumnSpan(_textBox!, 3);
-                }
-            }
-            BatchCommit();
-        }
-
-        if (MainThread.IsMainThread)
-            _updateRow0Layout();
-        else
-            MainThread.BeginInvokeOnMainThread(_updateRow0Layout);
+            });
+        });
     }
 
     #endregion Protected Methods
@@ -338,11 +383,15 @@ public partial class TextBoxField : BaseFormField<string>
 
     public override void Field_Unfocus()
     {
-        base.Field_Unfocus();
-        _textBox?.Unfocus();
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                base.Field_Unfocus();
+                _textBox?.Unfocus();
+            });
+        });
     }
-
-    public string GetCurrentValue() => _textBox.Text;
 
     #endregion Public Methods
 }

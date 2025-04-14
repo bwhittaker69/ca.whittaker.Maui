@@ -19,6 +19,7 @@
                         FormName="{x:Static strings:AppResources.Form_UserProfile_TItle}"
                         FormSaveButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Save}"
                         FormCancelButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Cancel}"
+                        FormAccessMode="Editing"
                         Command="{Binding FormSaveCommand}" 
                         Padding="10"
                         HorizontalOptions="Fill"
@@ -27,8 +28,10 @@
                 <Label Text="{Binding Userprofile_nickname}"></Label>
                 <Label Text="{Binding Userprofile_userid}"></Label>
                 <Label Text="{Binding Userprofile_country}"></Label>
+                <Label Text="{Binding Userprofile_date}"></Label>
 
                 <Forms:DateMonthYearField FieldLabelText="Date"
+                                          FieldDataSource="{Binding Userprofile_date}"
                                           FieldLabelWidth="150"
                                           FieldLabelVisible="True"
                                           FieldUndoButtonVisible="True"
@@ -36,6 +39,7 @@
                                           >
                 </Forms:DateMonthYearField>
                 <Forms:DateField     FieldLabelText="Date"
+                                     FieldDataSource="{Binding Userprofile_date}"
                                      FieldLabelWidth="150"
                                      FieldLabelVisible="True"
                                      FieldUndoButtonVisible="True"
@@ -63,7 +67,37 @@
                                      FieldMandatory="True"
                                      FieldLabelText="{x:Static strings:AppResources.Field_Country}">
                 </Forms:DropdownField>
-
+                <Forms:TextBoxField     FieldDataSource="{Binding Userprofile_email}"
+                                        TextBoxMaxLength="40"
+                                        TextBoxDataType="Email"
+                                        TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}"
+                                        FieldLabelWidth="150"
+                                        FieldLabelText="{x:Static strings:AppResources.Field_Email}"
+                                        FieldMandatory="False">
+                </Forms:TextBoxField>
+                <Forms:EditorField      FieldDataSource="{Binding Userprofile_email}"
+                                        EditorMaxSize="1000"
+                                        EditorRowCount="10"
+                                        EditorDataType="Richtext"
+                                        EditorPlaceholder="{x:Static strings:AppResources.Field_Name_Placeholder}"
+                                        FieldLabelWidth="150"
+                                        FieldLabelText="{x:Static strings:AppResources.Field_Name}"
+                                        FieldMandatory="False">
+                </Forms:EditorField>
+                <Forms:TextBoxField     FieldDataSource="{Binding Userprofile_bio}"
+                                        TextBoxMaxLength="50"
+                                        TextBoxPlaceholder="{x:Static strings:AppResources.Field_Bio_Placeholder}"
+                                        FieldLabelWidth="150"
+                                        FieldLabelText="{x:Static strings:AppResources.Field_Bio}">
+                </Forms:TextBoxField>
+                <Forms:CheckBoxField FieldDataSource="{Binding Userprofile_ispublic}"
+                                     CheckBoxDataType="TriState"
+                                     FieldLabelWidth="150"
+                                     FieldLabelVisible="False"
+                                     FieldUndoButtonVisible="True"
+                                     FieldMandatory="False"
+                                     FieldLabelText="{x:Static strings:AppResources.Field_IsPublic}">
+                </Forms:CheckBoxField>
             </VerticalStackLayout>
 
         </Forms:Form>

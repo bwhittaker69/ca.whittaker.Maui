@@ -7,9 +7,7 @@ public partial class DateField : BaseFormField<DateTimeOffset?>
 {
     #region Fields
 
-
     private DatePicker _datePicker;
-
 
     #endregion Fields
 
@@ -23,29 +21,30 @@ public partial class DateField : BaseFormField<DateTimeOffset?>
         };
         _datePicker.IsEnabled = false;
         _datePicker.DateSelected += DatePicker_DateSelected;
-        _datePicker.Focused += Field_Focused;   
-        _datePicker.Unfocused += Field_Unfocused;
+        Field_WireFocusEvents(_datePicker);
+
+        Field_InitializeDataSource();
 
         InitializeLayout();
     }
 
     #endregion Public Constructors
 
-
     #region Private Methods
-
 
     private void Date_ProcessAndSet(DateTimeOffset? newDate)
     {
         if (_datePicker.Date != newDate)
-            _datePicker.Date = newDate.HasValue ? newDate.Value.DateTime : DateTime.MinValue;
-        FieldDataSource = new DateTimeOffset(_datePicker.Date, TimeSpan.Zero); 
-    }
-
-    private void Date_SetValue(DateTimeOffset? value)
-    {
-        if (_datePicker.Date != value)
-            _datePicker.Date = value.HasValue ? value.Value.DateTime : DateTime.MinValue;
+        {
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    _datePicker.Date = newDate.HasValue ? newDate.Value.DateTime : DateTime.MinValue;
+                });
+            });
+        }
+        Field_SetDataSourceValue(new DateTimeOffset(_datePicker.Date, TimeSpan.Zero));
     }
 
     private void DatePicker_DateSelected(object? sender, DateChangedEventArgs e)
@@ -79,11 +78,13 @@ public partial class DateField : BaseFormField<DateTimeOffset?>
         };
         grid.Add(FieldLabel, 0, 0);
         grid.Add(_datePicker, 1, 0);
-        grid.Add(ButtonUndo, 2, 0);
+        grid.Add(FieldButtonUndo, 2, 0);
         grid.Add(FieldNotification, 0, 1);
         grid.SetColumnSpan(FieldNotification, 3);
         return grid;
     }
+
+    protected override DateTimeOffset? Field_GetCurrentValue() => _datePicker.Date;
 
     protected override string Field_GetFormatErrorMessage() => String.Empty;
 
@@ -101,69 +102,54 @@ public partial class DateField : BaseFormField<DateTimeOffset?>
     protected override bool Field_HasRequiredError() =>
                 FieldMandatory && _datePicker == null;
 
-    protected override void Field_OriginalValue_Reset()
+    protected override void Field_SetValue(DateTimeOffset? value)
     {
-        Date_SetValue(FieldOriginalValue);
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                if (_datePicker.Date != value)
+                    _datePicker.Date = value.HasValue ? value.Value.DateTime : DateTime.MinValue;
+            });
+        });
     }
 
-    protected override void Field_OriginalValue_SetToClear()
-    {
-        FieldOriginalValue = null;
-        Date_SetValue(FieldOriginalValue);
-    }
-
-    protected override void Field_OriginalValue_SetToCurrentValue()
-    {
-        FieldOriginalValue = GetCurrentValue();
-    }
-
-    protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue)
-    { }
-
-    protected override void OnParentSet()
-    {
-        base.OnParentSet();
-    }
 
     // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
     protected override void UpdateRow0Layout()
     {
-        void _updateRow0Layout()
+        UiThreadHelper.RunOnMainThread(() =>
         {
-            BatchBegin();
-            if (_datePicker!.Parent is Grid grid)
+            Field_PerformBatchUpdate(() =>
             {
-                bool isFieldLabelVisible = FieldLabelVisible;
-                bool isButtonUndoVisible = FieldUndoButtonVisible;
+                if (_datePicker!.Parent is Grid grid)
+                {
+                    bool isFieldLabelVisible = FieldLabelVisible;
+                    bool isButtonUndoVisible = FieldUndoButtonVisible;
 
-                if (isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_datePicker!, 1);
-                    Grid.SetColumnSpan(_datePicker!, 1);
+                    if (isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_datePicker!, 1);
+                        Grid.SetColumnSpan(_datePicker!, 1);
+                    }
+                    else if (isFieldLabelVisible && !isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_datePicker!, 1);
+                        Grid.SetColumnSpan(_datePicker!, 2);
+                    }
+                    else if (!isFieldLabelVisible && isButtonUndoVisible)
+                    {
+                        Grid.SetColumn(_datePicker!, 0);
+                        Grid.SetColumnSpan(_datePicker!, 2);
+                    }
+                    else // both not visible
+                    {
+                        Grid.SetColumn(_datePicker!, 0);
+                        Grid.SetColumnSpan(_datePicker!, 3);
+                    }
                 }
-                else if (isFieldLabelVisible && !isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_datePicker!, 1);
-                    Grid.SetColumnSpan(_datePicker!, 2);
-                }
-                else if (!isFieldLabelVisible && isButtonUndoVisible)
-                {
-                    Grid.SetColumn(_datePicker!, 0);
-                    Grid.SetColumnSpan(_datePicker!, 2);
-                }
-                else // both not visible
-                {
-                    Grid.SetColumn(_datePicker!, 0);
-                    Grid.SetColumnSpan(_datePicker!, 3);
-                }
-            }
-            BatchCommit();
-        }
-
-        if (MainThread.IsMainThread)
-            _updateRow0Layout();
-        else
-            MainThread.BeginInvokeOnMainThread(_updateRow0Layout);
+            });
+        });
     }
 
     #endregion Protected Methods
@@ -172,11 +158,15 @@ public partial class DateField : BaseFormField<DateTimeOffset?>
 
     public override void Field_Unfocus()
     {
-        base.Field_Unfocus();
-        _datePicker?.Unfocus();
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_PerformBatchUpdate(() =>
+            {
+                base.Field_Unfocus();
+                _datePicker?.Unfocus();
+            });
+        });
     }
-
-    public DateTimeOffset? GetCurrentValue() => _datePicker.Date;
 
     #endregion Public Methods
 }
