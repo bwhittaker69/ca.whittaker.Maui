@@ -6,6 +6,17 @@ namespace ca.whittaker.Maui.Controls.Forms;
 
 public interface IBaseFormField
 {
+
+    #region Events
+
+    event EventHandler<HasChangesEventArgs>? FieldHasChanges;
+
+    event EventHandler<ValidationDataChangesEventArgs>? FieldHasValidationChanges;
+
+    #endregion Events
+
+    #region Properties
+
     FieldAccessModeEnum FieldAccessMode { get; set; }
     ChangeStateEnum FieldChangeState { get; set; }
     ICommand FieldCommand { get; set; }
@@ -22,8 +33,9 @@ public interface IBaseFormField
     LayoutOptions HorizontalOptions { get; set; }
     LayoutOptions VerticalOptions { get; set; }
 
-    event EventHandler<HasChangesEventArgs>? FieldHasChanges;
-    event EventHandler<ValidationDataChangesEventArgs>? FieldHasValidationChanges;
+    #endregion Properties
+
+    #region Public Methods
 
     void Field_Clear();
     void Field_Focused(object? sender, FocusEventArgs e);
@@ -34,6 +46,9 @@ public interface IBaseFormField
     void Field_Unfocused(object? sender, FocusEventArgs e);
     void Field_UpdateLabelWidth(double newWidth);
     void Field_UpdateWidth(double newWidth);
+
+    #endregion Public Methods
+
 }
 
 
@@ -45,28 +60,11 @@ public interface IBaseFormField
 public abstract class BaseFormField<T> : ContentView, IBaseFormField
 {
 
-    public T? FieldLastValue = default(T);
-    public T? FieldOriginalValue = default(T);
-
-    public static readonly BindableProperty FieldDataSourceProperty = BindableProperty.Create(
-        propertyName: nameof(FieldDataSource),
-        returnType: typeof(T?),
-        declaringType: typeof(BaseFormField<T?>),
-        defaultValue: default(T),
-        defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: (bindable, oldValue, newValue) => { ((BaseFormField<T?>)bindable).OnFieldDataSourcePropertyChanged(newValue, oldValue); });
-
-    public T? FieldDataSource
-    {
-        get => (T?)GetValue(FieldDataSourceProperty);
-        set => SetValue(FieldDataSourceProperty, value);
-    }
     #region Fields
 
     private bool _fieldEvaluateToRaiseHasChangesEventing = false;
     private bool _previousFieldHasInvalidData = false;
     private ValidationStateEnum _previousFieldValidationState;
-
     protected const SizeEnum DefaultButtonSize = SizeEnum.XXSmall;
     protected bool _fieldDisabling = false;
     protected bool _fieldEnabling = false;
@@ -101,6 +99,14 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         propertyName: nameof(FieldCommand),
         returnType: typeof(ICommand),
         declaringType: typeof(Form));
+
+    public static readonly BindableProperty FieldDataSourceProperty = BindableProperty.Create(
+        propertyName: nameof(FieldDataSource),
+        returnType: typeof(T?),
+        declaringType: typeof(BaseFormField<T?>),
+        defaultValue: default(T?),
+        defaultBindingMode: BindingMode.TwoWay,
+        propertyChanged: (bindable, oldValue, newValue) => { ((BaseFormField<T?>)bindable).OnFieldDataSourcePropertyChanged(newValue, oldValue); });
 
     public static readonly BindableProperty FieldEnabledProperty = BindableProperty.Create(
         propertyName: nameof(FieldEnabled),
@@ -169,7 +175,9 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
 
     public UndoButton? ButtonUndo;
     public Label? FieldLabel;
+    public T? FieldLastValue = default(T);
     public Label? FieldNotification;
+    public T? FieldOriginalValue = default(T);
 
     #endregion Fields
 
@@ -186,7 +194,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     #endregion Public Constructors
 
     #region Events
-    protected void InitializeLayout() { }
+
     public event EventHandler<HasChangesEventArgs>? FieldHasChanges;
 
     public event EventHandler<ValidationDataChangesEventArgs>? FieldHasValidationChanges;
@@ -195,9 +203,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
 
     #region Properties
 
-    public void Field_Focused(object? sender, FocusEventArgs e) { }
-
-    public void Field_Unfocused(object? sender, FocusEventArgs e) { }
     public FieldAccessModeEnum FieldAccessMode
     {
         get => (FieldAccessModeEnum)GetValue(FieldAccessModeProperty);
@@ -222,6 +227,11 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         set => SetValue(FieldCommandParameterProperty, value);
     }
 
+    public T? FieldDataSource
+    {
+        get => (T?)GetValue(FieldDataSourceProperty);
+        set => SetValue(FieldDataSourceProperty, value);
+    }
     public bool FieldEnabled
     {
         get => (bool)GetValue(FieldEnabledProperty);
@@ -627,6 +637,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         if (ButtonUndo != null) ButtonUndo.Hide();
     }
 
+    protected void InitializeLayout() { }
     /// <summary>
     /// Called whenever the data source for a derived field changes. Derived classes typically handle type-specific logic here.
     /// </summary>
@@ -665,6 +676,8 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         Field_Unfocus();
     }
 
+    public void Field_Focused(object? sender, FocusEventArgs e) { }
+
     public void Field_NotifyHasChanges(bool hasChanged) =>
         FieldHasChanges?.Invoke(this, new HasChangesEventArgs(hasChanged));
 
@@ -681,6 +694,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
 
     public virtual void Field_Unfocus() => base.Unfocus();
 
+    public void Field_Unfocused(object? sender, FocusEventArgs e) { }
     public void Field_UpdateLabelWidth(double newWidth)
     {
         if (Content is Grid grid && grid.ColumnDefinitions.Count > 0)

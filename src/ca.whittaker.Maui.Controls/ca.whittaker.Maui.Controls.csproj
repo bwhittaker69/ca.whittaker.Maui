@@ -39,8 +39,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls.Core"  Version="9.0.0"/>
-		<PackageReference Include="Microsoft.Maui.Core"  Version="9.0.0"/>
+		<PackageReference Include="Microsoft.Maui.Controls.Core" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Maui.Core" Version="9.0.0" />
 	</ItemGroup>
 
 </Project>
