@@ -9,64 +9,18 @@ using System.Runtime.CompilerServices;
 
 namespace ca.whittaker.Maui.Controls.Forms
 {
-    public interface IBaseFormField
-    {
-        #region Events
 
-        event EventHandler<HasChangesEventArgs>? FieldHasChanges;
 
-        event EventHandler<ValidationDataChangesEventArgs>? FieldHasValidationChanges;
-
-        #endregion Events
-
-        #region Properties
-
-        FieldAccessModeEnum FieldAccessMode { get; set; }
-        ChangeStateEnum FieldChangeState { get; set; }
-        ICommand FieldCommand { get; set; }
-        object FieldCommandParameter { get; set; }
-        bool FieldEnabled { get; set; }
-        string FieldLabelText { get; set; }
-        bool FieldLabelVisible { get; set; }
-        double FieldLabelWidth { get; set; }
-        bool FieldMandatory { get; set; }
-        bool FieldReadOnly { get; set; }
-        bool FieldUndoButtonVisible { get; set; }
-        ValidationStateEnum FieldValidationState { get; set; }
-        double FieldWidth { get; set; }
-        LayoutOptions HorizontalOptions { get; set; }
-        LayoutOptions VerticalOptions { get; set; }
-
-        #endregion Properties
-
-        #region Public Methods
-
-        void Field_Clear();
-
-        void Field_NotifyHasChanges(bool hasChanged);
-
-        void Field_NotifyValidationChanges(bool isValid);
-
-        void Field_SaveAndMarkAsReadOnly();
-
-        void Field_Unfocus();
-
-        void Field_UpdateLabelWidth(double newWidth);
-
-        void Field_UpdateWidth(double newWidth);
-
-        #endregion Public Methods
-    }
 
     /// <summary>
     /// Represents the base class for customizable data capture controls.
     /// </summary>
-    public abstract class BaseFormField : ContentView, IBaseFormField
+    public abstract class BaseFormField : ContentView
     {
+
         #region Fields
 
         private bool _fieldEvaluateToRaiseHasChangesEventing = false;
-        private bool _fieldUndoing = false;
         private bool _previousFieldHasInvalidData = false;
         private ValidationStateEnum _previousFieldValidationState;
 
@@ -189,7 +143,7 @@ namespace ca.whittaker.Maui.Controls.Forms
         #endregion Public Constructors
 
         #region Events
-
+        protected void InitializeLayout() { }
         public event EventHandler<HasChangesEventArgs>? FieldHasChanges;
 
         public event EventHandler<ValidationDataChangesEventArgs>? FieldHasValidationChanges;
@@ -198,6 +152,9 @@ namespace ca.whittaker.Maui.Controls.Forms
 
         #region Properties
 
+        public void Field_Focused(object? sender, FocusEventArgs e) { }
+
+        public void Field_Unfocused(object? sender, FocusEventArgs e) { }
         public FieldAccessModeEnum FieldAccessMode
         {
             get => (FieldAccessModeEnum)GetValue(FieldAccessModeProperty);
@@ -460,7 +417,6 @@ namespace ca.whittaker.Maui.Controls.Forms
             Debug.WriteLine($"{FieldLabelText} : OnFieldButtonUndoPressed() - attempt revert");
             if (FieldAccessMode == FieldAccessModeEnum.Editing)
             {
-                _fieldUndoing = true;
                 try
                 {
                     Field_OriginalValue_Reset();
@@ -469,7 +425,6 @@ namespace ca.whittaker.Maui.Controls.Forms
                 }
                 finally
                 {
-                    _fieldUndoing = false;
                 }
             }
         }
@@ -699,5 +654,6 @@ namespace ca.whittaker.Maui.Controls.Forms
         }
 
         #endregion Public Methods
+
     }
 }
