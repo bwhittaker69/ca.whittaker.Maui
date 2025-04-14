@@ -1,11 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui;
-using Microsoft.Maui.Graphics;
-using Microsoft.Maui.ApplicationModel;
-
-using System.ComponentModel.DataAnnotations;
-
-namespace ca.whittaker.Maui.Controls.Gestures;
+﻿namespace ca.whittaker.Maui.Controls.Gestures;
 public class PanUpDownContainer : ContentView
 {
     double panY;

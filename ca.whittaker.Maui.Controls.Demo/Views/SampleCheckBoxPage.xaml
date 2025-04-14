@@ -21,7 +21,7 @@
 
             <Forms:CheckBoxField FieldLabelWidth="150"
                                 x:Name="CheckBox_IsPublic"
-                                CheckBoxDataSource="{Binding Userprofile_ispublic}"
+                                FieldDataSource="{Binding Userprofile_ispublic}"
                                 FieldLabelText="{x:Static strings:AppResources.Field_IsPublic}">
             </Forms:CheckBoxField>
 

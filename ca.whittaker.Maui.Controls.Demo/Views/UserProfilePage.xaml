@@ -32,7 +32,7 @@
                     
                     <Forms:TextBoxField 
                                         FieldLabelWidth="70"
-                                        TextBoxDataSource="{Binding Userprofile_nickname}"
+                                        FieldDataSource="{Binding Userprofile_nickname}"
                                         FieldLabelText="{x:Static strings:AppResources.Field_Name}"
                                         TextBoxMaxLength="40"
                                         TextBoxPlaceholder="{x:Static strings:AppResources.Field_Name_Placeholder}">

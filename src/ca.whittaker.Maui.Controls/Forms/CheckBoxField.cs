@@ -1,14 +1,5 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui;
-using Microsoft.Maui.Graphics;
-using Microsoft.Maui.ApplicationModel;
-using ca.whittaker.Maui.Controls.Buttons;
-using System.Text.RegularExpressions;
-using Entry = Microsoft.Maui.Controls.Entry;
-using Label = Microsoft.Maui.Controls.Label;
-using System.Windows.Input;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Diagnostics;
 using static ca.whittaker.Maui.Controls.Forms.CheckBoxField;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -63,23 +54,14 @@ public static class CheckedStateEnumExtensions
 /// This composite control supports boolean value capture, change tracking, and validation.
 /// </para>
 /// </summary>
-public partial class CheckBoxField : BaseFormField
+public partial class CheckBoxField : BaseFormField<bool?>
 {
     #region Fields
 
     private Microsoft.Maui.Controls.CheckBox? _checkBox;
     private TapGestureRecognizer _checkBoxOverlay;
     private ContentView _checkBoxTapOverlay;
-    private CheckedStateEnum _lastValue = CheckedStateEnum.NotSet;
-    private CheckedStateEnum _originalValue = CheckedStateEnum.NotSet;
 
-    public static readonly BindableProperty CheckBoxDataSourceProperty = BindableProperty.Create(
-        propertyName: nameof(CheckBoxDataSource),
-        returnType: typeof(bool?),
-        declaringType: typeof(CheckBoxField),
-        defaultValue: null,
-        defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: (bindable, oldValue, newValue) => { ((CheckBoxField)bindable).OnDataSourcePropertyChanged(newValue, oldValue); });
 
     public static readonly BindableProperty CheckBoxDataTypeSourceProperty = BindableProperty.Create(
         propertyName: nameof(CheckBoxDataType),
@@ -143,11 +125,6 @@ public partial class CheckBoxField : BaseFormField
 
     #region Properties
 
-    public bool? CheckBoxDataSource
-    {
-        get => (bool?)GetValue(CheckBoxDataSourceProperty);
-        set => SetValue(CheckBoxDataSourceProperty, value);
-    }
 
     public CheckBoxDataTypeEnum CheckBoxDataType
     {
@@ -175,7 +152,7 @@ public partial class CheckBoxField : BaseFormField
             BatchBegin();
             _checkBox!.IsEnabled = true;
             _checkBox!.IsChecked = true;
-            if (CheckBoxDataSource != true) CheckBoxDataSource = true;
+            if (FieldDataSource != true) FieldDataSource = true;
             BatchCommit();
         }
 
@@ -192,7 +169,7 @@ public partial class CheckBoxField : BaseFormField
             BatchBegin();
             _checkBox!.IsEnabled = false;
             _checkBox!.IsChecked = false;
-            if (CheckBoxDataSource != null) CheckBoxDataSource = null;
+            if (FieldDataSource != null) FieldDataSource = null;
             BatchCommit();
         }
 
@@ -244,7 +221,7 @@ public partial class CheckBoxField : BaseFormField
             BatchBegin();
             _checkBox!.IsEnabled = true;
             _checkBox!.IsChecked = false;
-            if (CheckBoxDataSource != false) CheckBoxDataSource = false;
+            if (FieldDataSource != false) FieldDataSource = false;
             BatchCommit();
         }
 
@@ -361,12 +338,12 @@ public partial class CheckBoxField : BaseFormField
 
     protected override bool Field_HasChangedFromLast()
     {
-        return _lastValue != CheckBox_GetState();
+        return FieldLastValue.FromNullableBoolean() != CheckBox_GetState();
     }
 
     protected override bool Field_HasChangedFromOriginal()
     {
-        return _originalValue != CheckBox_GetState();
+        return FieldOriginalValue.FromNullableBoolean() != CheckBox_GetState();
     }
 
     protected override bool Field_HasFormatError()
@@ -386,27 +363,27 @@ public partial class CheckBoxField : BaseFormField
 
     protected override void Field_OriginalValue_Reset()
     {
-        CheckBox_SetState(_originalValue);
+        CheckBox_SetState(FieldOriginalValue.FromNullableBoolean());
     }
 
     protected override void Field_OriginalValue_SetToClear()
     {
-        _originalValue = FieldMandatory ? CheckedStateEnum.UnChecked : CheckedStateEnum.NotSet;
+        FieldOriginalValue = (FieldMandatory ? CheckedStateEnum.UnChecked : CheckedStateEnum.NotSet).ToNullableBoolean();
     }
 
     protected override void Field_OriginalValue_SetToCurrentValue()
     {
-        _originalValue = GetCurrentValue().FromNullableBoolean();
+        FieldOriginalValue = GetCurrentValue();
     }
 
-    protected override void OnDataSourcePropertyChanged(object newValue, object oldValue)
+    protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue)
     {
     }
 
     protected override void OnParentSet()
     {
         base.OnParentSet();
-        CheckBox_SetState(CheckBoxDataSource.FromNullableBoolean());
+        CheckBox_SetState(FieldDataSource.FromNullableBoolean());
     }
 
     protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")

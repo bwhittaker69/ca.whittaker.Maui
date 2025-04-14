@@ -42,7 +42,7 @@
                                      FieldMandatory="True"
                                      >
                 </Forms:DateField>
-                <Forms:DropdownField DropdownDataSource="{Binding Userprofile_userid}"
+                <Forms:DropdownField FieldDataSource="{Binding Userprofile_userid}"
                                      DropdownPlaceholder="enum test"
                                      DropdownItemsSource="{Binding Userprofile_users}"
                                      FieldLabelWidth="150"
@@ -54,7 +54,7 @@
                                      DropdownItemsSourcePrimaryKey="UserId"
                                      >
                 </Forms:DropdownField>
-                <Forms:DropdownField DropdownDataSource="{Binding Userprofile_country}"
+                <Forms:DropdownField FieldDataSource="{Binding Userprofile_country}"
                                      DropdownPlaceholder="{x:Static strings:AppResources.Field_Country_Placeholder}"
                                      DropdownItemsSource="{x:Static strings:AppResources.Field_Country_Items}"
                                      FieldLabelWidth="150"

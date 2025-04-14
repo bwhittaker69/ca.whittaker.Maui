@@ -1,9 +1,4 @@
-﻿using Microsoft.Maui;
-using Microsoft.Maui.Devices;
-using Microsoft.Maui.Controls;
-using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace ca.whittaker.Maui.Controls.Gestures;
 

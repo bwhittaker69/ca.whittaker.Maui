@@ -1,9 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui;
-using Microsoft.Maui.Graphics;
-using Microsoft.Maui.ApplicationModel;
-
-namespace ca.whittaker.Maui.Controls.Gestures;
+﻿namespace ca.whittaker.Maui.Controls.Gestures;
 public class SwipeDownContainer : ContentView
 {
     public event EventHandler<SwipedEventArgs>? SwipeUp;

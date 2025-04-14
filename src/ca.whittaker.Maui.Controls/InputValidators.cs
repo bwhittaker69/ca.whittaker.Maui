@@ -97,44 +97,44 @@ namespace ca.whittaker.Maui.Controls
 
         // Removes disallowed characters from email strings.
         public static string FilterEmailFilter(bool filter, string text) =>
-            filter ? emailFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? emailFilterRegex.Replace((text ?? string.Empty), "") : text ?? string.Empty;
 
         // Removes disallowed characters from username strings.
         public static string FilterUsernameFilter(bool filter, string text) =>
-            filter ? usernameFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? usernameFilterRegex.Replace((text ?? string.Empty), "") : text ?? string.Empty;
 
         // Filters URL string to only allow alphanumeric characters, period, forward slash, and colons.
         public static string FilterUrlFilter(bool filter, string text) =>
-            filter ? urlFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? urlFilterRegex.Replace((text ?? string.Empty), "") : text ?? string.Empty;
 
         // Filters numeric string by removing any characters not digits, period, or minus sign.
         public static string FilterNumeric(bool filter, string text) =>
-            filter ? numericFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? numericFilterRegex.Replace((text ?? string.Empty), "") : text ?? string.Empty;
 
         // Filters integer string by removing any characters not digits or minus sign.
         public static string FilterInteger(bool filter, string text) =>
-            filter ? integerFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? integerFilterRegex.Replace((text ?? string.Empty), "") : text ?? string.Empty;
 
         // Filters currency string by removing any characters not digits, comma, period, minus sign, or '$'.
         public static string FilterCurrency(bool filter, string text) =>
-            filter ? currencyFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? currencyFilterRegex.Replace((text ?? string.Empty), "") : text ?? string.Empty;
 
         // Filters plain text by removing any characters not in the allowed ASCII range.
         public static string FilterPlaintext(bool filter, string text) =>
-            filter ? plainTextFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? plainTextFilterRegex.Replace((text ?? string.Empty), "") : text ?? string.Empty;
 
         // Filters rich text by removing control characters.
         public static string FilterRichtext(bool filter, string text) =>
-            filter ? richTextFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? richTextFilterRegex.Replace((text ?? string.Empty), "") : text ?? string.Empty;
 
         // Filters text to a single line by removing linebreaks and carriage returns.
         public static string FilterSingleLine(bool filter, string text) =>
-            filter ? singleLineFilterRegex.Replace(text, "") : text ?? string.Empty;
+            filter ? singleLineFilterRegex.Replace(text ?? string.Empty, "") : text ?? string.Empty;
 
         public static string FilterAllLowercase(bool filter, string text) =>
-            filter ? text.ToLower() : text ?? string.Empty;
+            filter ? (text ?? string.Empty).ToLower() : text ?? string.Empty;
 
         public static string FilterAllowWhiteSpace(bool filter, string text) =>
-            filter ? text.Replace(" ", "") : text ?? string.Empty;
+            filter ? (text ?? string.Empty).Replace(" ", "") : text ?? string.Empty;
     }
 }
