@@ -65,7 +65,6 @@ public partial class CheckBoxField : BaseFormField<bool?>
     private TapGestureRecognizer _checkBoxOverlay;
     private ContentView _checkBoxTapOverlay;
 
-
     public static readonly BindableProperty CheckBoxDataTypeSourceProperty = BindableProperty.Create(
         propertyName: nameof(CheckBoxDataType),
         returnType: typeof(CheckBoxDataTypeEnum),
@@ -359,11 +358,11 @@ public partial class CheckBoxField : BaseFormField<bool?>
         FieldOriginalValue = (FieldMandatory ? CheckedStateEnum.UnChecked : CheckedStateEnum.NotSet).ToNullableBoolean();
     }
 
-
     protected override void Field_SetValue(bool? newValue)
     {
         CheckBox_SetState(newValue.FromNullableBoolean());
     }
+
     protected override void OnParentSet()
     {
         base.OnParentSet();
@@ -385,7 +384,7 @@ public partial class CheckBoxField : BaseFormField<bool?>
                 if (_checkBoxTapOverlay!.Parent is Grid grid)
                 {
                     bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButtonVisible;
+                    bool isButtonUndoVisible = FieldUndoButton;
 
                     if (isFieldLabelVisible && isButtonUndoVisible)
                     {
@@ -410,7 +409,6 @@ public partial class CheckBoxField : BaseFormField<bool?>
                 }
             });
         });
-
     }
 
     #endregion Protected Methods
@@ -430,4 +428,5 @@ public partial class CheckBoxField : BaseFormField<bool?>
     }
 
     #endregion Public Methods
+
 }

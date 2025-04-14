@@ -262,9 +262,11 @@ public partial class DropdownField : BaseFormField<object>
             }
         }
     }
+
     #endregion Private Methods
 
     #region Protected Methods
+
     protected override Grid Field_CreateLayoutGrid()
     {
         // Explicitly add one row and one column.
@@ -321,7 +323,9 @@ public partial class DropdownField : BaseFormField<object>
     protected override bool Field_HasChangedFromOriginal() =>
         !object.Equals(FieldOriginalValue, FieldDataSource);
 
-    protected override bool Field_HasFormatError() { return false; }
+    protected override bool Field_HasFormatError()
+    { return false; }
+
     protected override bool Field_HasRequiredError() => FieldMandatory && FieldDataSource == null;
 
     protected override void Field_SetValue(object? selectedItem)
@@ -373,7 +377,6 @@ public partial class DropdownField : BaseFormField<object>
             });
     }
 
-
     // Update the _pickerControl layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
     protected override void UpdateRow0Layout()
     {
@@ -384,7 +387,7 @@ public partial class DropdownField : BaseFormField<object>
                 if (_pickerContainer?.Parent is Grid grid)
                 {
                     bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButtonVisible;
+                    bool isButtonUndoVisible = FieldUndoButton;
 
                     if (isFieldLabelVisible && isButtonUndoVisible)
                     {

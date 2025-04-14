@@ -5,6 +5,7 @@
 /// </summary>
 public partial class DateField : BaseFormField<DateTimeOffset?>
 {
+
     #region Fields
 
     private DatePicker _datePicker;
@@ -114,7 +115,6 @@ public partial class DateField : BaseFormField<DateTimeOffset?>
         });
     }
 
-
     // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
     protected override void UpdateRow0Layout()
     {
@@ -125,7 +125,7 @@ public partial class DateField : BaseFormField<DateTimeOffset?>
                 if (_datePicker!.Parent is Grid grid)
                 {
                     bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButtonVisible;
+                    bool isButtonUndoVisible = FieldUndoButton;
 
                     if (isFieldLabelVisible && isButtonUndoVisible)
                     {
@@ -169,4 +169,5 @@ public partial class DateField : BaseFormField<DateTimeOffset?>
     }
 
     #endregion Public Methods
+
 }

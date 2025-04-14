@@ -260,7 +260,6 @@ public partial class EditorField : BaseFormField<string>
     protected override bool Field_HasRequiredError() =>
         FieldMandatory && string.IsNullOrEmpty(_editorBox.Text);
 
-
     protected override void Field_OriginalValue_SetToClear()
     {
         FieldOriginalValue = String.Empty;
@@ -293,7 +292,7 @@ public partial class EditorField : BaseFormField<string>
                 if (_editorBox!.Parent is Grid grid)
                 {
                     bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButtonVisible;
+                    bool isButtonUndoVisible = FieldUndoButton;
 
                     if (isFieldLabelVisible && isButtonUndoVisible)
                     {

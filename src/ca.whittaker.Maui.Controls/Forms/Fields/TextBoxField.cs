@@ -323,7 +323,6 @@ public partial class TextBoxField : BaseFormField<string>
         Field_SetValue(FieldOriginalValue);
     }
 
-
     protected override void Field_SetValue(string? value)
     {
         UiThreadHelper.RunOnMainThread(() =>
@@ -350,7 +349,7 @@ public partial class TextBoxField : BaseFormField<string>
                 if (_textBox!.Parent is Grid grid)
                 {
                     bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButtonVisible;
+                    bool isButtonUndoVisible = FieldUndoButton;
 
                     if (isFieldLabelVisible && isButtonUndoVisible)
                     {

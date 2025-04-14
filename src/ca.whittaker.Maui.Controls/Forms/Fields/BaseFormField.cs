@@ -26,7 +26,7 @@ public interface IBaseFormField
     double FieldLabelWidth { get; set; }
     bool FieldMandatory { get; set; }
     bool FieldReadOnly { get; set; }
-    bool FieldUndoButtonVisible { get; set; }
+    bool FieldUndoButton { get; set; }
     ValidationStateEnum FieldValidationState { get; set; }
     double FieldWidth { get; set; }
     LayoutOptions HorizontalOptions { get; set; }
@@ -45,6 +45,8 @@ public interface IBaseFormField
     void Field_NotifyValidationChanges(bool isValid);
 
     void Field_SaveAndMarkAsReadOnly();
+
+    void Field_UndoValue();
 
     void Field_Unfocus();
 
@@ -188,8 +190,8 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         defaultBindingMode: BindingMode.OneWay);
 
     /// <summary>Property for showing or hiding the undo button.</summary>
-    public static readonly BindableProperty FieldUndoButtonVisibleProperty = BindableProperty.Create(
-        propertyName: nameof(FieldUndoButtonVisible),
+    public static readonly BindableProperty FieldUndoButtonProperty = BindableProperty.Create(
+        propertyName: nameof(FieldUndoButton),
         returnType: typeof(bool),
         declaringType: typeof(BaseFormField<T>),
         defaultValue: true,
@@ -238,13 +240,13 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     {
         FieldLabel = Field_CreateLabel(fieldLabelVisible: FieldLabelVisible);
         FieldNotification = Field_CreateNotificationLabel();
-        FieldButtonUndo = Field_CreateUndoButton(fieldHasUndo: FieldUndoButtonVisible, fieldAccessMode: FieldAccessMode);
+        FieldButtonUndo = Field_CreateUndoButton(fieldHasUndo: FieldUndoButton, fieldAccessMode: FieldAccessMode);
 
         // Subscribe to the undo button's Pressed event
         FieldButtonUndo.Pressed += OnFieldButtonUndoPressed;
 
         // Explicitly configure the undo button's initial state
-        if (FieldAccessMode == FieldAccessModeEnum.Editing && FieldUndoButtonVisible)
+        if (FieldAccessMode == FieldAccessModeEnum.Editing && FieldUndoButton)
         {
             if (Field_HasChangedFromOriginal())
                 FieldButtonUndo.Enabled();
@@ -351,10 +353,10 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     }
 
     /// <inheritdoc/>
-    public bool FieldUndoButtonVisible
+    public bool FieldUndoButton
     {
-        get => (bool)GetValue(FieldUndoButtonVisibleProperty);
-        set => SetValue(FieldUndoButtonVisibleProperty, value);
+        get => (bool)GetValue(FieldUndoButtonProperty);
+        set => SetValue(FieldUndoButtonProperty, value);
     }
 
     /// <inheritdoc/>
@@ -398,38 +400,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     #endregion Properties
 
     #region Private Methods
-
-    /// <summary>
-    /// Invoked when the field access mode property changes.
-    /// </summary>
-    protected static void OnFieldAccessModePropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is BaseFormField<T> element && newValue is FieldAccessModeEnum newAccessMode)
-        {
-            if (!oldValue.Equals(newValue))
-            {
-                Debug.WriteLine($"{element.FieldLabelText} : OnFieldAccessModePropertyChanged({newValue})");
-                switch (newAccessMode)
-                {
-                    case FieldAccessModeEnum.ViewOnly:
-                        element.Field_ConfigAccessModeViewOnly();
-                        return;
-
-                    case FieldAccessModeEnum.Editing:
-                        element.Field_ConfigAccessModeEditing();
-                        return;
-
-                    case FieldAccessModeEnum.Editable:
-                        element.Field_ConfigAccessModeEditable();
-                        return;
-
-                    case FieldAccessModeEnum.Hidden:
-                        element.FieldConfigAccessModeHidden();
-                        return;
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// Invoked when the field enabled property changes.
@@ -523,7 +493,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         if (_fieldPreviousHasChangedFromOriginal != hasChangedFromOriginal)
         {
             Debug.WriteLine($"{FieldLabelText} : EvaluateToRaiseHasChangesEvent()");
-            if (FieldButtonUndo != null && FieldUndoButtonVisible)
+            if (FieldButtonUndo != null && FieldUndoButton)
             {
                 if (FieldAccessMode == FieldAccessModeEnum.Editing)
                 {
@@ -587,6 +557,38 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     #endregion Private Methods
 
     #region Protected Methods
+
+    /// <summary>
+    /// Invoked when the field access mode property changes.
+    /// </summary>
+    protected static void OnFieldAccessModePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is BaseFormField<T> element && newValue is FieldAccessModeEnum newAccessMode)
+        {
+            if (!oldValue.Equals(newValue))
+            {
+                Debug.WriteLine($"{element.FieldLabelText} : OnFieldAccessModePropertyChanged({newValue})");
+                switch (newAccessMode)
+                {
+                    case FieldAccessModeEnum.ViewOnly:
+                        element.Field_ConfigAccessModeViewOnly();
+                        return;
+
+                    case FieldAccessModeEnum.Editing:
+                        element.Field_ConfigAccessModeEditing();
+                        return;
+
+                    case FieldAccessModeEnum.Editable:
+                        element.Field_ConfigAccessModeEditable();
+                        return;
+
+                    case FieldAccessModeEnum.Hidden:
+                        element.FieldConfigAccessModeHidden();
+                        return;
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// Enables descendant controls based on the current label visibility.
@@ -688,6 +690,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         {
             VerticalOptions = LayoutOptions.Center,
             HorizontalOptions = LayoutOptions.Start,
+            TextColor = Colors.Red,
             IsVisible = false
         };
         return label;
@@ -758,6 +761,10 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         Field_SyncUIFromDataSource(FieldDataSource);
     }
 
+    protected void Field_OriginalValue_Reset()
+    {
+        Field_SetValue(FieldOriginalValue);
+    }
 
     /// <summary>
     /// Clears the original value of the field.
@@ -767,12 +774,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         FieldOriginalValue = default(T);
         Field_SetValue(FieldOriginalValue);
     }
-
-    protected void Field_OriginalValue_Reset()
-    {
-        Field_SetValue(FieldOriginalValue);
-    }
-
 
     /// <summary>
     /// Updates the original value of the field to match its current state.
@@ -798,29 +799,14 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     protected virtual void Field_SetDataSourceValue(T? newValue)
     {
         Debug.WriteLine($"{FieldLabelText} : Field_SetDataSourceValue({newValue})");
-        FieldDataSource = newValue;
+        FieldDataSource = FieldLastValue = newValue;
         Field_UpdateValidationAndChangedState();
         Field_UpdateNotificationMessage();
-        FieldLastValue = newValue;
     }
 
     protected abstract void Field_SetValue(T? newValue);
 
-    protected void Field_SyncUIFromDataSource(T? newValue)
-    {
-        Field_SetValue(newValue);
-    }
-
-    protected virtual void Field_UndoValue()
-    {
-        // By default, restore FieldOriginalValue
-        Field_PerformBatchUpdate(() =>
-        {
-            Field_OriginalValue_Reset();
-            Field_UpdateValidationAndChangedState(true);
-            Field_UpdateNotificationMessage();
-        });
-    }
+    protected void Field_SyncUIFromDataSource(T? newValue) => Field_SetValue(newValue);
 
     /// <summary>
     /// Updates the field's notification label based on its validation state.
@@ -830,18 +816,36 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
         if (FieldNotification == null) return;
         if (Field_HasFormatError())
         {
-            FieldNotification.Text = Field_GetFormatErrorMessage();
-            FieldNotification.IsVisible = true;
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    FieldNotification.Text = Field_GetFormatErrorMessage();
+                    FieldNotification.IsVisible = true;
+                });
+            });
         }
         else if (Field_HasRequiredError())
         {
-            FieldNotification.Text = "Required.";
-            FieldNotification.IsVisible = true;
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    FieldNotification.Text = "Required.";
+                    FieldNotification.IsVisible = true;
+                });
+            });
         }
         else
         {
-            FieldNotification.Text = string.Empty;
-            FieldNotification.IsVisible = false;
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    FieldNotification.Text = string.Empty;
+                    FieldNotification.IsVisible = false;
+                });
+            });
         }
     }
 
@@ -886,14 +890,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     {
         Field_SyncUIFromDataSource((T)newValue);
     }
-
-    //protected override void OnParentSet()
-    //{
-    //    Debug.WriteLine($"OnParentSet()");
-    //    base.OnParentSet();
-    //    Field_SetValue(FieldDataSource);
-    //}
-
 
     /// <inheritdoc/>
     protected override void OnParentSet()
@@ -950,10 +946,21 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     /// <inheritdoc/>
     public void Field_SaveAndMarkAsReadOnly()
     {
-        FieldAccessMode = FieldAccessModeEnum.ViewOnly;
         Field_OriginalValue_SetToCurrentValue();
         Field_ConfigDisabled();
         Field_UpdateValidationAndChangedState();
+        FieldAccessMode = FieldAccessModeEnum.ViewOnly;
+    }
+
+    public virtual void Field_UndoValue()
+    {
+        // By default, restore FieldOriginalValue
+        Field_PerformBatchUpdate(() =>
+        {
+            Field_OriginalValue_Reset();
+            Field_UpdateValidationAndChangedState(true);
+            Field_UpdateNotificationMessage();
+        });
     }
 
     /// <inheritdoc/>
@@ -968,8 +975,15 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     {
         if (Content is Grid grid && grid.ColumnDefinitions.Count > 0)
         {
-            grid.ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
-            FieldLabel!.WidthRequest = newWidth;
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    grid.ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
+                    if (FieldLabel != null)
+                        FieldLabel.WidthRequest = newWidth;
+                });
+            });
         }
     }
 
@@ -977,7 +991,13 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     public void Field_UpdateWidth(double newWidth)
     {
         if (Content is Grid grid && grid.ColumnDefinitions.Count > 1)
-            grid.ColumnDefinitions[1].Width = new GridLength(newWidth, GridUnitType.Absolute);
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    grid.ColumnDefinitions[1].Width = new GridLength(newWidth, GridUnitType.Absolute);
+                });
+            });
     }
 
     #endregion Public Methods

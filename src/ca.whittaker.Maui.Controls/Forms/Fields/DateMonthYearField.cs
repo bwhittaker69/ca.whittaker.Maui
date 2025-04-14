@@ -59,13 +59,13 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
 
     #endregion Properties
 
-    #region Private Methods
-
     //private void Date_ProcessAndSet(DateTimeOffset newDateOffset)
     //{
     //    DateTime newDate = new DateTime(newDateOffset.Year, newDateOffset.Month, 1);
     //    Field_SetDataSourceValue(new DateTimeOffset(newDate, TimeSpan.Zero));
     //}
+
+    #region Private Methods
 
     private void OnPickerSelectionChanged(object? sender, EventArgs e)
     {
@@ -190,7 +190,7 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
                 if (_monthPicker.Parent is Layout<View> pickerLayout)
                 {
                     bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButtonVisible;
+                    bool isButtonUndoVisible = FieldUndoButton;
 
                     if (isFieldLabelVisible && isButtonUndoVisible)
                     {

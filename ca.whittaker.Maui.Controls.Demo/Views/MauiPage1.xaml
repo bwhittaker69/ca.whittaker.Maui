@@ -34,7 +34,7 @@
                                           FieldDataSource="{Binding Userprofile_date}"
                                           FieldLabelWidth="150"
                                           FieldLabelVisible="True"
-                                          FieldUndoButtonVisible="True"
+                                          FieldUndoButton="True"
                                           FieldMandatory="True"
                                           >
                 </Forms:DateMonthYearField>
@@ -42,7 +42,7 @@
                                      FieldDataSource="{Binding Userprofile_date}"
                                      FieldLabelWidth="150"
                                      FieldLabelVisible="True"
-                                     FieldUndoButtonVisible="True"
+                                     FieldUndoButton="True"
                                      FieldMandatory="True"
                                      >
                 </Forms:DateField>
@@ -51,7 +51,7 @@
                                      DropdownItemsSource="{Binding Userprofile_users}"
                                      FieldLabelWidth="150"
                                      FieldLabelVisible="True"
-                                     FieldUndoButtonVisible="True"
+                                     FieldUndoButton="True"
                                      FieldMandatory="True"
                                      FieldLabelText="User"
                                      DropdownItemsSourceDisplayPath="Nickname"
@@ -63,7 +63,7 @@
                                      DropdownItemsSource="{x:Static strings:AppResources.Field_Country_Items}"
                                      FieldLabelWidth="150"
                                      FieldLabelVisible="True"
-                                     FieldUndoButtonVisible="True"
+                                     FieldUndoButton="True"
                                      FieldMandatory="True"
                                      FieldLabelText="{x:Static strings:AppResources.Field_Country}">
                 </Forms:DropdownField>
@@ -94,8 +94,8 @@
                                      CheckBoxDataType="TriState"
                                      FieldLabelWidth="150"
                                      FieldLabelVisible="False"
-                                     FieldUndoButtonVisible="True"
-                                     FieldMandatory="False"
+                                     FieldUndoButton="False"
+                                     FieldMandatory="True"
                                      FieldLabelText="{x:Static strings:AppResources.Field_IsPublic}">
                 </Forms:CheckBoxField>
             </VerticalStackLayout>

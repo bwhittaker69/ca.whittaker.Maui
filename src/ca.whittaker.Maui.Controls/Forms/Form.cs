@@ -83,6 +83,13 @@ public class Form : ContentView
 
     #endregion Fields
 
+    #region Events
+
+    // Declare the event to notify subscribers when the form is saved.
+    public event EventHandler<FormSavedEventArgs>? FormSaved;
+
+    #endregion Events
+
     #region Properties
 
     public ICommand Command
@@ -153,21 +160,8 @@ public class Form : ContentView
 
     #endregion Properties
 
-    #region Public Events
-
-    // Declare the event to notify subscribers when the form is saved.
-    public event EventHandler<FormSavedEventArgs>? FormSaved;
-
-    // Protected virtual method to raise the event.
-    protected virtual void OnFormSaved(FormSavedEventArgs e)
-    {
-        FormSaved?.Invoke(this, e);
-    }
-
-    #endregion Public Events
-
-
     #region Private Methods
+
     private static void OnFormAccessModeChanged(BindableObject bindable, object? oldValue, object? newValue)
     {
         if (bindable is Form form && newValue is FormAccessModeEnum newAccessMode)
@@ -244,7 +238,6 @@ public class Form : ContentView
         }
     }
 
-
     private void FormClear()
     {
         foreach (IBaseFormField field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
@@ -317,7 +310,7 @@ public class Form : ContentView
     }
 
     private bool FormFieldsCheckAreValid() =>
-                this.GetVisualTreeDescendants().OfType<IBaseFormField>().All(field => field.FieldValidationState == ValidationStateEnum.Valid);
+                    this.GetVisualTreeDescendants().OfType<IBaseFormField>().All(field => field.FieldValidationState == ValidationStateEnum.Valid);
 
     /// <summary>
     /// puts form into "read" mode with edit button visible
@@ -325,16 +318,16 @@ public class Form : ContentView
     private void FormFieldsConfigAccessEditable()
     {
         foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.FieldAccessMode = FieldAccessModeEnum.Editable; 
+            t.FieldAccessMode = FieldAccessModeEnum.Editable;
     }
-        
+
     /// <summary>
     /// puts form into "read/write" mode with save and cancel buttons visible
     /// </summary>
     private void FormFieldsConfigAccessEditing()
     {
         foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.FieldAccessMode = FieldAccessModeEnum.Editing; 
+            t.FieldAccessMode = FieldAccessModeEnum.Editing;
     }
 
     /// <summary>
@@ -352,7 +345,7 @@ public class Form : ContentView
     private void FormFieldsConfigViewOnlyMode()
     {
         foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.FieldAccessMode = FieldAccessModeEnum.ViewOnly; 
+            t.FieldAccessMode = FieldAccessModeEnum.ViewOnly;
     }
 
     /// <summary>
@@ -361,7 +354,7 @@ public class Form : ContentView
     private void FormFieldsMarkAsSaved()
     {
         foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.Field_SaveAndMarkAsReadOnly(); 
+            t.Field_SaveAndMarkAsReadOnly();
     }
 
     private void FormFieldsWireUp()
@@ -501,6 +494,11 @@ public class Form : ContentView
 
     private void OnFormCancelButtonClicked(object? sender, EventArgs e)
     {
+        // undo any changes to all fields
+        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
+            field.Field_UndoValue();
+
+        // set form to editable state
         if (FormAccessMode != FormAccessModeEnum.Editable)
             FormAccessMode = FormAccessModeEnum.Editable;
     }
@@ -516,12 +514,11 @@ public class Form : ContentView
         if (Command?.CanExecute(CommandParameter) == true)
             Command.Execute(CommandParameter);
 
-
         bool hasChanges = !FormFieldsCheckArePristine();
 
         //
         // loop over each field, set original value to datasource value
-        // 
+        //
         if (hasChanges)
             FormFieldsMarkAsSaved();
 
@@ -532,12 +529,17 @@ public class Form : ContentView
 
         // Raise the FormSaved event.
         OnFormSaved(new FormSavedEventArgs(hasChanges));
-
     }
 
     #endregion Private Methods
 
     #region Protected Methods
+
+    // Protected virtual method to raise the event.
+    protected virtual void OnFormSaved(FormSavedEventArgs e)
+    {
+        FormSaved?.Invoke(this, e);
+    }
 
     protected override void OnParentSet()
     {
