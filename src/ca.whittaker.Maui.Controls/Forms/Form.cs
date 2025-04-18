@@ -18,7 +18,7 @@ public class Form : ContentView
     private Label? _formLabel;
     private Label? _formLabelNotification;
     private bool _formStatusEvaluating = false;
-    private SizeEnum DefaultButtonSize = SizeEnum.XXSmall;
+    private SizeEnum DefaultButtonSize = SizeEnum.Normal;
 
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
@@ -318,7 +318,10 @@ public class Form : ContentView
     private void FormFieldsConfigAccessEditable()
     {
         foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.FieldAccessMode = FieldAccessModeEnum.Editable;
+        {
+            if (!t.FieldReadOnly)
+                t.FieldAccessMode = FieldAccessModeEnum.Editable;
+        }
     }
 
     /// <summary>
@@ -535,10 +538,32 @@ public class Form : ContentView
 
     #region Protected Methods
 
+    public static readonly BindableProperty SaveCommandProperty =
+        BindableProperty.Create(nameof(SaveCommand), typeof(ICommand), typeof(Form));
+
+    public static readonly BindableProperty SaveCommandParameterProperty =
+        BindableProperty.Create(nameof(SaveCommandParameter), typeof(object), typeof(Form));
+
+    public ICommand SaveCommand
+    {
+        get => (ICommand)GetValue(SaveCommandProperty);
+        set => SetValue(SaveCommandProperty, value);
+    }
+    public object SaveCommandParameter
+    {
+        get => GetValue(SaveCommandParameterProperty);
+        set => SetValue(SaveCommandParameterProperty, value);
+    }
+
+
     // Protected virtual method to raise the event.
     protected virtual void OnFormSaved(FormSavedEventArgs e)
     {
         FormSaved?.Invoke(this, e);
+
+        if (SaveCommand?.CanExecute(SaveCommandParameter) == true)
+            SaveCommand.Execute(SaveCommandParameter);
+
     }
 
     protected override void OnParentSet()

@@ -76,7 +76,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormField
     private ValidationStateEnum _previousFieldValidationState;
 
     /// <summary>Defines the default button size.</summary>
-    protected const SizeEnum DefaultButtonSize = SizeEnum.XXSmall;
+    protected const SizeEnum DefaultButtonSize = SizeEnum.Normal;
 
     /// <summary>Flag to prevent redundant disabling calls.</summary>
     protected bool _fieldDisabling = false;
