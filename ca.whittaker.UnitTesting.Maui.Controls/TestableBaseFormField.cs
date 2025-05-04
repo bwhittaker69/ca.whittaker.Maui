@@ -16,7 +16,7 @@ public class TestableFieldBase : BaseFormField<string>
     private string? _testValue;
 
     // No real UI element needed for control‐view wiring
-    protected override List<View> Field_ControlView()
+    protected override List<View> Field_ControlMain()
         => new List<View>();
 
     // Base will call this to push a value into your “control”

@@ -14,7 +14,7 @@ public partial class DropdownField : BaseFormField<object>
 {
     private Grid _pickerContainer;
     private Picker _pickerControl;
-    private Entry _pickerControlPlaceholder;
+    private Entry _pickerControlPlaceholderEntry;
     private DataSourceTypeEnum dataSourceType;
 
     // Bindable property for DropdownItemsSourceDisplayPath
@@ -59,18 +59,21 @@ public partial class DropdownField : BaseFormField<object>
         _pickerContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
 
         // 2) Placeholder on top
-        _pickerControlPlaceholder = new Entry
+        _pickerControlPlaceholderEntry = new Entry
         {
             VerticalOptions = LayoutOptions.Center,
             HorizontalOptions = LayoutOptions.Fill,
             Placeholder = DropdownPlaceholder,
             InputTransparent = true,
+            IsReadOnly = true,
             IsEnabled = false,
             BackgroundColor = Colors.Transparent
+            
         };
-        Grid.SetRow(_pickerControlPlaceholder, 0);
-        Grid.SetColumn(_pickerControlPlaceholder, 0);
-        _pickerContainer.Children.Add(_pickerControlPlaceholder);
+
+        Grid.SetRow(_pickerControlPlaceholderEntry, 0);
+        Grid.SetColumn(_pickerControlPlaceholderEntry, 0);
+        _pickerContainer.Children.Add(_pickerControlPlaceholderEntry);
 
         // 3) Picker behind
         _pickerControl = new Picker
@@ -97,11 +100,18 @@ public partial class DropdownField : BaseFormField<object>
         Initialize();
     }
 
-    protected override List<View> Field_ControlView()
-        => new List<View> { _pickerContainer };
+    protected void Field_ConfigEditing()
+    {
 
-    //protected override List<View> Field_ControlView() =>
-        //new List<View> { _pickerControl, _pickerControlPlaceholder };
+    }
+    protected void Field_ConfigViewing()
+    {
+
+    }
+
+
+    protected override List<View> Field_ControlMain()
+        => new List<View> { _pickerContainer };
 
     protected override void OnParentSet()
     {
@@ -237,11 +247,11 @@ public partial class DropdownField : BaseFormField<object>
         {
             Field_PerformBatchUpdate(() =>
             {
-                _pickerControlPlaceholder.Text = newValue?.ToString() ?? "";
-                _pickerControlPlaceholder.InputTransparent = true;
-                _pickerControlPlaceholder.VerticalOptions = LayoutOptions.Center;
-                _pickerControlPlaceholder.HorizontalOptions = LayoutOptions.Fill;
-                _pickerControlPlaceholder.IsEnabled = false;
+                _pickerControlPlaceholderEntry.Text = newValue?.ToString() ?? "";
+                _pickerControlPlaceholderEntry.InputTransparent = true;
+                _pickerControlPlaceholderEntry.VerticalOptions = LayoutOptions.Center;
+                _pickerControlPlaceholderEntry.HorizontalOptions = LayoutOptions.Fill;
+                _pickerControlPlaceholderEntry.IsEnabled = false;
             });
         });
     }
@@ -336,7 +346,7 @@ public partial class DropdownField : BaseFormField<object>
                 bool noSelection = selectedItem == null
                     || (selectedItem is string s && string.IsNullOrWhiteSpace(s));
 
-                _pickerControlPlaceholder.IsVisible = noSelection;
+                _pickerControlPlaceholderEntry.IsVisible = noSelection;
 
                 if (noSelection)
                 {

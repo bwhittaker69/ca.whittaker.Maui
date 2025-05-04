@@ -102,7 +102,7 @@ public partial class CheckBoxField : BaseFormField<bool?>
 
         Initialize();
     }
-    protected override List<View> Field_ControlView() // ← was returning only the CheckBox
+    protected override List<View> Field_ControlMain() // ← was returning only the CheckBox
     {
         return new List<View> { _checkBox, _checkBoxTapOverlay };
     }

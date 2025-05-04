@@ -120,9 +120,9 @@ public interface IBaseFormField
 
 /// <summary>
 /// Base class that implements <see cref="IBaseFormFieldTyped{T}"/> and wires up:
-/// - Two-way bindable <c>FieldDataSource</c>,  
-/// - Original/Last/Current value tracking for undo & change detection,  
-/// - Format & required validation,  
+/// - Two-way bindable <c>FieldDataSource</c>,
+/// - Original/Last/Current value tracking for undo and change detection,
+/// - Format and required validation,  
 /// - Built-in Undo button,  
 /// - Access-mode handling (ViewOnly, Editable, Editing, Hidden),  
 /// - Notification label for errors,  
@@ -141,7 +141,7 @@ public interface IBaseFormField
 /// 4. **Field_SetValue(T? value)**  
 ///    Push the VM value into your control (inside `Field_PerformBatchUpdate` + main thread).<br/>
 /// 5. **Field_GetCurrentValue()**  
-///    Read your control’s current value so the base can compare to original & last.<br/>
+///    Read your control’s current value so the base can compare to original and last.<br/>
 /// 6. **Field_HasFormatError()** / **Field_HasRequiredError()**  
 ///    Return true when the current UI value is invalid or missing (for mandatory).<br/>
 /// 7. **Field_GetFormatErrorMessage()**  
@@ -152,7 +152,7 @@ public interface IBaseFormField
 /// The base already:
 /// - Captures the very first real VM assignment as the “original” value,  
 /// - Suppresses its own callbacks during programmatic updates,  
-/// - Raises events & enables/disables the Undo button automatically.
+/// - Raises events and enables/disables the Undo button automatically.
 /// </para>
 /// </remarks>
 public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
@@ -307,19 +307,19 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         propertyChanged: OnBaseFieldWidthPropertyChanged);
 
     /// <summary>Reference to the undo button.</summary>
-    public UndoButton? FieldButtonUndo;
+    protected UndoButton? FieldButtonUndo;
 
     /// <summary>Reference to the label for this field.</summary>
-    public Label? FieldLabel;
+    protected Label? FieldLabel;
 
     /// <summary>Stores the last known value of this field.</summary>
-    public T? FieldLastValue = default(T);
+    protected T? FieldLastValue = default(T);
 
     /// <summary>Reference to the notification label.</summary>
-    public Label? FieldNotification;
+    protected Label? FieldNotification;
 
     /// <summary>Stores the original value for this field.</summary>
-    public T? FieldOriginalValue = default(T);
+    protected T? FieldOriginalValue = default(T);
 
     #endregion Fields
 
@@ -354,8 +354,9 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     protected void Initialize()
     {
         Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Initialize()");
-        BaseField_WireFocusEvents(Field_ControlView());
+        BaseField_WireFocusEvents(Field_ControlMain());
         BaseField_InitializeDataSource();
+        ControlVisualHelper.MatchDisabledToEnabled(this);
     }
 
     #endregion Public Constructors
@@ -689,13 +690,23 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         if (bindable is BaseFormField<T> element && newValue is FieldAccessModeEnum newAccessMode)
         {
             element.Field_UpdateNotificationMessage();
+
+            // Respect FieldReadOnly: force ViewOnly if read-only
+            if (element.FieldReadOnly && newAccessMode != FieldAccessModeEnum.Hidden)
+            {
+                Debug.WriteLine($"[BaseFormField] : {element.FieldLabelText} : ReadOnly prevents switching to {newAccessMode}, forcing ViewOnly");
+                element.Field_ConfigAccessModeViewing();
+                return;
+            }
+
+
             if (!oldValue.Equals(newValue))
             {
                 Debug.WriteLine($"[BaseFormField] : {element.FieldLabelText} : OnFieldAccessModePropertyChanged({newValue})");
                 switch (newAccessMode)
                 {
                     case FieldAccessModeEnum.ViewOnly:
-                        element.Field_ConfigAccessModeViewOnly();
+                        element.Field_ConfigAccessModeViewing();
                         return;
 
                     case FieldAccessModeEnum.Editing:
@@ -703,7 +714,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
                         return;
 
                     case FieldAccessModeEnum.Editable:
-                        element.Field_ConfigAccessModeEditable();
+                        element.Field_ConfigAccessModeViewing();
                         return;
 
                     case FieldAccessModeEnum.Hidden:
@@ -731,16 +742,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     }
 
     /// <summary>
-    /// Sets this field to an editable mode by applying a read-only state and hiding the undo button.
-    /// </summary>
-    protected void Field_ConfigAccessModeEditable()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_ConfigAccessModeEditable()");
-        Field_ApplyReadOnly();
-        if (FieldButtonUndo != null) FieldButtonUndo.Hide();
-    }
-
-    /// <summary>
     /// Sets this field to an editing mode, enabling controls and evaluating any changes.
     /// </summary>
     protected void Field_ConfigAccessModeEditing()
@@ -753,7 +754,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// <summary>
     /// Sets this field to a view-only mode, applying a read-only state and hiding the undo button.
     /// </summary>
-    protected void Field_ConfigAccessModeViewOnly()
+    protected void Field_ConfigAccessModeViewing()
     {
         Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_ConfigAccessModeViewOnly()");
         Field_ApplyReadOnly();
@@ -848,7 +849,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// Return the raw input control(s) (Entry, DatePicker, CheckBoxOverlay, etc.)
     /// so the base can hook up Focused/Unfocused and validation logic.
     /// </summary>
-    protected abstract List<View> Field_ControlView();
+    protected abstract List<View> Field_ControlMain();
 
     /// <summary>
     /// Build a two-row Grid:
@@ -886,7 +887,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         grid.Add(FieldLabel, 0, 0);
 
         // 2) Field‐specific controls (overlay, container, etc.)
-        foreach (var ctl in Field_ControlView())
+        foreach (var ctl in Field_ControlMain())
             grid.Add(ctl, 1, 0);
 
         // 3) common undo button
@@ -1007,7 +1008,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         }
     }
 
-    private bool _initialField_SetDataSourceValue = false;
     protected virtual void Field_SetDataSourceValue(T? newValue)
     {
         Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_SetDataSourceValue({newValue})");
@@ -1105,6 +1105,9 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
         // 1) ignore any updates that fire before the VM is bound
         if (control.BindingContext == null)
+            return;
+
+        if (Equals(oldValue, newValue))
             return;
 
         // 2) first “real” assignment: capture original + sync UI

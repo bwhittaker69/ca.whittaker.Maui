@@ -45,7 +45,7 @@
                     </Forms:CheckBoxField>
                     
                     
-                    <!--<Label Text="{Binding Userprofile_date}"></Label>
+                    <Label Text="{Binding Userprofile_date}"></Label>
 
                     <Forms:DateField
                                     FieldLabelText="Date"
@@ -54,18 +54,18 @@
                                     FieldLabelVisible="True"
                                     FieldUndoButton="True"
                                     FieldMandatory="True">
-                    </Forms:DateField>-->
+                    </Forms:DateField>
 
-                    <!--<Label Text="{Binding Userprofile_date}"></Label>
+                    <Label Text="{Binding Userprofile_date}"></Label>
                     <Forms:DateMonthYearField FieldLabelText="Date"
                                               FieldDataSource="{Binding Userprofile_date}"
                                               FieldLabelWidth="150"
                                               FieldLabelVisible="True"
                                               FieldUndoButton="True"
                                               FieldMandatory="True"
-                                              ></Forms:DateMonthYearField>-->
+                                              ></Forms:DateMonthYearField>
 
-                    <!--<Label Text="{Binding Userprofile_email}"></Label>
+                    <Label Text="{Binding Userprofile_email}"></Label>
 
 
                     <Forms:TextBoxField     FieldDataSource="{Binding Userprofile_email}"
@@ -92,7 +92,7 @@
                                          DropdownItemsSourceDisplayPath="Nickname"
                                          DropdownItemsSourcePrimaryKey="UserId"
                                          >
-                    </Forms:DropdownField>-->
+                    </Forms:DropdownField>
                     
 
                 </VerticalStackLayout>

@@ -40,7 +40,7 @@ public partial class DateField : BaseFormField<DateTimeOffset?>, IBaseFormFieldT
         Initialize();
     }
 
-    protected override List<View> Field_ControlView() => new List<View>() { _datePicker };
+    protected override List<View> Field_ControlMain() => new List<View>() { _datePicker };
 
     #endregion Public Constructors
 

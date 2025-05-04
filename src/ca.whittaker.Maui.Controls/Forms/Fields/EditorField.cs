@@ -62,7 +62,7 @@ public partial class EditorField : BaseFormField<string>
         // Initialize 
         Initialize();
     }
-    protected override List<View> Field_ControlView() => new List<View>() { _editorBox };
+    protected override List<View> Field_ControlMain() => new List<View>() { _editorBox };
 
 
     #endregion Public Constructors

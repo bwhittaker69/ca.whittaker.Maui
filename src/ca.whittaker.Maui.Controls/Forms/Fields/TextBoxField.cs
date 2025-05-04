@@ -66,7 +66,7 @@ public partial class TextBoxField : BaseFormField<string>
 
         Initialize();
     }
-    protected override List<View> Field_ControlView() => new List<View>() { _textBox };
+    protected override List<View> Field_ControlMain() => new List<View>() { _textBox };
 
     #endregion Public Constructors
 

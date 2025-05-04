@@ -45,7 +45,7 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
         Initialize();
     }
 
-    protected override List<View> Field_ControlView()
+    protected override List<View> Field_ControlMain()
     {
         var stack = new StackLayout { Orientation = StackOrientation.Horizontal, Children = { _monthPicker, _yearPicker } };
         return new List<View> { stack };
