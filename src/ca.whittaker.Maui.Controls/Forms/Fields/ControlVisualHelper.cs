@@ -50,17 +50,23 @@ public static class ControlVisualHelper
         {
             Debug.WriteLine($"{c.ToString()}");
             if (c is Entry e)
-                e.IsEnabled = false;
+            {
+                e.IsEnabled = true;
+                e.IsReadOnly = true;
+            }
             if (c is StackLayout sl)
-                sl.IsEnabled = false;
+                sl.IsEnabled = true;
             if (c is Picker p)
                 p.IsEnabled = false;
             if (c is DatePicker dp)
                 dp.IsEnabled = false;
             if (c is Editor ed)
-                ed.IsEnabled = false;
+            {
+                ed.IsEnabled = true;
+                ed.IsReadOnly = true;
+            }
             if (c is ContentView cv)
-                cv.IsEnabled = false;
+                cv.IsEnabled = true;
             // labels are always enabled
             if (c is Label l && fieldLabelVisible)
                 l.IsEnabled = true;
@@ -75,7 +81,10 @@ public static class ControlVisualHelper
         {
             Debug.WriteLine($"{c.ToString()}");
             if (c is Entry e)
+            {
                 e.IsEnabled = true;
+                e.IsReadOnly = false;
+            }
             if (c is StackLayout sl)
                 sl.IsEnabled = true;
             if (c is DatePicker dp)
@@ -83,7 +92,10 @@ public static class ControlVisualHelper
             if (c is Picker p)
                 p.IsEnabled = true;
             if (c is Editor ed)
+            {
                 ed.IsEnabled = true;
+                ed.IsReadOnly = false;
+            }
             if (c is ContentView cv)
                 cv.IsEnabled = true;
             if (c is Label l && fieldLabelVisible)
