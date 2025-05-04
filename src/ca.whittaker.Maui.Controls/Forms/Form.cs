@@ -5,20 +5,40 @@ using System.Windows.Input;
 namespace ca.whittaker.Maui.Controls.Forms;
 
 /// <summary>
-/// Represents a form control within a MAUI application, providing integrated state management,
-/// validation, and control wiring for a composite user input interface.
+/// Represents a standardized contract for form field controls used inside a Form.<br/>
+/// <br/>
+/// <b>Core Responsibilities:</b><br/>
+/// - Exposes field-specific state (Access Mode, Validation, Change Tracking).<br/>
+/// - Supports undo/reset behavior.<br/>
+/// - Supports dynamic layout updates (label width, control width).<br/>
+/// - Raises events (`FieldHasChanges`, `FieldHasValidationChanges`) to notify the parent Form.<br/>
+/// - Allows the parent Form to control field focus/unfocus, clear, undo, and save operations.<br/>
+/// <br/>
+/// <b>Key Properties:</b><br/>
+/// - `FieldAccessMode`: Determines if the field is editable, editing, view-only, or hidden.<br/>
+/// - `FieldChangeState`: Tracks whether the field has unsaved changes.<br/>
+/// - `FieldValidationState`: Tracks whether the field's current value is valid.<br/>
+/// <br/>
+/// <b>Key Methods:</b><br/>
+/// - `Field_Clear()`: Clears the field.<br/>
+/// - `Field_UndoValue()`: Reverts to original value.<br/>
+/// - `Field_SaveAndMarkAsReadOnly()`: Commits current value and locks the field.<br/>
+/// - `Field_NotifyHasChanges()` and `Field_NotifyValidationChanges()`: Raise change/validation events.<br/>
+/// <br/>
+/// <b>Implementation Note:</b><br/>
+/// - Typically implemented by a base control such as `BaseFormField&lt;T&gt;`.<br/>
 /// </summary>
 public class Form : ContentView
 {
     #region Fields
 
-    private SaveButton? _formButtonCancel;
-    private EditButton? _formButtonEdit;
-    private CancelButton? _formButtonSave;
+    private SaveButton? _formButtonSaveAction;
+    private EditButton? _formButtonEditAction;
+    private CancelButton? _formButtonCancelAction;
     private Label? _formLabel;
     private Label? _formLabelNotification;
     private bool _formStatusEvaluating = false;
-    private SizeEnum DefaultButtonSize = SizeEnum.Normal;
+    private readonly SizeEnum DefaultButtonSize = SizeEnum.Normal;
 
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
@@ -168,7 +188,7 @@ public class Form : ContentView
         {
             if (oldValue == null || !oldValue.Equals(newValue))
             {
-                Debug.WriteLine($"OnFormAccessModeChanged({newAccessMode.ToString()})");
+                Debug.WriteLine($"[Form] : OnFormAccessModeChanged({newAccessMode.ToString()})");
                 switch (newAccessMode)
                 {
                     case FormAccessModeEnum.Editable:
@@ -198,8 +218,8 @@ public class Form : ContentView
         {
             UiThreadHelper.RunOnMainThread(() =>
             {
-                if (form._formButtonCancel != null)
-                    form._formButtonCancel.Text = newText;
+                if (form._formButtonSaveAction != null)
+                    form._formButtonSaveAction.Text = newText;
             });
         }
     }
@@ -210,8 +230,8 @@ public class Form : ContentView
         {
             UiThreadHelper.RunOnMainThread(() =>
             {
-                if (form._formButtonEdit != null)
-                    form._formButtonEdit.Text = newText;
+                if (form._formButtonEditAction != null)
+                    form._formButtonEditAction.Text = newText;
             });
         }
     }
@@ -233,8 +253,8 @@ public class Form : ContentView
     {
         if (bindable is Form form && newValue is string newText)
         {
-            if (form._formButtonSave != null)
-                UiThreadHelper.RunOnMainThread(() => { form._formButtonSave.Text = newText; });
+            if (form._formButtonCancelAction != null)
+                UiThreadHelper.RunOnMainThread(() => { form._formButtonCancelAction.Text = newText; });
         }
     }
 
@@ -255,34 +275,34 @@ public class Form : ContentView
         if (FormAccessMode == FormAccessModeEnum.Editable)
         {
             // Editable: show only the edit button
-            if (_formButtonSave != null)
-                _formButtonSave.ButtonState = ButtonStateEnum.Hidden;
-            if (_formButtonCancel != null)
-                _formButtonCancel.ButtonState = ButtonStateEnum.Hidden;
-            if (_formButtonEdit != null)
-                _formButtonEdit.ButtonState = ButtonStateEnum.Enabled;
+            if (_formButtonCancelAction != null)
+                _formButtonCancelAction.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonSaveAction != null)
+                _formButtonSaveAction.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonEditAction != null)
+                _formButtonEditAction.ButtonState = ButtonStateEnum.Enabled;
         }
         else if (FormAccessMode == FormAccessModeEnum.Editing)
         {
             // Editing: show save and cancel buttons
-            if (_formButtonSave != null)
-                _formButtonSave.ButtonState = FormHasChanges
+            if (_formButtonCancelAction != null)
+                _formButtonCancelAction.ButtonState = FormHasChanges
                     ? (FormHasErrors ? ButtonStateEnum.Disabled : ButtonStateEnum.Enabled)
                     : ButtonStateEnum.Disabled;
-            if (_formButtonCancel != null)
-                _formButtonCancel.ButtonState = ButtonStateEnum.Enabled;
-            if (_formButtonEdit != null)
-                _formButtonEdit.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonSaveAction != null)
+                _formButtonSaveAction.ButtonState = ButtonStateEnum.Enabled;
+            if (_formButtonEditAction != null)
+                _formButtonEditAction.ButtonState = ButtonStateEnum.Hidden;
         }
         else if (FormAccessMode == FormAccessModeEnum.ViewOnly || FormAccessMode == FormAccessModeEnum.Hidden)
         {
             // ViewOnly/Hidden: hide all buttons
-            if (_formButtonSave != null)
-                _formButtonSave.ButtonState = ButtonStateEnum.Hidden;
-            if (_formButtonCancel != null)
-                _formButtonCancel.ButtonState = ButtonStateEnum.Hidden;
-            if (_formButtonEdit != null)
-                _formButtonEdit.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonCancelAction != null)
+                _formButtonCancelAction.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonSaveAction != null)
+                _formButtonSaveAction.ButtonState = ButtonStateEnum.Hidden;
+            if (_formButtonEditAction != null)
+                _formButtonEditAction.ButtonState = ButtonStateEnum.Hidden;
         }
     }
 
@@ -292,7 +312,7 @@ public class Form : ContentView
             return;
 
         _formStatusEvaluating = true;
-        Debug.WriteLine("FormEvaluateStatus()");
+        Debug.WriteLine("[Form] : FormEvaluateStatus()");
         FormHasErrors = !FormFieldsCheckAreValid();
         FormHasChanges = !FormFieldsCheckArePristine();
         FormConfigButtonStates();
@@ -377,7 +397,7 @@ public class Form : ContentView
     {
         void _initializeUI()
         {
-            _formButtonEdit = new EditButton
+            _formButtonEditAction = new EditButton
             {
                 Text = FormEditButtonText,
                 ButtonSize = DefaultButtonSize,
@@ -389,10 +409,10 @@ public class Form : ContentView
                 ButtonIcon = ButtonIconEnum.Edit,
                 IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
             };
-            _formButtonEdit.Clicked += OnFormEditButtonClicked;
-            _formButtonEdit.UpdateUI();
+            _formButtonEditAction.Clicked += OnFormEditButtonClicked;
+            _formButtonEditAction.UpdateUI();
 
-            _formButtonSave = new CancelButton
+            _formButtonCancelAction = new CancelButton
             {
                 Text = FormSaveButtonText,
                 ButtonSize = DefaultButtonSize,
@@ -404,10 +424,10 @@ public class Form : ContentView
                 ButtonIcon = ButtonIconEnum.Save,
                 IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
             };
-            _formButtonSave.Clicked += OnFormSaveButtonClicked;
-            _formButtonSave.UpdateUI();
+            _formButtonCancelAction.Clicked += OnFormSaveButtonClicked;
+            _formButtonCancelAction.UpdateUI();
 
-            _formButtonCancel = new SaveButton
+            _formButtonSaveAction = new SaveButton
             {
                 Text = FormCancelButtonText,
                 ButtonSize = DefaultButtonSize,
@@ -419,8 +439,8 @@ public class Form : ContentView
                 ButtonIcon = ButtonIconEnum.Cancel,
                 IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
             };
-            _formButtonCancel.Clicked += OnFormCancelButtonClicked;
-            _formButtonCancel.UpdateUI();
+            _formButtonSaveAction.Clicked += OnFormCancelButtonClicked;
+            _formButtonSaveAction.UpdateUI();
 
             _formLabelNotification = new Label
             {
@@ -459,13 +479,13 @@ public class Form : ContentView
             };
 
             gridLayout.Add(_formLabel, 0, 0);
-            gridLayout.Add(_formButtonSave, 0, 1);
-            gridLayout.Add(_formButtonCancel, 1, 1);
-            gridLayout.Add(_formButtonEdit, 0, 2);
+            gridLayout.Add(_formButtonCancelAction, 0, 1);
+            gridLayout.Add(_formButtonSaveAction, 1, 1);
+            gridLayout.Add(_formButtonEditAction, 0, 2);
             gridLayout.Add(_formLabelNotification, 0, 3);
             gridLayout.SetColumnSpan(_formLabel, 2);
             gridLayout.SetColumnSpan(_formLabelNotification, 2);
-            gridLayout.SetColumnSpan(_formButtonEdit, 2);
+            gridLayout.SetColumnSpan(_formButtonEditAction, 2);
 
             if (Content is Layout existingLayout)
             {
@@ -491,19 +511,29 @@ public class Form : ContentView
         FormFieldsWireUp();
     }
 
-    private void OnFieldHasChanges(object? sender, HasChangesEventArgs e) => FormEvaluateStatus();
+    private void OnFieldHasChanges(object? sender, HasChangesEventArgs e)
+    {
+        if (sender is IBaseFormField field)
+        {
+            Debug.WriteLine($"[Form] FieldHasChanges fired from: {field.FieldLabelText}, NewState: {e.HasChanged} {e}");
+        }
+        FormEvaluateStatus();
+    }
 
     private void OnFieldHasValidationChanges(object? sender, ValidationDataChangesEventArgs e) => FormEvaluateStatus();
 
     private void OnFormCancelButtonClicked(object? sender, EventArgs e)
     {
-        // undo any changes to all fields
-        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            field.Field_UndoValue();
-
         // set form to editable state
         if (FormAccessMode != FormAccessModeEnum.Editable)
             FormAccessMode = FormAccessModeEnum.Editable;
+
+        // undo any changes to all fields
+        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
+        {
+                field.Field_UndoValue();
+        }
+
     }
 
     private void OnFormEditButtonClicked(object? sender, EventArgs e)

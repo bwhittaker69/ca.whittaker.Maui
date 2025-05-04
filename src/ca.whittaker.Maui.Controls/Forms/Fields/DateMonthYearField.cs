@@ -42,12 +42,13 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
         _monthPicker.SelectedIndexChanged += OnPickerSelectionChanged;
         _yearPicker.SelectedIndexChanged += OnPickerSelectionChanged;
 
-        Field_WireFocusEvents(_monthPicker);
-        Field_WireFocusEvents(_yearPicker);
+        Initialize();
+    }
 
-        Field_InitializeDataSource();
-
-        InitializeLayout();
+    protected override List<View> Field_ControlView()
+    {
+        var stack = new StackLayout { Orientation = StackOrientation.Horizontal, Children = { _monthPicker, _yearPicker } };
+        return new List<View> { stack };
     }
 
     #endregion Public Constructors
@@ -58,12 +59,6 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
     public Picker _yearPicker { get; private set; }
 
     #endregion Properties
-
-    //private void Date_ProcessAndSet(DateTimeOffset newDateOffset)
-    //{
-    //    DateTime newDate = new DateTime(newDateOffset.Year, newDateOffset.Month, 1);
-    //    Field_SetDataSourceValue(new DateTimeOffset(newDate, TimeSpan.Zero));
-    //}
 
     #region Private Methods
 
@@ -76,9 +71,12 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
         int year = int.Parse(_yearPicker?.SelectedItem?.ToString() ?? String.Empty);
         try
         {
-            // Create a new DateTime with the day fixed to 1.
-            DateTime newDate = new DateTime(year, month, 1);
-            Field_SetDataSourceValue(new DateTimeOffset(newDate, TimeSpan.Zero));
+            DateTimeOffset? newDate; 
+            if (FieldDataSource != null)
+                newDate = ChangeYearMonth((DateTimeOffset)FieldDataSource, year, month);
+            else
+                newDate = new DateTime(year, month, FieldDataSource == null ? 1 : FieldDataSource.Value.Day);
+            Field_SetDataSourceValue(newDate);
         }
         catch (Exception ex)
         {
@@ -86,45 +84,19 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
         }
     }
 
+    /// <summary>
+    /// Returns a new DateTimeOffset with its year and month replaced, preserving day (clamped), time, and offset.
+    /// </summary>
+    private static DateTimeOffset? ChangeYearMonth(DateTimeOffset original, int year, int month)
+    {
+        int day = Math.Min(original.Day, DateTime.DaysInMonth(year, month));
+        // rebuild a DateTime preserving the time‐of‐day ticks
+        var baseDate = new DateTime(year, month, day).AddTicks(original.TimeOfDay.Ticks);
+        return new DateTimeOffset(baseDate, original.Offset);
+    }
     #endregion Private Methods
 
     #region Protected Methods
-
-    protected override Grid Field_CreateLayoutGrid()
-    {
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-            },
-            RowDefinitions =
-            {
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto }
-            },
-            VerticalOptions = LayoutOptions.Fill
-        };
-
-        grid.Add(FieldLabel, 0, 0);
-
-        // Create a horizontal layout for the Month and Year pickers.
-        var pickerLayout = new StackLayout
-        {
-            Orientation = StackOrientation.Horizontal,
-            VerticalOptions = LayoutOptions.Center,
-            Spacing = 10,
-            Children = { _monthPicker, _yearPicker }
-        };
-
-        grid.Add(pickerLayout, 1, 0);
-        grid.Add(FieldButtonUndo, 2, 0);
-        grid.Add(FieldNotification, 0, 1);
-        Grid.SetColumnSpan(FieldNotification, 3);
-        return grid;
-    }
 
     protected override DateTimeOffset? Field_GetCurrentValue() => FieldDataSource;
 
@@ -164,19 +136,6 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
         {
             _monthPicker.SelectedIndex = -1;
             _yearPicker.SelectedIndex = -1;
-        }
-    }
-
-    protected override void OnFieldDataSourcePropertyChanged(object newValue, object oldValue)
-    {
-        if (newValue is DateTimeOffset dto)
-        {
-            Field_SetValue(dto);
-            FieldLastValue = dto;
-        }
-        else
-        {
-            Field_SetValue(null);
         }
     }
 

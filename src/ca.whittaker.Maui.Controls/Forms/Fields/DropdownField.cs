@@ -1,4 +1,4 @@
-using Microsoft.Maui.Controls.Compatibility;
+﻿using Microsoft.Maui.Controls.Compatibility;
 using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
@@ -12,8 +12,6 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public partial class DropdownField : BaseFormField<object>
 {
-    #region Fields
-
     private Grid _pickerContainer;
     private Picker _pickerControl;
     private Entry _pickerControlPlaceholder;
@@ -53,15 +51,14 @@ public partial class DropdownField : BaseFormField<object>
         propertyChanged: (bindable, oldValue, newValue) =>
             ((DropdownField)bindable).OnDropdownPlaceholderPropertyChanged(newValue));
 
-    #endregion Fields
-
-    #region Public Constructors
-
     public DropdownField()
     {
-        _pickerContainer = new Grid
-        {
-        };
+        // 1) Prepare an overlay container
+        _pickerContainer = new Grid();
+        _pickerContainer.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+        _pickerContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+
+        // 2) Placeholder on top
         _pickerControlPlaceholder = new Entry
         {
             VerticalOptions = LayoutOptions.Center,
@@ -71,41 +68,53 @@ public partial class DropdownField : BaseFormField<object>
             IsEnabled = false,
             BackgroundColor = Colors.Transparent
         };
+        Grid.SetRow(_pickerControlPlaceholder, 0);
+        Grid.SetColumn(_pickerControlPlaceholder, 0);
+        _pickerContainer.Children.Add(_pickerControlPlaceholder);
+
+        // 3) Picker behind
         _pickerControl = new Picker
         {
             VerticalOptions = LayoutOptions.Center,
             HorizontalOptions = LayoutOptions.Fill
         };
+        Grid.SetRow(_pickerControl, 0);
+        Grid.SetColumn(_pickerControl, 0);
+        _pickerContainer.Children.Add(_pickerControl);
+
         _pickerControl.IsEnabled = false;
         _pickerControl.SelectedIndexChanged += OnDropdownSelectedIndexChanged;
 
-        Field_WireFocusEvents(_pickerControl);
-
-        // Use ItemDisplayBinding instead of custom DisplayMemberPath
-        _pickerControl.SetBinding(Picker.ItemsSourceProperty, new Binding(nameof(DropdownItemsSource), source: this));
-
-        if (!String.IsNullOrEmpty(DropdownItemsSourceDisplayPath))
+        // 4) Keep your binding logic exactly as before
+        _pickerControl.SetBinding(
+            Picker.ItemsSourceProperty,
+            new Binding(nameof(DropdownItemsSource), source: this)
+        );
+        if (!string.IsNullOrEmpty(DropdownItemsSourceDisplayPath))
             _pickerControl.ItemDisplayBinding = new Binding(DropdownItemsSourceDisplayPath);
 
-        Field_InitializeDataSource();
-
-        // Initialize layout of this control.
-        InitializeLayout();
+        // 5) Finish initialization
+        Initialize();
     }
 
-    #endregion Public Constructors
+    protected override List<View> Field_ControlView()
+        => new List<View> { _pickerContainer };
 
-    #region Enums
+    //protected override List<View> Field_ControlView() =>
+        //new List<View> { _pickerControl, _pickerControlPlaceholder };
+
+    protected override void OnParentSet()
+    {
+        base.OnParentSet();
+
+        Field_UpdateValidationAndChangedState();
+    }
 
     private enum DataSourceTypeEnum
     {
         delimitedstring,
         complexobject
     }
-
-    #endregion Enums
-
-    #region Properties
 
     /// <summary>
     /// Gets or sets dropdown items.
@@ -142,10 +151,6 @@ public partial class DropdownField : BaseFormField<object>
         get => (string)GetValue(DropdownPlaceholderProperty);
         set => SetValue(DropdownPlaceholderProperty, value);
     }
-
-    #endregion Properties
-
-    #region Private Methods
 
     private void Dropdown_SetItems(object newValue)
     {
@@ -203,6 +208,13 @@ public partial class DropdownField : BaseFormField<object>
                 {
                     throw new ArgumentException("Invalid type for DropdownItems. Expected IEnumerable<object>.");
                 }
+
+                // Re-apply the VM value now that the list exists
+                Field_SetValue(FieldDataSource);
+
+                // And make sure change-tracking / undo state are refreshed
+                Field_UpdateValidationAndChangedState();
+
             });
         });
     }
@@ -236,82 +248,48 @@ public partial class DropdownField : BaseFormField<object>
 
     private void OnDropdownSelectedIndexChanged(object? sender, EventArgs e)
     {
-        Debug.WriteLine($"OnDropdownSelectedIndexChanged");
+        Debug.WriteLine($"[DropdownField] : {FieldLabelText} : OnDropdownSelectedIndexChanged");
 
-        if (FieldAccessMode == FieldAccessModeEnum.Editing)
+        if (FieldAccessMode != FieldAccessModeEnum.Editing)
+            return;
+
+        object? newValue;
+
+        switch (dataSourceType)
         {
-            // When a new selection is made, update the binding property.
-            switch (dataSourceType)
-            {
-                case DataSourceTypeEnum.delimitedstring:
-                    if (_pickerControl.SelectedIndex >= 0 && _pickerControl.Items.Count > _pickerControl.SelectedIndex)
-                        Field_SetDataSourceValue(_pickerControl.Items[_pickerControl.SelectedIndex]);
-                    else
-                        Field_SetDataSourceValue(String.Empty);
-                    break;
+            case DataSourceTypeEnum.delimitedstring:
+                if (_pickerControl.SelectedIndex >= 0
+                    && _pickerControl.Items.Count > _pickerControl.SelectedIndex)
+                {
+                    newValue = _pickerControl.Items[_pickerControl.SelectedIndex];
+                }
+                else
+                {
+                    newValue = string.Empty;
+                }
+                break;
 
-                case DataSourceTypeEnum.complexobject:
-                    if (_pickerControl.SelectedItem != null)
-                    {
-                        var key = GetProperty(_pickerControl.SelectedItem, DropdownItemsSourcePrimaryKey);
-                        Field_SetDataSourceValue(key);
-                    }
-                    else
-                        Field_SetDataSourceValue(String.Empty);
-                    break;
-            }
+            case DataSourceTypeEnum.complexobject:
+                if (_pickerControl.SelectedItem != null)
+                {
+                    newValue = GetProperty(_pickerControl.SelectedItem, DropdownItemsSourcePrimaryKey);
+                }
+                else
+                {
+                    newValue = string.Empty;
+                }
+                break;
+
+            default:
+                newValue = null;
+                break;
         }
+
+        // push into VM, then record as “last”
+        Field_SetDataSourceValue(newValue);
+        FieldLastValue = newValue;
     }
-
-    #endregion Private Methods
-
-    #region Protected Methods
-
-    protected override Grid Field_CreateLayoutGrid()
-    {
-        // Explicitly add one row and one column.
-        _pickerContainer.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
-        _pickerContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-
-        // Set the Picker to row 0, column 0.
-        Grid.SetRow(_pickerControl, 0);
-        Grid.SetColumn(_pickerControl, 0);
-        _pickerContainer.Children.Add(_pickerControl);
-
-        // Set the placeholder Label to row 0, column 0 as well.
-        Grid.SetRow(_pickerControlPlaceholder, 0);
-        Grid.SetColumn(_pickerControlPlaceholder, 0);
-
-        // Make sure the Label is transparent to input and background.
-        _pickerControlPlaceholder.InputTransparent = true;
-        _pickerControlPlaceholder.BackgroundColor = Colors.Transparent;
-        _pickerControlPlaceholder.HorizontalOptions = LayoutOptions.Fill;
-        _pickerControlPlaceholder.VerticalOptions = LayoutOptions.Center;
-        _pickerContainer.Children.Add(_pickerControlPlaceholder);
-
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-            },
-            RowDefinitions =
-            {
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto }
-            },
-            VerticalOptions = LayoutOptions.Fill
-        };
-        grid.Add(FieldLabel, 0, 0);
-        grid.Add(_pickerContainer, 1, 0);
-        grid.Add(FieldButtonUndo, 2, 0);
-        grid.Add(FieldNotification, 0, 1);
-        grid.SetColumnSpan(FieldNotification, 3);
-        return grid;
-    }
-
+ 
     protected override object? Field_GetCurrentValue() => FieldDataSource;
 
     protected override string Field_GetFormatErrorMessage() =>
@@ -326,55 +304,108 @@ public partial class DropdownField : BaseFormField<object>
     protected override bool Field_HasFormatError()
     { return false; }
 
-    protected override bool Field_HasRequiredError() => FieldMandatory && FieldDataSource == null;
+    //protected override bool Field_HasRequiredError() => FieldMandatory && FieldDataSource == null;
+    protected override bool Field_HasRequiredError()
+    {
+        // 1) Not mandatory → no error
+        if (!FieldMandatory)
+            return false;
 
+        // 2) Null → definitely no selection → error
+        if (FieldDataSource == null)
+            return true;
+
+        // 3) Empty-string → treated as no selection → error
+        if (FieldDataSource is string s && string.IsNullOrWhiteSpace(s))
+            return true;
+
+        // 4) Otherwise, a valid selection exists → no error
+        return false;
+    }
     protected override void Field_SetValue(object? selectedItem)
     {
-        Debug.WriteLine($"Dropdown_SetSelectedItem ({selectedItem})");
+        Debug.WriteLine($"[DropdownField] : {FieldLabelText} : Field_SetValue(selectedItem: {selectedItem})");
 
-        if (_pickerControl != null)
-            UiThreadHelper.RunOnMainThread(() =>
+        UiThreadHelper.RunOnMainThread(() =>
+            Field_PerformBatchUpdate(() =>
             {
-                Field_PerformBatchUpdate(() =>
+                // Detach handler to prevent recursive SelectedIndexChanged calls
+                _pickerControl.SelectedIndexChanged -= OnDropdownSelectedIndexChanged;
+
+                // Show placeholder when there’s no real selection
+                bool noSelection = selectedItem == null
+                    || (selectedItem is string s && string.IsNullOrWhiteSpace(s));
+
+                _pickerControlPlaceholder.IsVisible = noSelection;
+
+                if (noSelection)
                 {
-                    if ((selectedItem is not string && selectedItem is not null)
-                         || !String.IsNullOrEmpty(selectedItem?.ToString()))
-                    {
-                        switch (dataSourceType)
-                        {
-                            case DataSourceTypeEnum.delimitedstring:
-                                _pickerControl.SelectedIndex = _pickerControl.Items.IndexOf(selectedItem.ToString());
-                                _pickerControlPlaceholder.IsVisible = _pickerControl.SelectedIndex < 0;
-                                if (_pickerControl!.SelectedIndex > -1 && FieldDataSource != selectedItem)
-                                    Field_SetDataSourceValue(selectedItem?.ToString() ?? String.Empty);
-                                break;
 
-                            case DataSourceTypeEnum.complexobject:
-                                _pickerControlPlaceholder.IsVisible = false;
-                                Field_SetDataSourceValue(selectedItem?.ToString() ?? String.Empty);
-                                break;
+                    // clear selection
+                    if (dataSourceType == DataSourceTypeEnum.delimitedstring)
+                        if (_pickerControl.SelectedIndex > 0)
+                            _pickerControl.SelectedIndex = -1;
+
+                    if (dataSourceType == DataSourceTypeEnum.complexobject && DropdownItemsSource is IEnumerable items)
+                        if (_pickerControl.SelectedItem != null)
+                            _pickerControl.SelectedItem = null;
+
+                }
+                else if (dataSourceType == DataSourceTypeEnum.delimitedstring)
+                {
+                    // Items is a string list: find the index of that value
+                    var text = selectedItem!.ToString()!;
+                    // Items[0] is the blank placeholder, so this will push up to the correct slot
+                    _pickerControl.SelectedIndex = _pickerControl.Items.IndexOf(text);
+                }
+                else if (dataSourceType == DataSourceTypeEnum.complexobject && DropdownItemsSource is IEnumerable items)
+                {
+                    // ItemsSource is IList<object?> with first element == null
+                    var src = (IList<object?>)_pickerControl.ItemsSource!;
+                    // scan from 1…N
+                    for (int i = 1; i < src.Count; i++)
+                    {
+                        var obj = src[i]!;
+                        var key = GetProperty(obj, DropdownItemsSourcePrimaryKey)?.ToString();
+                        if (key == selectedItem!.ToString())
+                        {
+                            // select it by index (this also sets SelectedItem under the hood)
+                            _pickerControl.SelectedIndex = i;
+                            break;
                         }
                     }
-                    else
-                    {
-                        _pickerControlPlaceholder.IsVisible = true;
-                        _pickerControlPlaceholder.InputTransparent = true;
-                        _pickerControlPlaceholder.VerticalOptions = LayoutOptions.Center;
-                        _pickerControlPlaceholder.HorizontalOptions = LayoutOptions.Fill;
-                        Field_SetDataSourceValue(null);
-                        switch (dataSourceType)
-                        {
-                            case DataSourceTypeEnum.delimitedstring:
-                                _pickerControl.SelectedIndex = -1;
-                                break;
+                }
+                _pickerControl.SelectedIndexChanged += OnDropdownSelectedIndexChanged;
+            })
+        );
+    }
 
-                            case DataSourceTypeEnum.complexobject:
-                                _pickerControl.SelectedItem = null;
-                                break;
-                        }
-                    }
-                });
-            });
+    protected override void OnBindingContextChanged()
+    {
+        // 1) grab the current datasource (VM→Field) before base runs
+        var initial = FieldDataSource;
+
+        // 2) call up so MAUI wires everything up (but don't let this fire our change logic)
+        bool wasSuppress = FieldSuppressDataSourceCallback;
+        FieldSuppressDataSourceCallback = true;
+        base.OnBindingContextChanged();
+        FieldSuppressDataSourceCallback = wasSuppress;
+
+        // 3) if we haven’t yet recorded an original, do it now—without touching the UI
+        if (!FieldIsOriginalValueSet)
+        {
+            FieldOriginalValue = initial;
+            FieldIsOriginalValueSet = true;
+        }
+    }
+
+
+    protected override void Field_SetDataSourceValue(object? newValue)
+    {
+        FieldSuppressDataSourceCallback = true;           // ← prevent original-capture loop
+        SetValue(FieldDataSourceProperty, newValue);
+        Field_SetValue(newValue);
+        Field_UpdateValidationAndChangedState();          // ← tell base to re-check
     }
 
     // Update the _pickerControl layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
@@ -420,10 +451,6 @@ public partial class DropdownField : BaseFormField<object>
         }
     }
 
-    #endregion Protected Methods
-
-    #region Public Methods
-
     public static List<string> GetListFromDelimitedString(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -452,8 +479,6 @@ public partial class DropdownField : BaseFormField<object>
             });
         });
     }
-
-    #endregion Public Methods
 }
 
 // Converter to extract the primary key from the selected item.

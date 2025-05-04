@@ -21,13 +21,19 @@ namespace ca.whittaker.Maui.Controls.Demo
             //builder.Logging.AddDebug();
 #endif
 
-            builder.Services.AddSingleton<LoginLogoutViewModel>();
-            builder.Services.AddSingleton<LoginLogoutPage>();
-            builder.Services.AddSingleton<UserProfilePage>();
-            //builder.Services.AddSingleton<SampleCheckBoxPage>();
+            builder.Services.AddSingleton<TestForm1ViewModel>();
+            builder.Services.AddSingleton<TestForm2ViewModel>();
+            builder.Services.AddSingleton<TestForm3ViewModel>();
+            builder.Services.AddSingleton<TestForm4ViewModel>();
+            builder.Services.AddSingleton<TestForm5ViewModel>();
 
-            builder.Services.AddSingleton<MauiPage1>();
-            builder.Services.AddSingleton<MauiPage2>();
+            builder.Services.AddSingleton<TestForm1>();
+            builder.Services.AddSingleton<TestForm2>();
+            builder.Services.AddSingleton<TestForm3>();
+            builder.Services.AddSingleton<TestForm4>();
+            builder.Services.AddSingleton<TestForm5>();
+
+            builder.Services.AddSingleton<TestForm>();
 
             return builder.Build();
         }

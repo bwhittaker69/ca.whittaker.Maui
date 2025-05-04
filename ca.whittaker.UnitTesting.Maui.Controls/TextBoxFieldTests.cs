@@ -1,204 +1,264 @@
-﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using ca.whittaker.Maui.Controls.Buttons;
+﻿using System.ComponentModel;
+using System.Reflection;
+using ca.whittaker.Maui.Controls.Forms;
 using Microsoft.Maui.Controls;
-using ca.whittaker.Maui.Controls;
+using NUnit.Framework;
 
 namespace ca.whittaker.UnitTesting.Maui.Controls;
 
+
 [TestFixture]
-public class TextBoxFieldTests
+public partial class TextBoxFieldTests
 {
+    static Entry GetInnerEntry(TextBoxField fld)
+    {
+        var fi = typeof(TextBoxField)
+                 .GetField("_textBox", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        return (Entry)fi.GetValue(fld)!;
+    }
+
+    static object InvokePrivate(object target, string name, params object?[] args)
+    {
+        var mi = target.GetType()
+                       .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!;
+        return mi.Invoke(target, args)!;
+    }
 
     [Test]
-    public void Test_TextBoxFieldTests()
+    public void Defaults_Are_AsExpected()
     {
         // ARRANGE
-        var buttonClasses = ca.whittaker.Maui.Controls.Buttons.TypeHelper.GetNonAbstractClasses();
-        var assertions = new List<string>();
+        var fld = new TextBoxField();
+        var results = new List<string>();
 
         // ACT
-        foreach (var buttonClass in buttonClasses)
+        var allLower = fld.TextBoxAllLowerCase;
+        var allowWs = fld.TextBoxAllowWhiteSpace;
+        var maxLen = fld.TextBoxMaxLength;
+        var placeholder = fld.TextBoxPlaceholder;
+        var entry = GetInnerEntry(fld);
+
+        // ASSERT
+        try
         {
-            var button = (ButtonBase?)Activator.CreateInstance(buttonClass);
-            button!.Parent = new ContentView();
-            Assert.That(button, Is.Not.Null, $"Button class {buttonClass.Name} should not be null.");
-            Assert.That(button.ButtonIcon, Is.Not.Null, $"Button class {buttonClass.Name} should have a ButtonIcon.");
-            Assert.That(button.ButtonSize, Is.Not.Null, $"Button class {buttonClass.Name} should have a ButtonSize.");
-            Assert.That(button.ButtonState, Is.Not.Null, $"Button class {buttonClass.Name} should have a ButtonState.");
-            assertions.Add($"> PASS: {buttonClass.Name} ImageSource {nameof(buttonClass)}.");
+            Assert.That(allLower, Is.False, "TextBoxAllLowerCase should default to false");
+            results.Add("> PASS: TextBoxAllLowerCase is false");
+
+            Assert.That(allowWs, Is.True, "TextBoxAllowWhiteSpace should default to true");
+            results.Add("> PASS: TextBoxAllowWhiteSpace is true");
+
+            Assert.That(maxLen, Is.EqualTo(255), "TextBoxMaxLength should default to 255");
+            results.Add("> PASS: TextBoxMaxLength is 255");
+
+            Assert.That(placeholder, Is.EqualTo(string.Empty), "TextBoxPlaceholder should default to empty");
+            results.Add("> PASS: TextBoxPlaceholder is empty");
+
+            Assert.That(entry.IsEnabled, Is.False, "Entry.IsEnabled should default to false");
+            results.Add("> PASS: Entry.IsEnabled is false");
+
+            Assert.That(entry.Placeholder, Is.EqualTo(string.Empty), "Entry.Placeholder should default to empty");
+            results.Add("> PASS: Entry.Placeholder is empty");
+
+            Assert.That(entry.MaxLength, Is.EqualTo(255), "Entry.MaxLength should default to 255");
+            results.Add("> PASS: Entry.MaxLength is 255");
+
+            Assert.Pass($"Test passed: Defaults_Are_AsExpected\n{string.Join("\n", results)}");
         }
-        Assert.Pass($"Test passed\r\nResult List:\r\n{string.Join("\r\n", assertions)}");
-    }
-
-
-    [Test]
-    public void Test_Buttons_Disabled()
-    {
-        // ARRANGE
-        var buttonClasses = ca.whittaker.Maui.Controls.Buttons.TypeHelper.GetNonAbstractClasses();
-        var assertions = new List<string>();
-
-        // ACT
-        foreach (var buttonClass in buttonClasses)
+        catch (AssertionException ex)
         {
-            var button = (ButtonBase?)Activator.CreateInstance(buttonClass);
-            button!.Parent = new ContentView();
-            button.ButtonState = ButtonStateEnum.Disabled;
-            var disabledImageSource = button.ImageSource.IsEmpty;
-
-            Assert.That(button, Is.Not.Null, $"Button class {buttonClass.Name} should not be null.");
-            Assert.That(disabledImageSource, Is.False, $"Button class {buttonClass.Name} should have a Disabled ImageSource.");
-            Assert.That(button.ButtonIcon, Is.Not.Null, $"Button class {buttonClass.Name} should have a ButtonIcon.");
-            Assert.That(button.ButtonSize, Is.Not.Null, $"Button class {buttonClass.Name} should have a ButtonSize.");
-            Assert.That(button.ButtonState, Is.Not.Null, $"Button class {buttonClass.Name} should have a ButtonState.");
-            assertions.Add($"> PASS: {buttonClass.Name} ImageSource {nameof(buttonClass)}.");
+            results.Add($"> FAIL: {ex.Message}");
+            Assert.Fail($"Test failed: Defaults_Are_AsExpected\n{string.Join("\n", results)}");
         }
-        Assert.Pass($"Test passed\r\nResult List:\r\n{string.Join("\r\n", assertions)}");
     }
 
-
     [Test]
-    public void Test_Button_ImageSource()
+    public void Setting_Placeholder_Updates_Entry()
     {
         // ARRANGE
-        var assertions = new List<string>();
+        var fld = new TextBoxField();
+        var results = new List<string>();
 
         // ACT
-        var cancelButton = new CancelButton();
-        cancelButton.Parent = new ContentView();
+        fld.TextBoxPlaceholder = "Enter name";
+        InvokePrivate(fld, "OnTextBoxPlaceholderPropertyChanged", fld.TextBoxPlaceholder);
+        var entry = GetInnerEntry(fld);
 
         // ASSERT
-        Assert.That(cancelButton.ImageSource, Is.Not.Null, "ImageSource should have a value");
-        Assert.That(cancelButton.ImageSource.IsEmpty, Is.False, "ImageSource should not be empty");
-        Assert.That(cancelButton.ButtonIcon, Is.EqualTo(ButtonIconEnum.Cancel), "CancelButton should set ButtonIcon to Cancel.");
-        assertions.Add($"> PASS: CancelButton ImageSource {cancelButton.ButtonIcon}.");
-        Assert.Pass($"Test passed\r\nResult List:\r\n{string.Join("\r\n", assertions)}");
-    }
-
-
-
-    #region Constructor Tests
-    [Test]
-    public void Test_Button_Constructor_Sets_ButtonIconToCancel()
-    {
-        // ARRANGE
-        var assertions = new List<string>();
-
-        // ACT
-        var cancelButton = new CancelButton();
-
-        // ASSERT
-        Assert.That(cancelButton.ButtonIcon, Is.EqualTo(ButtonIconEnum.Cancel), "CancelButton should set ButtonIcon to Cancel.");
-        assertions.Add($"> PASS: CancelButton constructor sets ButtonIcon to {cancelButton.ButtonIcon}.");
-        Assert.Pass($"Test passed\r\nResult List:\r\n{string.Join("\r\n", assertions)}");
-    }
-    #endregion
-
-    #region State Methods Tests
-    [Test]
-    public void Test_Enabled_Method_Sets_StateAndUIProperties()
-    {
-        // ARRANGE
-        var assertions = new List<string>();
-        var button = new CancelButton
+        try
         {
-            // Assume a valid size and style for testing UI logic.
-            ButtonSize = SizeEnum.Normal,
-            ButtonStyle = ButtonStyleEnum.IconAndText,
-            Text = "Cancel"
-        };
+            Assert.That(entry.Placeholder, Is.EqualTo("Enter name"), "Placeholder should update on property change");
+            results.Add("> PASS: Placeholder updated to 'Enter name'");
 
-        // ACT
-        // First, set to a different state.
-        button.Disabled();
-        button.Enabled();
-
-        // ASSERT
-        Assert.That(button.ButtonState, Is.EqualTo(ButtonStateEnum.Enabled), "Enabled() should set ButtonState to Enabled.");
-        assertions.Add("> PASS: Enabled() set ButtonState to Enabled.");
-        Assert.That(button.IsEnabled, Is.True, "Enabled() should set IsEnabled to true.");
-        assertions.Add("> PASS: Enabled() set IsEnabled to true.");
-        Assert.That(button.IsVisible, Is.True, "Enabled() should set IsVisible to true.");
-        assertions.Add("> PASS: Enabled() set IsVisible to true.");
-
-        Assert.Pass($"Test passed\r\nResult List:\r\n{string.Join("\r\n", assertions)}");
-    }
-
-    [Test]
-    public void Test_Disabled_Method_Sets_StateAndUIProperties()
-    {
-        // ARRANGE
-        var assertions = new List<string>();
-        var button = new CancelButton
+            Assert.Pass($"Test passed: Setting_Placeholder_Updates_Entry\n{string.Join("\n", results)}");
+        }
+        catch (AssertionException ex)
         {
-            ButtonSize = SizeEnum.Normal,
-            ButtonStyle = ButtonStyleEnum.IconAndText,
-            Text = "Cancel"
-        };
-
-        // ACT
-        button.Disabled();
-
-        // ASSERT
-        Assert.That(button.ButtonState, Is.EqualTo(ButtonStateEnum.Disabled), "Disabled() should set ButtonState to Disabled.");
-        assertions.Add("> PASS: Disabled() set ButtonState to Disabled.");
-        Assert.That(button.IsEnabled, Is.False, "Disabled() should set IsEnabled to false.");
-        assertions.Add("> PASS: Disabled() set IsEnabled to false.");
-        Assert.That(button.IsVisible, Is.True, "Disabled() should leave IsVisible as true.");
-        assertions.Add("> PASS: Disabled() left IsVisible as true.");
-
-        Assert.Pass($"Test passed\r\nResult List:\r\n{string.Join("\r\n", assertions)}");
+            results.Add($"> FAIL: {ex.Message}");
+            Assert.Fail($"Test failed: Setting_Placeholder_Updates_Entry\n{string.Join("\n", results)}");
+        }
     }
 
     [Test]
-    public void Test_Hide_Method_Sets_StateAndUIProperties()
+    public void Setting_MaxLength_Updates_Entry()
     {
         // ARRANGE
-        var assertions = new List<string>();
-        var button = new CancelButton();
+        var fld = new TextBoxField();
+        var results = new List<string>();
 
         // ACT
-        button.Hide();
+        fld.TextBoxMaxLength = 10;
+        InvokePrivate(fld, "OnTextBoxMaxLengthPropertyChanged", fld.TextBoxMaxLength);
+        var entry = GetInnerEntry(fld);
 
         // ASSERT
-        Assert.That(button.ButtonState, Is.EqualTo(ButtonStateEnum.Hidden), "Hide() should set ButtonState to Hidden.");
-        assertions.Add("> PASS: Hide() set ButtonState to Hidden.");
-        Assert.That(button.IsVisible, Is.False, "Hide() should set IsVisible to false.");
-        assertions.Add("> PASS: Hide() set IsVisible to false.");
-
-        Assert.Pass($"Test passed\r\nResult List:\r\n{string.Join("\r\n", assertions)}");
-    }
-    #endregion
-
-    #region UpdateUI Logic Tests
-    [Test]
-    public void Test_UpdateUI_ConfiguresEnabledProperly()
-    {
-        // ARRANGE
-        var assertions = new List<string>();
-        var button = new CancelButton
+        try
         {
-            ButtonSize = SizeEnum.Normal,
-            ButtonStyle = ButtonStyleEnum.IconAndText,
-            Text = "Cancel"
-        };
+            Assert.That(entry.MaxLength, Is.EqualTo(10), "MaxLength should update on property change");
+            results.Add("> PASS: MaxLength updated to 10");
 
-        // Set initial state to Disabled then switch to Enabled
-        button.Disabled();
-        button.Enabled();
+            Assert.Pass($"Test passed: Setting_MaxLength_Updates_Entry\n{string.Join("\n", results)}");
+        }
+        catch (AssertionException ex)
+        {
+            results.Add($"> FAIL: {ex.Message}");
+            Assert.Fail($"Test failed: Setting_MaxLength_Updates_Entry\n{string.Join("\n", results)}");
+        }
+    }
+
+    [Test]
+    public void DataTypeProperty_Sets_Correct_Keyboard()
+    {
+        // ARRANGE
+        var fld = new TextBoxField();
+        var results = new List<string>();
+
+        // ACT & ASSERT
+        try
+        {
+            fld.TextBoxDataType = ca.whittaker.Maui.Controls.TextBoxDataTypeEnum.Email;
+            InvokePrivate(fld, "OnTextBoxDataTypeChanged", ca.whittaker.Maui.Controls.TextBoxDataTypeEnum.Email);
+            Assert.That(GetInnerEntry(fld).Keyboard, Is.EqualTo(Keyboard.Email), "Email type sets Email keyboard");
+            results.Add("> PASS: Email keyboard set");
+
+            fld.TextBoxDataType = ca.whittaker.Maui.Controls.TextBoxDataTypeEnum.Url;
+            InvokePrivate(fld, "OnTextBoxDataTypeChanged", ca.whittaker.Maui.Controls.TextBoxDataTypeEnum.Url);
+            Assert.That(GetInnerEntry(fld).Keyboard, Is.EqualTo(Keyboard.Url), "URL type sets Url keyboard");
+            results.Add("> PASS: Url keyboard set");
+
+            Assert.Pass($"Test passed: DataTypeProperty_Sets_Correct_Keyboard\n{string.Join("\n", results)}");
+        }
+        catch (AssertionException ex)
+        {
+            results.Add($"> FAIL: {ex.Message}");
+            Assert.Fail($"Test failed: DataTypeProperty_Sets_Correct_Keyboard\n{string.Join("\n", results)}");
+        }
+    }
+
+    [Test]
+    public void ProcessAndSetText_Filters_Correctly()
+    {
+        // ARRANGE
+        var fld = new TextBoxField
+        {
+            TextBoxAllLowerCase = true,
+            TextBoxAllowWhiteSpace = true,
+            TextBoxDataType = ca.whittaker.Maui.Controls.TextBoxDataTypeEnum.Plaintext
+        };
+        var results = new List<string>();
 
         // ACT
-        button.UpdateUI();
+        InvokePrivate(fld, "TextBox_ProcessAndSetText", "Ab C!1");
+        var current = (string)InvokePrivate(fld, "Field_GetCurrentValue")!;
 
-        // ASSERT - Check that UI-related properties are set as expected.
-        Assert.That(button.IsEnabled, Is.True, "After UpdateUI in Enabled state, IsEnabled should be true.");
-        assertions.Add("> PASS: UpdateUI in Enabled state sets IsEnabled to true.");
-        Assert.That(button.IsVisible, Is.True, "After UpdateUI in Enabled state, IsVisible should be true.");
-        assertions.Add("> PASS: UpdateUI in Enabled state sets IsVisible to true.");
-        // Additional assertions might check if Text and ImageSource are set based on ButtonStyle.
-        Assert.Pass($"Test passed\r\nResult List:\r\n{string.Join("\r\n", assertions)}");
+        // ASSERT
+        try
+        {
+            Assert.That(current, Is.EqualTo("abc!1"), "Processed text should be 'abc!1'");
+            results.Add("> PASS: Processed text is 'abc!1'");
+
+            Assert.Pass($"Test passed: ProcessAndSetText_Filters_Correctly\n{string.Join("\n", results)}");
+        }
+        catch (AssertionException ex)
+        {
+            results.Add($"> FAIL: {ex.Message}");
+            Assert.Fail($"Test failed: ProcessAndSetText_Filters_Correctly\n{string.Join("\n", results)}");
+        }
     }
-    #endregion
+
+    [Test]
+    public void ReturnCommand_Executes_FieldCommand()
+    {
+        // ARRANGE
+        var fld = new TextBoxField();
+        bool invoked = false;
+        fld.FieldCommand = new Command(_ => invoked = true);
+
+        // ACT
+        // invoke the private method via reflection, passing a null object parameter
+        var mi = fld.GetType()
+                    .GetMethod("TextBox_ReturnPressedCommand",
+                               BindingFlags.Instance | BindingFlags.NonPublic)!;
+        mi.Invoke(fld, new object[] { null! });
+
+        // ASSERT
+        Assert.That(invoked, Is.True, "ReturnCommand should invoke FieldCommand");
+    }
+    
+
+    [Test]
+    public void RequiredValidation_Works()
+    {
+        // ARRANGE
+        var fld = new TextBoxField { FieldMandatory = true };
+        var results = new List<string>();
+
+        // ACT & ASSERT
+        try
+        {
+            var hasReq = (bool)InvokePrivate(fld, "Field_HasRequiredError")!;
+            Assert.That(hasReq, Is.True, "Mandatory field with no text should error");
+            results.Add("> PASS: Required error on empty");
+
+            InvokePrivate(fld, "Field_SetValue", "X");
+            var noReq = (bool)InvokePrivate(fld, "Field_HasRequiredError")!;
+            Assert.That(noReq, Is.False, "After setting value, no required error");
+            results.Add("> PASS: No required error after value set");
+
+            Assert.Pass($"Test passed: RequiredValidation_Works\n{string.Join("\n", results)}");
+        }
+        catch (AssertionException ex)
+        {
+            results.Add($"> FAIL: {ex.Message}");
+            Assert.Fail($"Test failed: RequiredValidation_Works\n{string.Join("\n", results)}");
+        }
+    }
+
+    [Test]
+    public void FormatError_EmailValidation()
+    {
+        // ARRANGE
+        var fld = new TextBoxField { TextBoxDataType = ca.whittaker.Maui.Controls.TextBoxDataTypeEnum.Email };
+        var results = new List<string>();
+
+        // ACT & ASSERT
+        try
+        {
+            InvokePrivate(fld, "Field_SetValue", "not-an-email");
+            var bad = (bool)InvokePrivate(fld, "Field_HasFormatError")!;
+            Assert.That(bad, Is.True, "Invalid email should error");
+            results.Add("> PASS: Invalid email detected");
+
+            InvokePrivate(fld, "Field_SetValue", "me@example.com");
+            var good = (bool)InvokePrivate(fld, "Field_HasFormatError")!;
+            Assert.That(good, Is.False, "Valid email should not error");
+            results.Add("> PASS: Valid email accepted");
+
+            Assert.Pass($"Test passed: FormatError_EmailValidation\n{string.Join("\n", results)}");
+        }
+        catch (AssertionException ex)
+        {
+            results.Add($"> FAIL: {ex.Message}");
+            Assert.Fail($"Test failed: FormatError_EmailValidation\n{string.Join("\n", results)}");
+        }
+    }
 }

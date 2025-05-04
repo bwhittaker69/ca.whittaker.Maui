@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ca.whittaker.Maui.Controls.Demo.ViewModels;
 
-public class UserProfilePageViewModel : ObservableObject
+public class TestForm2ViewModel : ObservableObject
 {
     private bool _isVisible = true;
     public bool IsVisible
@@ -46,7 +46,7 @@ public class UserProfilePageViewModel : ObservableObject
 
     public Command FormSaveCommand { get; }
 
-    public UserProfilePageViewModel()
+    public TestForm2ViewModel()
     {
         FormSaveCommand = new Command(OnFormSave);
     }

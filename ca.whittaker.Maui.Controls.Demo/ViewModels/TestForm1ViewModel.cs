@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
 namespace ca.whittaker.Maui.Controls.Demo.ViewModels;
 
-public class LoginLogoutViewModel : ObservableObject
+public class TestForm1ViewModel : ObservableObject
 {
     private string _loginLogoutHeaderText = Resources.Strings.AppResources.Page_LoginLogout_Title_SignIn;
     public string LoginLogoutHeaderText
@@ -115,8 +116,9 @@ public class LoginLogoutViewModel : ObservableObject
     public Command<string> LoginCommand { get; }
     public Command<string> LogoutCommand { get; }
 
-    public LoginLogoutViewModel()
+    public TestForm1ViewModel()
     {
+
         IsVisible = false;
 
         LoginCommand = new Command<string>(Login);
@@ -125,6 +127,8 @@ public class LoginLogoutViewModel : ObservableObject
 
         LoginButtonState = ButtonStateEnum.Enabled;
         LogoutButtonState = ButtonStateEnum.Hidden;
+
+
     }
 
     private void Login(string loginscheme)

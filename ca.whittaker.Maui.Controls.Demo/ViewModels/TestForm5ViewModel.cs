@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ public class TestUser
 }
 
 
-public class MauiPage1ViewModel : ObservableObject
+public class TestForm5ViewModel : ObservableObject
 {
 
     private List<TestUser>? GenerateTestUsers(int count)
@@ -67,19 +68,26 @@ public class MauiPage1ViewModel : ObservableObject
     private DateTimeOffset? _userprofile_date = new DateTimeOffset(new DateTime(1969, 7, 25));
     public DateTimeOffset? Userprofile_date
     {
-        get => _userprofile_date;
-        set => SetProperty(ref _userprofile_date, value);
+        get
+        {
+            Debug.WriteLine($"[ViewModel Getter] Userprofile_date GET: {_userprofile_date}");
+            return _userprofile_date;
+        }
+        set
+        {
+            Debug.WriteLine($"[ViewModel Setter] Userprofile_date SET: {value}");
+            SetProperty(ref _userprofile_date, value);
+        }
     }
 
-
-    private string _userprofile_nickname = "Nickname value";
+    private string _userprofile_nickname = "Nickname original value";
     public string Userprofile_nickname
     {
         get => _userprofile_nickname;
         set => SetProperty(ref _userprofile_nickname, value);
     }
 
-    private string _userprofile_email = string.Empty;
+    private string _userprofile_email = "brett@whittaker.ca";
     public string Userprofile_email
     {
         get => _userprofile_email;
@@ -113,6 +121,13 @@ public class MauiPage1ViewModel : ObservableObject
         set => SetProperty(ref _userprofile_country_items, value);
     }
 
+    private bool? _userprofile_istristate = false;
+    public bool? Userprofile_istristate
+    {
+        get => _userprofile_istristate;
+        set => SetProperty(ref _userprofile_istristate, value);
+    }
+
     private bool _userprofile_ispublic = false;
     public bool Userprofile_ispublic
     {
@@ -122,12 +137,18 @@ public class MauiPage1ViewModel : ObservableObject
 
     public Command FormSaveCommand { get; }
 
-    public MauiPage1ViewModel()
+    public TestForm5ViewModel()
     {
+
+        Debug.WriteLine("[ViewModel Constructor] TestForm5ViewModel created.");
+
         FormSaveCommand = new Command(OnFormSave);
 
         // Populate Userprofile_users with TestUser objects.
         Userprofile_users = GenerateTestUsers(6);
+
+        Debug.WriteLine($"[ViewModel Constructor End] Userprofile_date = {Userprofile_date}");
+
     }
 
     private void OnFormSave()

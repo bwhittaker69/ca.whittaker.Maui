@@ -7,15 +7,8 @@ using System.Threading.Tasks;
 
 namespace ca.whittaker.Maui.Controls.Demo.ViewModels;
 
-public class SampleCheckBoxViewModel : ObservableObject
+public class TestForm3ViewModel : ObservableObject
 {
-    private bool _userprofile_ispublic;
-    public bool Userprofile_ispublic
-    {
-        get => _userprofile_ispublic;
-        set => SetProperty(ref _userprofile_ispublic, value);
-    }
-
     private bool _isVisible = true;
     public bool IsVisible
     {
@@ -23,8 +16,15 @@ public class SampleCheckBoxViewModel : ObservableObject
         set => SetProperty(ref _isVisible, value);
     }
 
-    public SampleCheckBoxViewModel()
+    private string _userprofile_nickname = string.Empty;
+    public string Userprofile_nickname
     {
-        // Default initialization if needed.
+        get => _userprofile_nickname;
+        set => SetProperty(ref _userprofile_nickname, value);
+    }
+
+    public TestForm3ViewModel()
+    {
+        // Initialization logic if needed.
     }
 }

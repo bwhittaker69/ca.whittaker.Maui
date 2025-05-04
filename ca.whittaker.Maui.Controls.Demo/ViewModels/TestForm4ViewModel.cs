@@ -7,8 +7,15 @@ using System.Threading.Tasks;
 
 namespace ca.whittaker.Maui.Controls.Demo.ViewModels;
 
-public class SampleTextBoxViewModel : ObservableObject
+public class TestForm4ViewModel : ObservableObject
 {
+    private bool _userprofile_ispublic;
+    public bool Userprofile_ispublic
+    {
+        get => _userprofile_ispublic;
+        set => SetProperty(ref _userprofile_ispublic, value);
+    }
+
     private bool _isVisible = true;
     public bool IsVisible
     {
@@ -16,15 +23,8 @@ public class SampleTextBoxViewModel : ObservableObject
         set => SetProperty(ref _isVisible, value);
     }
 
-    private string _userprofile_nickname = string.Empty;
-    public string Userprofile_nickname
+    public TestForm4ViewModel()
     {
-        get => _userprofile_nickname;
-        set => SetProperty(ref _userprofile_nickname, value);
-    }
-
-    public SampleTextBoxViewModel()
-    {
-        // Initialization logic if needed.
+        // Default initialization if needed.
     }
 }

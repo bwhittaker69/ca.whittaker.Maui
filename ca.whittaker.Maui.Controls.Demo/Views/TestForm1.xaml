@@ -6,12 +6,14 @@
              xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
-             x:Class="ca.whittaker.Maui.Controls.Demo.Views.LoginLogoutPage"
-             Title="{Binding LoginLogoutHeaderText}"
-             x:DataType="vm:LoginLogoutViewModel">
+             x:Class="ca.whittaker.Maui.Controls.Demo.Views.TestForm1"
+             Title="TestForm1"
+             x:DataType="vm:TestForm1ViewModel">
 
     <VerticalStackLayout>
-        
+
+        <Label Text="TestForm1" FontSize="Header"></Label>
+
         <VerticalStackLayout Spacing="15"
                              Padding="25"  
                              Margin="20, 20, 20, 20"

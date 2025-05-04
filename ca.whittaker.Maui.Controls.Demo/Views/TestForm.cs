@@ -3,12 +3,12 @@ using ca.whittaker.Maui.Controls.Buttons;
 using System.Diagnostics;
 namespace ca.whittaker.Maui.Controls.Demo.Views;
 
-public class MauiPage2 : ContentPage
+public class TestForm : ContentPage
 {
     public UndoButton? undoButton;
     public Label? label;
 
-    public MauiPage2()
+    public TestForm()
     {
         undoButton = new UndoButton
         {
@@ -18,7 +18,7 @@ public class MauiPage2 : ContentPage
         //undoButton.Enabled();
         label = new Label
         {
-            Text = "Welcome to .NET MAUI!!!",
+            Text = "TestForm",
             TextColor = Colors.Red,
             HorizontalOptions = LayoutOptions.Center,
             VerticalOptions = LayoutOptions.Center

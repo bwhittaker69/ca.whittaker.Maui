@@ -3,10 +3,10 @@ using ca.whittaker.Maui.Controls.Demo.ViewModels;
 
 namespace ca.whittaker.Maui.Controls.Demo.Views;
 
-public partial class LoginLogoutPage : ContentPage
+public partial class TestForm1 : ContentPage
 {
 
-    public LoginLogoutPage(LoginLogoutViewModel viewModel)
+    public TestForm1(TestForm1ViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;

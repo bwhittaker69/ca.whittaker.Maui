@@ -1,4 +1,5 @@
-﻿using Entry = Microsoft.Maui.Controls.Entry;
+﻿using System.Diagnostics;
+using Entry = Microsoft.Maui.Controls.Entry;
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
@@ -50,8 +51,7 @@ public partial class TextBoxField : BaseFormField<string>
     #endregion Fields
 
     #region Public Constructors
-
-    public TextBoxField()
+    public TextBoxField() : base()
     {
         _textBox = new Entry
         {
@@ -61,15 +61,12 @@ public partial class TextBoxField : BaseFormField<string>
         _textBox.ReturnCommand = new Command(TextBox_ReturnPressedCommand);
         _textBox.TextChanged += TextBox_TextChanged;
 
-        Field_WireFocusEvents(_textBox);
-
         TextBox_SetPlaceholderText(TextBoxPlaceholder);
         TextBox_SetMaxLength(TextBoxMaxLength);
 
-        Field_InitializeDataSource();
-
-        InitializeLayout();
+        Initialize();
     }
+    protected override List<View> Field_ControlView() => new List<View>() { _textBox };
 
     #endregion Public Constructors
 
@@ -244,31 +241,31 @@ public partial class TextBoxField : BaseFormField<string>
     #endregion Private Methods
 
     #region Protected Methods
-
-    protected override Grid Field_CreateLayoutGrid()
-    {
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-            },
-            RowDefinitions =
-            {
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto }
-            },
-            VerticalOptions = LayoutOptions.Fill
-        };
-        grid.Add(FieldLabel, 0, 0);
-        grid.Add(_textBox, 1, 0);
-        grid.Add(FieldButtonUndo, 2, 0);
-        grid.Add(FieldNotification, 0, 1);
-        grid.SetColumnSpan(FieldNotification, 3);
-        return grid;
-    }
+    //TestBoxField
+    //protected override Grid Field_CreateLayoutGrid()
+    //{
+    //    var grid = new Grid
+    //    {
+    //        ColumnDefinitions =
+    //        {
+    //            new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
+    //            new ColumnDefinition { Width = GridLength.Star },
+    //            new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
+    //        },
+    //        RowDefinitions =
+    //        {
+    //            new RowDefinition { Height = GridLength.Auto },
+    //            new RowDefinition { Height = GridLength.Auto }
+    //        },
+    //        VerticalOptions = LayoutOptions.Fill
+    //    };
+    //    grid.Add(FieldLabel, 0, 0);
+    //    grid.Add(_textBox, 1, 0);
+    //    grid.Add(FieldButtonUndo, 2, 0);
+    //    grid.Add(FieldNotification, 0, 1);
+    //    grid.SetColumnSpan(FieldNotification, 3);
+    //    return grid;
+    //}
 
     protected override string? Field_GetCurrentValue() => _textBox.Text;
 
@@ -289,8 +286,11 @@ public partial class TextBoxField : BaseFormField<string>
     protected override bool Field_HasChangedFromLast() =>
                 FieldLastValue != (_textBox.Text ?? String.Empty);
 
-    protected override bool Field_HasChangedFromOriginal() =>
-                        FieldOriginalValue != (_textBox.Text ?? String.Empty);
+    protected override bool Field_HasChangedFromOriginal()
+    {
+        Debug.WriteLine($"[TextBoxField] : {FieldLabelText} : Field_HasChangedFromOriginal() = {!FieldAreValuesEqual(FieldOriginalValue, _textBox?.Text)}");
+        return !FieldAreValuesEqual(FieldOriginalValue, _textBox?.Text);
+    }
 
     protected override bool Field_HasFormatError()
     {
@@ -325,6 +325,7 @@ public partial class TextBoxField : BaseFormField<string>
 
     protected override void Field_SetValue(string? value)
     {
+        Debug.WriteLine($"[TextBoxField] : {FieldLabelText} : Field_SetValue(value: {value})");
         UiThreadHelper.RunOnMainThread(() =>
         {
             Field_PerformBatchUpdate(() =>
@@ -394,3 +395,4 @@ public partial class TextBoxField : BaseFormField<string>
 
     #endregion Public Methods
 }
+

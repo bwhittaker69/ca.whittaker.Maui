@@ -23,7 +23,7 @@ public static class ControlVisualHelper
                 ed.IsEnabled = false;
             if (c is ContentView cv)
                 cv.IsEnabled = false;
-            // If Label is encountered and fieldLabelVisible is true, keep it enabled.
+            // labels are always enabled
             if (c is Label l && fieldLabelVisible)
                 l.IsEnabled = true;
         }
@@ -48,7 +48,6 @@ public static class ControlVisualHelper
                 ed.IsEnabled = true;
             if (c is ContentView cv)
                 cv.IsEnabled = true;
-            // If Label is encountered and fieldLabelVisible is true, keep it enabled.
             if (c is Label l && fieldLabelVisible)
                 l.IsEnabled = true;
         }

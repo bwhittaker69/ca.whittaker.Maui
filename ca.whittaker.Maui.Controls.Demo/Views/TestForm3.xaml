@@ -6,24 +6,29 @@
              xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
              xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="ca.whittaker.Maui.Controls.Demo.Views.SampleCheckBoxPage"
+             x:Class="ca.whittaker.Maui.Controls.Demo.Views.TestForm3"
              IsVisible="{Binding IsVisible}" 
              Disappearing="ContentPage_Disappearing"
              Title="{x:Static strings:AppResources.Page_UserProfile_Title}"
-             x:DataType="vm:SampleCheckBoxViewModel">
-    
+             x:DataType="vm:TestForm3ViewModel">
+
     <VerticalStackLayout>
+
+        <Label Text="TestForm3" FontSize="Header"></Label>
 
         <VerticalStackLayout Spacing="15"
                              Padding="25"  
                              Margin="0, 0, 0, 0"
                              VerticalOptions="Start" >
 
-            <Forms:CheckBoxField FieldLabelWidth="150"
-                                x:Name="CheckBox_IsPublic"
-                                FieldDataSource="{Binding Userprofile_ispublic}"
-                                FieldLabelText="{x:Static strings:AppResources.Field_IsPublic}">
-            </Forms:CheckBoxField>
+            <Forms:TextBoxField
+                    FieldLabelWidth="70"
+                    x:Name="TextBox_Name"
+                    FieldDataSource="{Binding Userprofile_nickname}"
+                    FieldLabelText="{x:Static strings:AppResources.Field_Name}"
+                    TextBoxMaxLength="40"
+                    TextBoxPlaceholder="{x:Static strings:AppResources.Field_Name_Placeholder}">
+            </Forms:TextBoxField>
 
         </VerticalStackLayout>
         

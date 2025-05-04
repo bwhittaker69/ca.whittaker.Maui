@@ -56,15 +56,14 @@ public partial class EditorField : BaseFormField<string>
         _editorBox.IsEnabled = false;
         _editorBox.TextChanged += Editor_TextChanged;
 
-        Field_WireFocusEvents(_editorBox);
-
         Editor_SetPlaceholderText(EditorPlaceholder);
         Editor_SetMaxSize(EditorMaxSize);
 
-        Field_InitializeDataSource();
-
-        InitializeLayout();
+        // Initialize 
+        Initialize();
     }
+    protected override List<View> Field_ControlView() => new List<View>() { _editorBox };
+
 
     #endregion Public Constructors
 
@@ -206,31 +205,31 @@ public partial class EditorField : BaseFormField<string>
     #endregion Private Methods
 
     #region Protected Methods
-
-    protected override Grid Field_CreateLayoutGrid()
-    {
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-            },
-            RowDefinitions =
-            {
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto }
-            },
-            VerticalOptions = LayoutOptions.Fill
-        };
-        grid.Add(FieldLabel, 0, 0);
-        grid.Add(_editorBox, 1, 0);
-        grid.Add(FieldButtonUndo, 2, 0);
-        grid.Add(FieldNotification, 0, 1);
-        grid.SetColumnSpan(FieldNotification, 3);
-        return grid;
-    }
+    //EditorField
+    //protected override Grid Field_CreateLayoutGrid()
+    //{
+    //    var grid = new Grid
+    //    {
+    //        ColumnDefinitions =
+    //        {
+    //            new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
+    //            new ColumnDefinition { Width = GridLength.Star },
+    //            new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
+    //        },
+    //        RowDefinitions =
+    //        {
+    //            new RowDefinition { Height = GridLength.Auto },
+    //            new RowDefinition { Height = GridLength.Auto }
+    //        },
+    //        VerticalOptions = LayoutOptions.Fill
+    //    };
+    //    grid.Add(FieldLabel, 0, 0);
+    //    grid.Add(_editorBox, 1, 0);
+    //    grid.Add(FieldButtonUndo, 2, 0);
+    //    grid.Add(FieldNotification, 0, 1);
+    //    grid.SetColumnSpan(FieldNotification, 3);
+    //    return grid;
+    //}
 
     protected override string Field_GetCurrentValue() => _editorBox.Text;
 

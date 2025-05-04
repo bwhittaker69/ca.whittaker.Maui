@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="ca.whittaker.Maui.Controls.Demo.Views.TestForm5"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
+    xmlns:vm="clr-namespace:ca.whittaker.Maui.Controls.Demo.ViewModels"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:ca.whittaker.Maui.Controls.Demo.Views"
+    xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
+    xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
+    mc:Ignorable="d"
+    x:DataType="vm:TestForm5ViewModel">
+    <ContentPage.BindingContext>
+        <vm:TestForm5ViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+
+        <VerticalStackLayout>
+                    
+
+            <Label Text="TestForm5" FontSize="Header"></Label>
+            <Forms:Form x:Name="UserProfileForm" 
+                            FormName="{x:Static strings:AppResources.Form_UserProfile_TItle}"
+                            FormSaveButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Save}"
+                            FormCancelButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Cancel}"
+                            FormAccessMode="Editing"
+                            Command="{Binding FormSaveCommand}" 
+                            Padding="10"
+                            HorizontalOptions="Fill"
+                            CommandParameter="">
+                <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Center" HorizontalOptions="Fill">
+
+
+
+                    <Label Text="{Binding Userprofile_istristate}"></Label>
+
+                    <Forms:CheckBoxField FieldDataSource="{Binding Userprofile_istristate}"
+                                         CheckBoxDataType="TriState"
+                                         FieldLabelWidth="150"
+                                         FieldLabelVisible="True"
+                                         FieldUndoButton="True"
+                                         FieldMandatory="False"
+                                         FieldLabelText="Checkbox">
+                    </Forms:CheckBoxField>
+                    
+                    
+                    <!--<Label Text="{Binding Userprofile_date}"></Label>
+
+                    <Forms:DateField
+                                    FieldLabelText="Date"
+                                    FieldDataSource="{Binding Userprofile_date, Mode=TwoWay}"
+                                    FieldLabelWidth="150"
+                                    FieldLabelVisible="True"
+                                    FieldUndoButton="True"
+                                    FieldMandatory="True">
+                    </Forms:DateField>-->
+
+                    <!--<Label Text="{Binding Userprofile_date}"></Label>
+                    <Forms:DateMonthYearField FieldLabelText="Date"
+                                              FieldDataSource="{Binding Userprofile_date}"
+                                              FieldLabelWidth="150"
+                                              FieldLabelVisible="True"
+                                              FieldUndoButton="True"
+                                              FieldMandatory="True"
+                                              ></Forms:DateMonthYearField>-->
+
+                    <!--<Label Text="{Binding Userprofile_email}"></Label>
+
+
+                    <Forms:TextBoxField     FieldDataSource="{Binding Userprofile_email}"
+                                            TextBoxMaxLength="40"
+                                            TextBoxDataType="Email"
+                                            FieldUndoButton="True"
+                                            TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}"
+                                            FieldLabelWidth="150"
+                                            FieldLabelText="{x:Static strings:AppResources.Field_Email}"
+                                            FieldMandatory="False">
+                    </Forms:TextBoxField>
+                    
+                    
+                    <Label Text="{Binding Userprofile_userid}"></Label>
+
+                    <Forms:DropdownField FieldDataSource="{Binding Userprofile_userid}"
+                                         DropdownPlaceholder="dropdown"
+                                         DropdownItemsSource="{Binding Userprofile_users}"
+                                         FieldLabelWidth="150"
+                                         FieldLabelVisible="True"
+                                         FieldUndoButton="True"
+                                         FieldMandatory="False"
+                                         FieldLabelText="User"
+                                         DropdownItemsSourceDisplayPath="Nickname"
+                                         DropdownItemsSourcePrimaryKey="UserId"
+                                         >
+                    </Forms:DropdownField>-->
+                    
+
+                </VerticalStackLayout>
+
+            </Forms:Form>
+
+        </VerticalStackLayout>
+
+    </ContentPage.Content>
+</ContentPage>
+
+
+
+<!--<Label Text="{Binding Userprofile_istristate}"></Label>
+
+                    <Forms:CheckBoxField FieldDataSource="{Binding Userprofile_istristate}"
+                                         CheckBoxDataType="TriState"
+                                         FieldLabelWidth="150"
+                                         FieldLabelVisible="False"
+                                         FieldUndoButton="True"
+                                         FieldMandatory="False"
+                                         FieldLabelText="Checkbox">
+                    </Forms:CheckBoxField>-->
+
+
+<!--<Label Text="{Binding Userprofile_date}"></Label>
+
+                    <Forms:DateField
+                                    FieldLabelText="Date"
+                                    FieldDataSource="{Binding Userprofile_date, Mode=TwoWay}"
+                                    FieldLabelWidth="150"
+                                    FieldLabelVisible="True"
+                                    FieldUndoButton="True"
+                                    FieldMandatory="True">
+                    </Forms:DateField>-->
+
+<!--<Label Text="{Binding Userprofile_email}"></Label>
+
+
+                    <Forms:TextBoxField     FieldDataSource="{Binding Userprofile_email}"
+                                            TextBoxMaxLength="40"
+                                            TextBoxDataType="Email"
+                                            TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}"
+                                            FieldLabelWidth="150"
+                                            FieldLabelText="{x:Static strings:AppResources.Field_Email}"
+                                            FieldMandatory="False">
+                    </Forms:TextBoxField>-->
+
+<!--
+                    <Label Text="{Binding Userprofile_nickname}"></Label>
+                    <Label Text="{Binding Userprofile_userid}"></Label>
+                    <Label Text="{Binding Userprofile_country}"></Label>
+                    <Label Text="{Binding Userprofile_date}"></Label>
+
+
+    
+                        <Forms:DateMonthYearField FieldLabelText="Date"
+                                              FieldDataSource="{Binding Userprofile_date}"
+                                              FieldLabelWidth="150"
+                                              FieldLabelVisible="True"
+                                              FieldUndoButton="True"
+                                              FieldMandatory="True"
+                                              >
+                    </Forms:DateMonthYearField>
+                    <Forms:DateField     FieldLabelText="Date"
+                                         FieldDataSource="{Binding Userprofile_date}"
+                                         FieldLabelWidth="150"
+                                         FieldLabelVisible="True"
+                                         FieldUndoButton="True"
+                                         FieldMandatory="True"
+                                         >
+                    </Forms:DateField>
+                    <Forms:DropdownField FieldDataSource="{Binding Userprofile_userid}"
+                                         DropdownPlaceholder="enum test"
+                                         DropdownItemsSource="{Binding Userprofile_users}"
+                                         FieldLabelWidth="150"
+                                         FieldLabelVisible="True"
+                                         FieldUndoButton="True"
+                                         FieldMandatory="True"
+                                         FieldLabelText="User"
+                                         DropdownItemsSourceDisplayPath="Nickname"
+                                         DropdownItemsSourcePrimaryKey="UserId"
+                                         >
+                    </Forms:DropdownField>
+                    <Forms:DropdownField FieldDataSource="{Binding Userprofile_country}"
+                                         DropdownPlaceholder="{x:Static strings:AppResources.Field_Country_Placeholder}"
+                                         DropdownItemsSource="{x:Static strings:AppResources.Field_Country_Items}"
+                                         FieldLabelWidth="150"
+                                         FieldLabelVisible="True"
+                                         FieldUndoButton="True"
+                                         FieldMandatory="True"
+                                         FieldLabelText="{x:Static strings:AppResources.Field_Country}">
+                    </Forms:DropdownField>
+    
+                    <Forms:EditorField      FieldDataSource="{Binding Userprofile_email}"
+                                            EditorMaxSize="1000"
+                                            EditorRowCount="10"
+                                            EditorDataType="Richtext"
+                                            EditorPlaceholder="{x:Static strings:AppResources.Field_Name_Placeholder}"
+                                            FieldLabelWidth="150"
+                                            FieldLabelText="{x:Static strings:AppResources.Field_Name}"
+                                            FieldMandatory="False">
+                    </Forms:EditorField>
+                    <Forms:TextBoxField     FieldDataSource="{Binding Userprofile_bio}"
+                                            TextBoxMaxLength="50"
+                                            TextBoxPlaceholder="{x:Static strings:AppResources.Field_Bio_Placeholder}"
+                                            FieldLabelWidth="150"
+                                            FieldLabelText="{x:Static strings:AppResources.Field_Bio}">
+                    </Forms:TextBoxField>
+                    <Forms:CheckBoxField FieldDataSource="{Binding Userprofile_ispublic}"
+                                         CheckBoxDataType="TriState"
+                                         FieldLabelWidth="150"
+                                         FieldLabelVisible="False"
+                                         FieldUndoButton="False"
+                                         FieldMandatory="True"
+                                         FieldLabelText="{x:Static strings:AppResources.Field_IsPublic}">
+                    </Forms:CheckBoxField>
+    
+    -->

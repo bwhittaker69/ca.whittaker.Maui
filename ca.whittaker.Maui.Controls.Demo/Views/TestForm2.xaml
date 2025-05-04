@@ -6,14 +6,16 @@
              xmlns:Forms="clr-namespace:ca.whittaker.Maui.Controls.Forms;assembly=ca.whittaker.Maui.Controls"
              xmlns:strings="clr-namespace:ca.whittaker.Maui.Controls.Demo.Resources.Strings"    
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="ca.whittaker.Maui.Controls.Demo.Views.UserProfilePage"
+             x:Class="ca.whittaker.Maui.Controls.Demo.Views.TestForm2"
              IsVisible="{Binding IsVisible}" 
              Disappearing="ContentPage_Disappearing"
              Title="{x:Static strings:AppResources.Page_UserProfile_Title}"
-             x:DataType="vm:UserProfilePageViewModel">
+             x:DataType="vm:TestForm2ViewModel">
     
     <VerticalStackLayout>
-        
+
+        <Label Text="TestForm2" FontSize="Header"></Label>
+
         <VerticalStackLayout Spacing="15"
                              Padding="25"  
                              Margin="0, 0, 0, 0"
