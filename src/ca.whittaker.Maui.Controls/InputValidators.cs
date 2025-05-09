@@ -29,14 +29,14 @@ namespace ca.whittaker.Maui.Controls
 
         // Validates plain text ensuring only basic ASCII characters are used.
         public static bool IsValidPlaintext(string text) =>
-            !string.IsNullOrEmpty(text) &&
-            text.Length >= 5 &&
+            string.IsNullOrEmpty(text) || 
             plainTextRegex.IsMatch(text);
 
         // Validates rich text which allows plain text plus emoji and special characters.
         public static bool IsValidRichtext(string text) =>
-            !string.IsNullOrEmpty(text) &&
-            text.Length >= 5;
+            string.IsNullOrEmpty(text) ||
+            richTextFilterRegex.IsMatch(text);
+
 
         // Applies the email filter then validates email format and plain ASCII characters.
         public static bool IsValidEmail(string email)

@@ -20,17 +20,15 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// - `FieldValidationState`: Tracks whether the field's current value is valid.
 ///
 /// Key Methods:
-/// - `Field_Clear()`: Clears the field.
-/// - `Field_UndoValue()`: Reverts to original value.
-/// - `Field_SaveAndMarkAsReadOnly()`: Commits current value and locks the field.
-/// - `Field_NotifyHasChanges()` and `Field_NotifyValidationChanges()`: Raise change/validation events.
+/// - `Clear()`: Clears the field.
+/// - `Undo()`: Reverts to original value.
+/// - `Save()`: Commits current value and locks the field.
+/// - `NotifyHasChanges()` and `NotifyValidationChanges()`: Raise change/validation events.
 ///
 /// Implementation Note:
 /// - Typically implemented by a base control such as `BaseFormField<T/>`.
 /// </summary>
-/// 
-
-
+///
 
 /// <summary>
 /// Contract for a strongly-typed form field whose value is of type <typeparamref name="T"/>.
@@ -61,9 +59,6 @@ public interface IBaseFormField
     /// <summary>Parameter to pass to the command when it executes.</summary>
     object FieldCommandParameter { get; set; }
 
-    /// <summary>Whether the field is enabled or disabled.</summary>
-    bool FieldEnabled { get; set; }
-
     /// <summary>The text label shown next to the control.</summary>
     string FieldLabelText { get; set; }
 
@@ -90,74 +85,70 @@ public interface IBaseFormField
 
     /// <summary>LayoutOptions for the outer grid container.</summary>
     LayoutOptions HorizontalOptions { get; set; }
+
     LayoutOptions VerticalOptions { get; set; }
 
     /// <summary>Fired when HasChanges toggles on/off.</summary>
-    event EventHandler<HasChangesEventArgs>? FieldHasChanges;
+    event EventHandler<HasChangesEventArgs>? OnHasChanges;
 
     /// <summary>Fired when Validation state changes.</summary>
-    event EventHandler<ValidationDataChangesEventArgs>? FieldHasValidationChanges;
-
-    /// <summary>Clear to default/empty.</summary>
-    void Field_Clear();
-
-    /// <summary>Save current value as new “original” and lock.</summary>
-    void Field_SaveAndMarkAsReadOnly();
-
-    /// <summary>Revert back to the original value.</summary>
-    void Field_UndoValue();
+    event EventHandler<ValidationDataChangesEventArgs>? OnHasValidationChanges;
 
     /// <summary>Remove focus from any inner control.</summary>
-    void Field_Unfocus();
+    void Unfocus();
+    void Save();
+    void Undo();
+    void Clear();
 
-    /// <summary>Adjust the label column width at runtime.</summary>
-    void Field_UpdateLabelWidth(double newWidth);
-
-    /// <summary>Adjust the control column width at runtime.</summary>
-    void Field_UpdateWidth(double newWidth);
 }
-
 
 /// <summary>
 /// Base class that implements <see cref="IBaseFormFieldTyped{T}"/> and wires up:
 /// - Two-way bindable <c>FieldDataSource</c>,
 /// - Original/Last/Current value tracking for undo and change detection,
-/// - Format and required validation,  
-/// - Built-in Undo button,  
-/// - Access-mode handling (ViewOnly, Editable, Editing, Hidden),  
-/// - Notification label for errors,  
+/// - Format and required validation,
+/// - Built-in Undo button,
+/// - Access-mode handling (ViewOnly, Editable, Editing, Hidden),
+/// - Notification label for errors,
 /// - Batched UI updates to minimize flicker.
 /// </summary>
 /// <remarks>
 /// <para>When you derive your own field (e.g. TextBoxField, DateField, CheckBoxField):
-/// 1. **Field_ControlView()**  
+/// 1. **Field_ControlView()**
 ///    Return your raw input element(s) so the base can wire focus events.<br/>
-/// 2. **Field_CreateLayoutGrid()**  
-///    Arrange: Label | your control | UndoButton in row 0  
+/// 2. **Field_CreateLayoutGrid()**
+///    Arrange: Label | your control | UndoButton in row 0
 ///    and NotificationLabel spanning all columns in row 1.<br/>
-/// 3. **OnParentSet()** (override if your control has a non-default initial UI state)  
-///    Call `base.OnParentSet()`, then align `FieldOriginalValue = FieldDataSource`  
+/// 3. **OnParentSet()** (override if your control has a non-default initial UI state)
+///    Call `base.OnParentSet()`, then align `FieldOriginalValue = FieldDataSource`
 ///    so first change-detection runs correctly.<br/>
-/// 4. **Field_SetValue(T? value)**  
+/// 4. **Field_SetValue(T? value)**
 ///    Push the VM value into your control (inside `Field_PerformBatchUpdate` + main thread).<br/>
-/// 5. **Field_GetCurrentValue()**  
+/// 5. **Field_GetCurrentValue()**
 ///    Read your control’s current value so the base can compare to original and last.<br/>
-/// 6. **Field_HasFormatError()** / **Field_HasRequiredError()**  
+/// 6. **Field_HasFormatError()** / **Field_HasRequiredError()**
 ///    Return true when the current UI value is invalid or missing (for mandatory).<br/>
-/// 7. **Field_GetFormatErrorMessage()**  
+/// 7. **Field_GetFormatErrorMessage()**
 ///    Provide a user-friendly message for format errors (shown under the control).<br/>
-/// 8. **Field_HasChangedFromOriginal()** / **Field_HasChangedFromLast()**  
+/// 8. **Field_HasChangedFromOriginal()** / **Field_HasChangedFromLast()**
 ///    Compare `FieldOriginalValue` or `FieldLastValue` against `Field_GetCurrentValue()`.<br/>
-/// 
+///
 /// The base already:
-/// - Captures the very first real VM assignment as the “original” value,  
-/// - Suppresses its own callbacks during programmatic updates,  
+/// - Captures the very first real VM assignment as the “original” value,
+/// - Suppresses its own callbacks during programmatic updates,
 /// - Raises events and enables/disables the Undo button automatically.
 /// </para>
 /// </remarks>
 public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 {
-    #region Fields
+    #region Private Fields
+    private double _borderWidth = -1;
+    private Color? _textColor = null;
+    private Microsoft.Maui.Controls.SolidColorBrush? _backgroundColor = null;
+    private Guid _placeholderEntryId;
+    private Guid _placeholderEntrySpacerId;
+    /// <summary>grid for layout</summary>
+    private Grid? _layoutGrid;
 
     /// <summary>Flag to control internal evaluation of changes.</summary>
     private bool _baseFieldEvaluateToRaiseHasChangesEventing = false;
@@ -174,12 +165,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// <summary>Re-entrancy guard for programmatic DataSource → UI updates.</summary>
     protected bool FieldSuppressDataSourceCallback = false;
 
-    /// <summary>Flag to prevent redundant disabling calls.</summary>
-    private bool _baseFieldDisabling = false;
-
-    /// <summary>Flag to prevent redundant enabling calls.</summary>
-    private bool _baseFieldEnabling = false;
-
     /// <summary>Flag to control internal evaluation of validation changes.</summary>
     private bool _baseFieldEvaluateToRaiseValidationChangesEventing = false;
 
@@ -191,7 +176,30 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
     /// <summary>Flag used to skip nested property change events.</summary>
     private bool _baseFieldUpdateValidationAndChangedStating = false;
+    #endregion  Private Fields
 
+    #region Protected Fields
+    protected Label _placeholderEntry;
+    protected UiEntry _placeholderEntrySpacer;
+
+    /// <summary>Reference to the undo button.</summary>
+    protected UndoButton? FieldButtonUndo;
+
+    /// <summary>Reference to the label for this field.</summary>
+    protected Label? FieldLabel;
+
+    /// <summary>Stores the last known value of this field.</summary>
+    protected T? FieldLastValue = default(T);
+
+    /// <summary>Reference to the notification label.</summary>
+    protected Label? FieldNotification;
+
+    /// <summary>Stores the original value for this field.</summary>
+    protected T? FieldOriginalValue = default(T);
+
+    #endregion Protected Fields
+
+    #region Bindable Properties
     /// <summary>Property for controlling how the field is accessed.</summary>
     public static readonly BindableProperty FieldAccessModeProperty = BindableProperty.Create(
         propertyName: nameof(FieldAccessMode),
@@ -199,7 +207,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         declaringType: typeof(BaseFormField<T>),
         defaultValue: FieldAccessModeEnum.ViewOnly,
         defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: OnFieldAccessModePropertyChanged);
+        propertyChanged: OnBaseFieldAccessModePropertyChanged);
 
     /// <summary>Property for tracking the field's change state.</summary>
     public static readonly BindableProperty FieldChangeStateProperty = BindableProperty.Create(
@@ -231,15 +239,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         defaultValue: default(T?),
         defaultBindingMode: BindingMode.TwoWay,
         propertyChanged: OnBaseFieldDataSourcePropertyChangedStatic);
-
-    /// <summary>Property for enabling or disabling the field.</summary>
-    public static readonly BindableProperty FieldEnabledProperty = BindableProperty.Create(
-        propertyName: nameof(FieldEnabled),
-        returnType: typeof(bool),
-        declaringType: typeof(BaseFormField<T>),
-        defaultValue: false,
-        defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: OnBaseFieldEnabledPropertyChanged);
 
     /// <summary>Property for the field's label text.</summary>
     public static readonly BindableProperty FieldLabelTextProperty = BindableProperty.Create(
@@ -306,30 +305,25 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         defaultBindingMode: BindingMode.TwoWay,
         propertyChanged: OnBaseFieldWidthPropertyChanged);
 
-    /// <summary>Reference to the undo button.</summary>
-    protected UndoButton? FieldButtonUndo;
+    public static readonly BindableProperty FieldLabelLayoutProperty =
+        BindableProperty.Create(
+            nameof(FieldLabelLayout),
+            typeof(FieldLabelLayoutEnum),
+            typeof(BaseFormField<T>),
+            FieldLabelLayoutEnum.Left,
+            propertyChanged: (b, o, n) => ((BaseFormField<T>)b).ApplyFieldLabelLayout()
+        );
+    #endregion
 
-    /// <summary>Reference to the label for this field.</summary>
-    protected Label? FieldLabel;
-
-    /// <summary>Stores the last known value of this field.</summary>
-    protected T? FieldLastValue = default(T);
-
-    /// <summary>Reference to the notification label.</summary>
-    protected Label? FieldNotification;
-
-    /// <summary>Stores the original value for this field.</summary>
-    protected T? FieldOriginalValue = default(T);
-
-    #endregion Fields
-
-    #region Public Constructors
+    #region Public Constructors & Initializer
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseFormField{T}"/> class.
     /// </summary>
     public BaseFormField()
     {
+
+
         FieldLabel = Field_CreateLabel(fieldLabelVisible: FieldLabelVisible);
         FieldNotification = Field_CreateNotificationLabel();
         FieldButtonUndo = Field_CreateUndoButton(fieldHasUndo: FieldUndoButton, fieldAccessMode: FieldAccessMode);
@@ -349,14 +343,55 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         {
             FieldButtonUndo.Hide();
         }
+        // build our one-and-only layout grid now  
+        _layoutGrid = null;// Field_CreateLayoutGrid();
+                           //ApplyFieldLabelLayout();
+
+        _placeholderEntryId = Guid.NewGuid();
+        _placeholderEntrySpacerId = Guid.NewGuid();
+
+        _placeholderEntrySpacer = new UiEntry
+        {
+            AutomationId = _placeholderEntrySpacerId.ToString(),
+            VerticalOptions = new LayoutOptions(LayoutAlignment.Fill, true),
+            HorizontalOptions = new LayoutOptions(LayoutAlignment.Fill, true),
+            BackgroundColor = Colors.Transparent,
+            BorderColor = Colors.Transparent,
+            InputTransparent = true,
+            IsReadOnly = true,
+            IsEnabled = false,
+            IsVisible = true,
+            Text = String.Empty,
+            ZIndex = 0
+        };
+
+        // 2) Placeholder entry on top
+        _placeholderEntry = new Label
+        {
+            AutomationId = _placeholderEntryId.ToString(),
+            VerticalOptions = new LayoutOptions(LayoutAlignment.Fill, true),
+            HorizontalOptions = new LayoutOptions(LayoutAlignment.Fill, true),
+            HorizontalTextAlignment = TextAlignment.Start,
+            VerticalTextAlignment = TextAlignment.Center,
+            IsVisible = FieldAccessMode == FieldAccessModeEnum.Editable,
+            Text = String.Empty,
+            IsEnabled = true,
+            BackgroundColor = Colors.Transparent,
+            Margin = new Thickness(8, 0, 0, 0)
+        };
     }
 
     protected void Initialize()
     {
         Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Initialize()");
-        BaseField_WireFocusEvents(Field_ControlMain());
+        BaseField_WireFocusEvents(Field_GetControlsFromGrid());
         BaseField_InitializeDataSource();
-        ControlVisualHelper.MatchDisabledToEnabled(this);
+
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            _placeholderEntrySpacer.MoveToBack();
+        });
+
     }
 
     #endregion Public Constructors
@@ -364,10 +399,10 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     #region Events
 
     /// <inheritdoc/>
-    public event EventHandler<HasChangesEventArgs>? FieldHasChanges;
+    public event EventHandler<HasChangesEventArgs>? OnHasChanges;
 
     /// <inheritdoc/>
-    public event EventHandler<ValidationDataChangesEventArgs>? FieldHasValidationChanges;
+    public event EventHandler<ValidationDataChangesEventArgs>? OnHasValidationChanges;
 
     #endregion Events
 
@@ -401,6 +436,12 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         set => SetValue(FieldCommandParameterProperty, value);
     }
 
+    public FieldLabelLayoutEnum FieldLabelLayout
+    {
+        get => (FieldLabelLayoutEnum)GetValue(FieldLabelLayoutProperty);
+        set => SetValue(FieldLabelLayoutProperty, value);
+    }
+
     /// <summary>
     /// Gets or sets the typed data source for this field.
     /// </summary>
@@ -412,13 +453,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
             SetValue(FieldDataSourceProperty, value);
             Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : FieldDataSource set to: {value}");
         }
-    }
-
-    /// <inheritdoc/>
-    public bool FieldEnabled
-    {
-        get => (bool)GetValue(FieldEnabledProperty);
-        set => SetValue(FieldEnabledProperty, value);
     }
 
     /// <inheritdoc/>
@@ -506,6 +540,88 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     #region Private Methods
 
     /// <summary>
+    /// Build a two-row Grid (default layout for label left mode)
+    /// Row 0: Label | control(s) | UndoButton
+    /// Row 1: NotificationLabel spanning all columns
+    /// and return it.
+    /// </summary>
+    /// <summary>
+    /// Shared grid‐template for *all* fields:
+    ///   • Col 0: fixed label width
+    ///   • Col 1: star (*) for your controls
+    ///   • Col 2: fixed undo-button width
+    ///   • Row 0: auto for label/control/undo
+    ///   • Row 1: auto for notification
+    /// </summary>
+    private Grid BaseField_CreateLayoutGrid()
+    {
+        var grid = new Grid
+        {
+            ColumnDefinitions =
+        {
+            new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
+            new ColumnDefinition { Width = GridLength.Star },
+            new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
+        },
+            RowDefinitions =
+        {
+            new RowDefinition { Height = 0 },              // row1 – label‑top (collapsed by default)
+            new RowDefinition { Height = GridLength.Auto },// row2 – main controls
+            new RowDefinition { Height = 0 }               // row3 – notification (start collapsed)
+        },
+            VerticalOptions = LayoutOptions.Fill
+        };
+
+        // label + controls + undo
+        grid.Add(FieldLabel, col1, row2);
+        foreach (var ctl in Field_GetControls())
+            grid.Add(ctl, col2, row2);
+        grid.Add(_placeholderEntry, col2, row2);
+        grid.Add(_placeholderEntrySpacer, col2, row2);
+        grid.Add(FieldButtonUndo, col3, row2);
+
+        // notification now lives in its own row (row3)
+        grid.Add(FieldNotification, col1, row3);
+        Grid.SetColumnSpan(FieldNotification, 3);
+
+        return grid;
+    }
+
+    private const int col1 = 0, col2 = 1, col3 = 2;
+    private const int row1 = 0, row2 = 1, row3 = 2;
+
+    private void ApplyFieldLabelLayout()
+    {
+        if (_layoutGrid == null) return;
+
+        // Label left layout
+        if (FieldLabelLayout == FieldLabelLayoutEnum.Left)
+        {
+            // row1 is hidden, col1 width is FieldLabelWidth
+            _layoutGrid.RowDefinitions[row1].Height = 0;
+            _layoutGrid.ColumnDefinitions[col1].Width = FieldLabelWidth;
+
+            // label in position 1st row and column spanning 1 column
+            Grid.SetRow(FieldLabel, row2);
+            Grid.SetColumn(FieldLabel, col1);
+            Grid.SetColumnSpan(FieldLabel, 1);
+
+        }
+        else  // Label top layout
+        {
+            // row1 has auto height and col1 is hidden
+            _layoutGrid.RowDefinitions[row1].Height = GridLength.Auto;
+            _layoutGrid.ColumnDefinitions[col1].Width = 0;
+
+            // label in 1st row and column spanning all columns
+            Grid.SetRow(FieldLabel, row1);
+            Grid.SetColumn(FieldLabel, col1);
+            Grid.SetColumnSpan(FieldLabel, 3);
+
+        }
+    }
+
+    /// <summary>
     /// Invoked when the field enabled property changes.
     /// </summary>
     private static void OnBaseFieldEnabledPropertyChanged(BindableObject bindable, object oldValue, object newValue)
@@ -575,27 +691,57 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     }
 
     /// <summary>
+    /// Invoked when the field access mode property changes.
+    /// </summary>
+    private static void OnBaseFieldAccessModePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        // Property Changed: FieldAccessModeEnum
+        if (bindable is BaseFormField<T> elementAccessModeChanged && newValue is FieldAccessModeEnum newAccessMode)
+        {
+            #region 
+            elementAccessModeChanged.Field_UpdateNotificationMessage();
+
+            // Respect FieldReadOnly: force ViewOnly if read-only
+            if (elementAccessModeChanged.FieldReadOnly && newAccessMode != FieldAccessModeEnum.Hidden)
+            {
+                Debug.WriteLine($"[BaseFormField] : {elementAccessModeChanged.FieldLabelText} : ReadOnly prevents switching to {newAccessMode}, forcing ViewOnly");
+                elementAccessModeChanged.Field_ConfigAccessModeViewing();
+                return;
+            }
+
+            if (!oldValue.Equals(newValue))
+            {
+                Debug.WriteLine($"[BaseFormField] : {elementAccessModeChanged.FieldLabelText} : OnFieldAccessModePropertyChanged({newValue})");
+                switch (newAccessMode)
+                {
+                    case FieldAccessModeEnum.ViewOnly:
+                        elementAccessModeChanged.Field_ConfigAccessModeViewing();
+                        return;
+
+                    case FieldAccessModeEnum.Editing:
+                        elementAccessModeChanged.Field_ConfigAccessModeEditing();
+                        return;
+
+                    case FieldAccessModeEnum.Editable:
+                        elementAccessModeChanged.Field_ConfigAccessModeViewing();
+                        return;
+
+                    case FieldAccessModeEnum.Hidden:
+                        elementAccessModeChanged.BaseConfigAccessModeHidden();
+                        return;
+                }
+            }
+            #endregion 
+        }
+    }
+
+    /// <summary>
     /// Invoked when the field width changes.
     /// </summary>
     private static void OnBaseFieldWidthPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is BaseFormField<T> element && element.Content is Grid)
             element.Field_UpdateWidth((double)newValue);
-    }
-
-    protected bool FieldAreValuesEqual(T? original, T? current)
-    {
-        if (typeof(T) == typeof(string))
-        {
-            var s1 = original as string ?? string.Empty;
-            var s2 = current as string ?? string.Empty;
-
-            Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : FieldAreValuesEqual(Comparing strings (forced cast): Original='{s1}', Current='{s2}')");
-            return string.Equals(s1.Trim(), s2.Trim(), StringComparison.Ordinal);
-        }
-
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : FieldAreValuesEqual(Comparing objects: Original='{original}', Current='{current}')");
-        return Equals(original, current);
     }
 
     /// <summary>
@@ -670,7 +816,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         {
             try
             {
-                Field_UndoValue();
+                Undo();
             }
             finally
             {
@@ -678,104 +824,77 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         }
     }
 
+
+    /// <summary>
+    /// Hides the field by applying a read-only state and hiding the undo button.
+    /// </summary>
+    private void BaseConfigAccessModeHidden()
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseFieldConfigAccessModeHidden()");
+        this.HideAllDescendantControls();
+        if (FieldButtonUndo != null) FieldButtonUndo.Hide();
+    }
+
+
     #endregion Private Methods
 
     #region Protected Methods
 
-    /// <summary>
-    /// Invoked when the field access mode property changes.
-    /// </summary>
-    protected static void OnFieldAccessModePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    protected void SaveBorderWidth(double width)
     {
-        if (bindable is BaseFormField<T> element && newValue is FieldAccessModeEnum newAccessMode)
+        if (_borderWidth <= 0 && width > 0)
+            _borderWidth = width;
+    }
+
+    protected double GetBorderWidth()
+    {
+        return (_borderWidth > 0 ? _borderWidth : 0);
+    }
+
+    protected Color? GetTextColor()
+    {
+        return _textColor;
+    }
+
+    protected void SaveTextColor(Color? color)
+    {
+        if (color != null && _textColor == null)
+            _textColor = color;
+    }
+
+    protected Microsoft.Maui.Controls.SolidColorBrush? GetBackgroundColor()
+    {
+        return _backgroundColor;
+    }
+
+    protected void SaveBackgroundColor(Microsoft.Maui.Controls.SolidColorBrush? color)
+    {
+        if (color != null && _backgroundColor == null && color != Brush.Transparent)
+            _backgroundColor = color;
+    }
+    protected bool FieldAreValuesEqual(T? original, T? current)
+    {
+        if (typeof(T) == typeof(string))
         {
-            element.Field_UpdateNotificationMessage();
+            var s1 = original as string ?? string.Empty;
+            var s2 = current as string ?? string.Empty;
 
-            // Respect FieldReadOnly: force ViewOnly if read-only
-            if (element.FieldReadOnly && newAccessMode != FieldAccessModeEnum.Hidden)
-            {
-                Debug.WriteLine($"[BaseFormField] : {element.FieldLabelText} : ReadOnly prevents switching to {newAccessMode}, forcing ViewOnly");
-                element.Field_ConfigAccessModeViewing();
-                return;
-            }
-
-
-            if (!oldValue.Equals(newValue))
-            {
-                Debug.WriteLine($"[BaseFormField] : {element.FieldLabelText} : OnFieldAccessModePropertyChanged({newValue})");
-                switch (newAccessMode)
-                {
-                    case FieldAccessModeEnum.ViewOnly:
-                        element.Field_ConfigAccessModeViewing();
-                        return;
-
-                    case FieldAccessModeEnum.Editing:
-                        element.Field_ConfigAccessModeEditing();
-                        return;
-
-                    case FieldAccessModeEnum.Editable:
-                        element.Field_ConfigAccessModeViewing();
-                        return;
-
-                    case FieldAccessModeEnum.Hidden:
-                        element.BaseFieldConfigAccessModeHidden();
-                        return;
-                }
-            }
+            Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : FieldAreValuesEqual(Comparing strings (forced cast): Original='{s1}', Current='{s2}')");
+            return string.Equals(s1.Trim(), s2.Trim(), StringComparison.Ordinal);
         }
+
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : FieldAreValuesEqual(Comparing objects: Original='{original}', Current='{current}')");
+        return Equals(original, current);
     }
 
-    /// <summary>
-    /// Enables descendant controls based on the current label visibility.
-    /// </summary>
-    protected void Field_ApplyEnabled()
-    {
-        ControlVisualHelper.EnableDescendantControls(this, FieldLabelVisible);
-    }
-
-    /// <summary>
-    /// Applies a read-only state to all descendant controls.
-    /// </summary>
-    protected void Field_ApplyReadOnly()
-    {
-        ControlVisualHelper.DisableDescendantControls(this, FieldLabelVisible);
-    }
-
-    /// <summary>
-    /// Sets this field to an editing mode, enabling controls and evaluating any changes.
-    /// </summary>
-    protected void Field_ConfigAccessModeEditing()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_ConfigAccessModeEditing()");
-        Field_ApplyEnabled();
-        BaseFieldEvaluateToRaiseHasChangesEvent();
-    }
-
-    /// <summary>
-    /// Sets this field to a view-only mode, applying a read-only state and hiding the undo button.
-    /// </summary>
-    protected void Field_ConfigAccessModeViewing()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_ConfigAccessModeViewOnly()");
-        Field_ApplyReadOnly();
-        if (FieldButtonUndo != null) FieldButtonUndo.Hide();
-    }
-    protected override void OnBindingContextChanged()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnBindingContextChanged()");
-        base.OnBindingContextChanged();
-        // no more resetting FieldIsOriginalValueSet here
-    }
     /// <summary>
     /// Disables user interaction on this field.
     /// </summary>
     protected void Field_ConfigDisabled()
     {
         Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_ConfigDisabled()");
-        if (_baseFieldDisabling) return;
-        _baseFieldDisabling = true;
-        Field_ApplyReadOnly();
-        _baseFieldDisabling = false;
+        FieldAccessMode = FieldAccessModeEnum.ViewOnly;
+        //this.ViewingModeDescendantControls(FieldLabelVisible);
     }
 
     /// <summary>
@@ -784,10 +903,14 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     protected void Field_ConfigEnabled()
     {
         Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_ConfigEnabled()");
-        if (_baseFieldEnabling) return;
-        _baseFieldEnabling = true;
-        Field_ApplyEnabled();
-        _baseFieldEnabling = false;
+        FieldAccessMode = FieldAccessModeEnum.ViewOnly;
+    }
+
+    protected override void OnBindingContextChanged()
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnBindingContextChanged()");
+        base.OnBindingContextChanged();
+        // no more resetting FieldIsOriginalValueSet here
     }
 
     /// <summary>
@@ -803,7 +926,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         };
         return label;
     }
-
 
     /// <summary>
     /// Creates a label used for notification messages such as errors or required fields.
@@ -843,137 +965,25 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         return btn;
     }
 
-    #region Abstract members you **must** implement in your subclass
-
-    /// <summary>
-    /// Return the raw input control(s) (Entry, DatePicker, CheckBoxOverlay, etc.)
-    /// so the base can hook up Focused/Unfocused and validation logic.
-    /// </summary>
-    protected abstract List<View> Field_ControlMain();
-
-    /// <summary>
-    /// Build a two-row Grid:
-    /// Row 0: Label | control(s) | UndoButton  
-    /// Row 1: NotificationLabel spanning all columns  
-    /// and return it.
-    /// </summary>
-    /// <summary>
-    /// Shared grid‐template for *all* fields:
-    ///   • Col 0: fixed label width  
-    ///   • Col 1: star (*) for your controls  
-    ///   • Col 2: fixed undo-button width  
-    ///   • Row 0: auto for label/control/undo  
-    ///   • Row 1: auto for notification  
-    /// </summary>
-    private Grid Field_CreateLayoutGrid()
+    protected (int row, int col) Field_GetControlLocation()
     {
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-                new ColumnDefinition { Width = GridLength.Star },
-                    new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-            },
-            RowDefinitions =
-            {
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto }
-            },
-            VerticalOptions = LayoutOptions.Fill
-        };
-
-        // 1) Label
-        grid.Add(FieldLabel, 0, 0);
-
-        // 2) Field‐specific controls (overlay, container, etc.)
-        foreach (var ctl in Field_ControlMain())
-            grid.Add(ctl, 1, 0);
-
-        // 3) common undo button
-        grid.Add(FieldButtonUndo, 2, 0);
-
-        // 4) common notification row
-        grid.Add(FieldNotification, 0, 1);
-        Grid.SetColumnSpan(FieldNotification, 3);
-
-        return grid;
+        if (FieldLabelLayout == FieldLabelLayoutEnum.Left)
+            return (row1, col2);
+        else
+            return (row2, col2);
     }
 
-    /// <summary>
-    /// Push a new value from the VM into your UI widget(s).
-    /// Wrap all assignments in:
-    /// UiThreadHelper.RunOnMainThread(() ⇒  
-    ///     Field_PerformBatchUpdate(() ⇒ { … })  
-    /// );
-    /// </summary>
-    protected abstract void Field_SetValue(T? value);
-
-    /// <summary>
-    /// Read the current value back out of your UI widget(s) so
-    /// the base can compare it to original/last.
-    /// </summary>
-    protected abstract T? Field_GetCurrentValue();
-
-    /// <summary>
-    /// Return true if the current UI text/value is missing or empty
-    /// while <c>FieldMandatory</c> is true.
-    /// </summary>
-    protected abstract bool Field_HasRequiredError();
-
-    /// <summary>
-    /// Return true if the current UI text/value is syntactically invalid.
-    /// </summary>
-    protected abstract bool Field_HasFormatError();
-
-    /// <summary>
-    /// Provide the format-error message to display under the field.
-    /// </summary>
-    protected abstract string Field_GetFormatErrorMessage();
-
-    /// <summary>
-    /// Compare <c>FieldLastValue</c> to <c>Field_GetCurrentValue()</c>
-    /// to decide if the value changed since last update.
-    /// </summary>
-    protected abstract bool Field_HasChangedFromLast();
-
-    /// <summary>
-    /// Compare <c>FieldOriginalValue</c> to <c>Field_GetCurrentValue()</c>
-    /// to decide if the value changed since initial load.
-    /// </summary>
-    protected abstract bool Field_HasChangedFromOriginal();
-
-    /// <summary>
-    /// After toggling LabelVisible or UndoButton, recalc your
-    /// Grid.ColumnSpan/Column so your control remains centered.
-    /// </summary>
-    protected abstract void UpdateRow0Layout();
-
-    #endregion
-
-
-    /// <summary>
-    /// Determines if the field data is valid by checking format and required errors.
-    /// </summary>
-    private bool BaseField_HasValidData()
+    protected List<View> Field_GetControlsFromGrid()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_HasValidData()");
-        // Evaluate all error conditions and return false if any found.
-        bool fail = Field_HasFormatError() || Field_HasRequiredError();
-        return !fail;
-    }
-
-    private void BaseField_InitializeDataSource()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_InitializeDataSource()");
-        FieldOriginalValue = FieldDataSource;
-        Field_SetValue(FieldDataSource);
-    }
-
-    protected void BaseField_OriginalValue_Reset()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_OriginalValue_Reset()");
-        Field_SetValue(FieldOriginalValue);
+        var siblings = _layoutGrid?.Children
+                   .Where(
+                            v => _layoutGrid?.GetRow(v) == Field_GetControlLocation().row &&
+                                 _layoutGrid?.GetColumn(v) == Field_GetControlLocation().col &&
+                                 v.AutomationId != _placeholderEntryId.ToString() &&
+                                 v.AutomationId != _placeholderEntrySpacerId.ToString())
+                   .Cast<View>()
+                   .ToList() ?? new();
+        return siblings;
     }
 
     /// <summary>
@@ -986,14 +996,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         Field_SetValue(FieldOriginalValue);
     }
 
-    /// <summary>
-    /// Updates the original value of the field to match its current state.
-    /// </summary>
-    private void Field_OriginalValue_SetToCurrentValue()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_OriginalValue_SetToCurrentValue()");
-        FieldOriginalValue = Field_GetCurrentValue();
-    }
 
     protected void Field_PerformBatchUpdate(Action updateAction)
     {
@@ -1019,36 +1021,45 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         Field_UpdateNotificationMessage();
     }
 
-
     /// <summary>
     /// Updates the field's notification label based on its validation state.
     /// </summary>
-    protected virtual void Field_UpdateNotificationMessage()
+    protected void Field_UpdateNotificationMessage()
     {
         Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateNotificationMessage()");
-        bool showNotificationMessage = false;
-        string notificationMessageText = String.Empty;
-        if (FieldNotification == null) return;
+        bool show = false;
+        string msg = string.Empty;
+
         if (FieldAccessMode == FieldAccessModeEnum.Editing)
         {
             if (Field_HasRequiredError())
             {
-                showNotificationMessage = true;
-                notificationMessageText += String.Concat(" ", "Required");
+                show = true;
+                msg = "Required";
             }
             if (Field_HasFormatError())
             {
-                showNotificationMessage = true;
-                notificationMessageText = Field_GetFormatErrorMessage();
+                show = true;
+                msg = Field_GetFormatErrorMessage();
             }
         }
+
         UiThreadHelper.RunOnMainThread(() =>
         {
             Field_PerformBatchUpdate(() =>
             {
-                FieldNotification.Text = notificationMessageText.Trim();
-                FieldNotification.IsVisible = showNotificationMessage;
+                if (FieldNotification != null)
+                {
+                    FieldNotification.Text = msg;
+                    FieldNotification.IsVisible = show;
+                }
+
+                // Collapse / expand the dedicated notification row
+                if (_layoutGrid != null)
+                    _layoutGrid.RowDefinitions[row3].Height = show ? GridLength.Auto : 0;
             });
+
+            Field_RefreshLayout();   // force re‑measure so overall height updates
         });
     }
 
@@ -1068,6 +1079,237 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         _baseFieldUpdateValidationAndChangedStating = false;
     }
 
+    /// <inheritdoc/>
+    protected override void OnParentSet()
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnParentSet()");
+        base.OnParentSet();
+
+        // only build once, after derived ctor has created its controls
+        if (_layoutGrid == null)
+        {
+            Content = _layoutGrid = BaseField_CreateLayoutGrid();
+        }
+        ApplyFieldLabelLayout();
+
+        // keep the UI in sync if a design-time value is already present
+        Field_SetValue(FieldDataSource);
+
+        OnBaseFieldAccessModePropertyChanged(
+            bindable: this,
+            oldValue: FieldAccessMode,  // or something else if you have an "old" value
+            newValue: FieldAccessMode
+        );
+    }
+
+    /// <inheritdoc/>
+    protected void Field_Unfocused(object? sender, FocusEventArgs e)
+    { }
+
+
+    /// <inheritdoc/>
+    protected void Field_Focused(object? sender, FocusEventArgs e)
+    { }
+
+    /// <inheritdoc/>
+    protected void Field_NotifyHasChanges(bool hasChanged) =>
+        OnHasChanges?.Invoke(this, new HasChangesEventArgs(hasChanged));
+
+    /// <inheritdoc/>
+    protected void Field_NotifyValidationChanges(bool isValid) =>
+        OnHasValidationChanges?.Invoke(this, new ValidationDataChangesEventArgs(!isValid));
+
+    protected void Field_ShowPlaceholders()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            _placeholderEntry.IsVisible = true;
+            _placeholderEntry.Text = Field_GetDisplayText();
+            _placeholderEntry.BringToFront();
+            _placeholderEntrySpacer.MoveToBack();
+        });
+    }
+
+    protected void Field_HidePlaceholders()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+        _placeholderEntry.IsVisible = false;
+        _placeholderEntry.MoveToBack();
+        _placeholderEntrySpacer.MoveToBack();
+        });
+    }
+
+
+    /// <inheritdoc/>
+    protected void Field_UpdateLabelWidth(double newWidth)
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateLabelWidth(newWidth: {newWidth})");
+        if (Content is Grid grid && grid.ColumnDefinitions.Count > 0)
+        {
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    grid.ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
+                    if (FieldLabel != null)
+                        FieldLabel.WidthRequest = newWidth;
+                });
+            });
+        }
+    }
+
+    /// <inheritdoc/>
+    protected void Field_UpdateWidth(double newWidth)
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateWidth(newWidth: {newWidth})");
+        if (Content is Grid grid && grid.ColumnDefinitions.Count > 1)
+            UiThreadHelper.RunOnMainThread(() =>
+            {
+                Field_PerformBatchUpdate(() =>
+                {
+                    grid.ColumnDefinitions[1].Width = new GridLength(newWidth, GridUnitType.Absolute);
+                });
+            });
+    }
+
+
+    #endregion Protected methods
+
+    #region Abstract members you **must** implement in your subclass
+
+    /// <summary>
+    /// Return every interactive child view that represents the “field body”.
+    /// The base class wires Focused / Unfocused, change‑tracking, and validation
+    /// to these controls, so exclude the label, undo button, placeholder overlay,
+    /// and notification label that BaseFormField creates.
+    /// </summary>
+    protected abstract List<View> Field_GetControls();
+
+    /// <summary>
+    /// Switch the field into editing mode.<br/>
+    /// • Enable or reveal your input controls and hide any read‑only overlay.<br/>
+    /// • Call <c>Field_RefreshLayout()</c> (or <c>RefreshLayout()</c>) so column spans
+    ///   adjust after you show/hide elements.<br/>
+    /// • Call <c>Field_HidePlaceholders()</c> when real controls are visible.
+    /// </summary>
+    protected abstract void Field_ConfigAccessModeEditing();
+
+    /// <summary>
+    /// Switch the field into viewing mode.<br/>
+    /// • Remove focus from inner controls and disable or hide them.<br/>
+    /// • Call <c>Field_ShowPlaceholders()</c> so read‑only text appears.<br/>
+    /// • Ensure the undo button is hidden when <c>FieldAccessMode</c> ≠ Editing.
+    /// </summary>
+    protected abstract void Field_ConfigAccessModeViewing();
+
+    /// <summary>
+    /// Push a new VM value into the UI.<br/>
+    /// • Always wrap UI writes in
+    ///   <c>UiThreadHelper.RunOnMainThread(() => Field_PerformBatchUpdate(...))</c>.<br/>
+    /// • Detach value‑changed handlers before you assign, then re‑attach afterward
+    ///   to avoid recursion.<br/>
+    /// • Show or hide a blank placeholder row when the value represents
+    ///   “no selection”.  Do NOT modify <c>FieldDataSource</c> here.
+    /// </summary>
+    protected abstract void Field_SetValue(T? value);
+
+    /// <summary>
+    /// Read the current value from the UI so the base class can compare it to
+    /// <c>FieldOriginalValue</c> and <c>FieldLastValue</c>.
+    /// Never perform additional side‑effects here.
+    /// </summary>
+    protected abstract T? Field_GetCurrentValue();
+
+    /// <summary>
+    /// Return <c>true</c> when the user has supplied no value and
+    /// <c>FieldMandatory</c> is <c>true</c>.  Use the same “blank” rules that
+    /// <c>Field_SetValue</c> applies when showing placeholders.
+    /// </summary>
+    protected abstract bool Field_HasRequiredError();
+
+    /// <summary>
+    /// Return <c>true</c> when the raw UI text/value is syntactically invalid
+    /// (e.g., bad date, number out of range).  Do NOT combine required checks here.
+    /// </summary>
+    protected abstract bool Field_HasFormatError();
+
+    /// <summary>
+    /// Human‑readable message that will be displayed in the notification label
+    /// when <c>Field_HasFormatError()</c> is <c>true</c>.
+    /// </summary>
+    protected abstract string Field_GetFormatErrorMessage();
+
+    /// <summary>
+    /// Compare <c>FieldLastValue</c> with <c>Field_GetCurrentValue()</c>.
+    /// Use <c>FieldAreValuesEqual</c> for consistent string trimming &amp; null logic.
+    /// </summary>
+    protected abstract bool Field_HasChangedFromLast();
+
+    /// <summary>
+    /// Compare <c>FieldOriginalValue</c> with <c>Field_GetCurrentValue()</c>.
+    /// Use <c>FieldAreValuesEqual</c> so the base class gets reliable change events.
+    /// </summary>
+    protected abstract bool Field_HasChangedFromOriginal();
+
+    /// <summary>
+    /// Re‑apply layout after items or visibility change (e.g., after repopulating
+    /// a Picker).  Usually refreshes <c>ItemsSource</c>, reapplies selection,
+    /// then calls <c>Field_UpdateValidationAndChangedState()</c>.
+    /// </summary>
+    protected abstract void Field_RefreshLayout();
+
+    /// <summary>
+    /// Return the user‑visible text that should appear in the read‑only placeholder
+    /// when the field is in viewing mode.  Must mirror exactly what the live
+    /// control would show for the same selection.
+    /// </summary>
+    protected abstract string Field_GetDisplayText();
+
+
+
+
+    #endregion Abstract members you **must** implement in your subclass
+
+    #region Private Methods
+
+    /// <summary>
+    /// Determines if the field data is valid by checking format and required errors.
+    /// </summary>
+    private bool BaseField_HasValidData()
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_HasValidData()");
+        // Evaluate all error conditions and return false if any found.
+        bool fail = Field_HasFormatError() || Field_HasRequiredError();
+        return !fail;
+    }
+
+    private void BaseField_InitializeDataSource()
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_InitializeDataSource()");
+        FieldOriginalValue = FieldDataSource;
+        Field_SetValue(FieldDataSource);
+    }
+
+    private void BaseField_OriginalValue_Reset()
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_OriginalValue_Reset()");
+        FieldDataSource = FieldOriginalValue;
+        Field_SetValue(FieldOriginalValue);
+        Field_SetDataSourceValue(FieldOriginalValue);
+    }
+
+
+    /// <summary>
+    /// Updates the original value of the field to match its current state.
+    /// </summary>
+    private void BaseField_OriginalValue_SetToCurrentValue()
+    {
+        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_OriginalValue_SetToCurrentValue()");
+        FieldOriginalValue = Field_GetCurrentValue();
+    }
+
+
     private void BaseField_WireFocusEvents(List<View> inputList)
     {
         foreach (var control in inputList)
@@ -1075,16 +1317,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
             control.Focused += Field_Focused;
             control.Unfocused += Field_Unfocused;
         }
-    }
-
-    /// <summary>
-    /// Hides the field by applying a read-only state and hiding the undo button.
-    /// </summary>
-    private void BaseFieldConfigAccessModeHidden()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseFieldConfigAccessModeHidden()");
-        Field_ApplyReadOnly();
-        if (FieldButtonUndo != null) FieldButtonUndo.Hide();
     }
 
     /// <summary>
@@ -1115,7 +1347,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         {
             control.FieldIsOriginalValueSet = true;
             // record this as the original value
-            control.OnBaseInitializeFieldDataSourceSet(initialValue: (T?)newValue);
+            control.OnBaseFieldInitializeFieldDataSourceSet(initialValue: (T?)newValue);
             // now sync the UI
             control.OnBaseFieldDataSourceChanged(oldValue: (T?)oldValue, newValue: (T?)newValue);
             return;
@@ -1132,12 +1364,11 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         control.OnBaseFieldDataSourceChanged(oldValue: (T?)oldValue, newValue: (T?)newValue);
     }
 
-
     /// <summary>
     /// Called once, on the very first assignment of FieldDataSource.
     /// Default implementation sets <see cref="FieldOriginalValue"/>; override for custom setup but call base.
     /// </summary>
-    private void OnBaseInitializeFieldDataSourceSet(T? initialValue)
+    private void OnBaseFieldInitializeFieldDataSourceSet(T? initialValue)
     {
         Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnBaseInitializeFieldDataSourceSet(initialValue {initialValue})");
         FieldOriginalValue = initialValue;
@@ -1154,107 +1385,198 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         FieldLastValue = newValue;
     }
 
-    /// <inheritdoc/>
-    protected override void OnParentSet()
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnParentSet()");
-        base.OnParentSet();
-
-        Content = Field_CreateLayoutGrid();
-
-        // keep the UI in sync if a design-time value is already present
-        Field_SetValue(FieldDataSource);
-
-        OnFieldAccessModePropertyChanged(
-            bindable: this,
-            oldValue: FieldAccessMode,  // or something else if you have an "old" value
-            newValue: FieldAccessMode
-        );
-    }
-
-    #endregion Protected Methods
+    #endregion Private Methods
 
     #region Public Methods
-
     /// <inheritdoc/>
-    public void Field_Clear()
+    public void Clear()
     {
         Field_OriginalValue_SetToClear();
         Field_UpdateValidationAndChangedState();
-        Field_Unfocus();
+        Unfocus();
     }
 
     /// <inheritdoc/>
-    protected void Field_Focused(object? sender, FocusEventArgs e)
-    { }
-
-    /// <inheritdoc/>
-    protected void Field_NotifyHasChanges(bool hasChanged) =>
-        FieldHasChanges?.Invoke(this, new HasChangesEventArgs(hasChanged));
-
-    /// <inheritdoc/>
-    protected void Field_NotifyValidationChanges(bool isValid) =>
-        FieldHasValidationChanges?.Invoke(this, new ValidationDataChangesEventArgs(!isValid));
-
-    /// <inheritdoc/>Field_SaveAndMarkAsReadOnly
-    public void Field_SaveAndMarkAsReadOnly()
+    public void Save()
     {
-        Field_OriginalValue_SetToCurrentValue();
-        Field_ConfigDisabled();
+        BaseField_OriginalValue_SetToCurrentValue();
         Field_UpdateValidationAndChangedState();
         FieldAccessMode = FieldAccessModeEnum.ViewOnly;
     }
 
-    public void Field_UndoValue()
+    public void Undo()
     {
         // By default, restore FieldOriginalValue
-        Field_PerformBatchUpdate(() =>
-        {
-            BaseField_OriginalValue_Reset();
-            Field_UpdateValidationAndChangedState(true);
-            Field_UpdateNotificationMessage();
-        });
+        BaseField_OriginalValue_Reset();
+        Field_UpdateValidationAndChangedState(true);
+        Field_UpdateNotificationMessage();
+        FieldButtonUndo!.ButtonState = ButtonStateEnum.Disabled;
+        BaseFieldEvaluateToRaiseHasChangesEvent();
     }
 
-    /// <inheritdoc/>
-    public virtual void Field_Unfocus() => base.Unfocus();
-
-    /// <inheritdoc/>
-    protected void Field_Unfocused(object? sender, FocusEventArgs e)
-    { }
-
-    /// <inheritdoc/>
-    public void Field_UpdateLabelWidth(double newWidth)
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateLabelWidth(newWidth: {newWidth})");
-        if (Content is Grid grid && grid.ColumnDefinitions.Count > 0)
-        {
-            UiThreadHelper.RunOnMainThread(() =>
-            {
-                Field_PerformBatchUpdate(() =>
-                {
-                    grid.ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
-                    if (FieldLabel != null)
-                        FieldLabel.WidthRequest = newWidth;
-                });
-            });
-        }
-    }
-
-    /// <inheritdoc/>
-    public void Field_UpdateWidth(double newWidth)
-    {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateWidth(newWidth: {newWidth})");
-        if (Content is Grid grid && grid.ColumnDefinitions.Count > 1)
-            UiThreadHelper.RunOnMainThread(() =>
-            {
-                Field_PerformBatchUpdate(() =>
-                {
-                    grid.ColumnDefinitions[1].Width = new GridLength(newWidth, GridUnitType.Absolute);
-                });
-            });
-    }
 
     #endregion Public Methods
 }
 
+public static class ViewGridExtensions
+{
+
+    private static bool IsInGrid(this View? control)
+    {
+        if (control == null)
+            return false;
+        Element? parent = control.Parent;
+        while (parent != null)
+        {
+            if (parent is Grid)
+                return true;
+            parent = (parent as VisualElement)?.Parent;
+        }
+        return false;
+    }
+
+    private static (int row, int col, int colSpan) GetPositionInGrid(this View? control)
+    {
+        if (control == null)
+            return (-1, -1, 1);
+        Element? parent = control.Parent;
+        while (parent != null)
+        {
+            if (parent is Grid grid)
+            {
+                int row = grid.GetRow(control);
+                int col = grid.GetColumn(control);
+                int span = grid.GetColumnSpan(control);
+                return (row, col, span);
+            }
+            parent = (parent as VisualElement)?.Parent;
+        }
+        return (-1, -1, 1);
+    }
+
+    public static void BringToFront(this View? control)
+    {
+        if (control == null || !control.IsInGrid())
+            return;
+        var (row, col, span) = control.GetPositionInGrid();
+        if (row < 0)
+            return;
+
+        var grid = control.GetParentGrid();
+        if (grid == null)
+            return;
+
+        var siblings = grid.Children
+                           .Where(v => grid.GetRow(v) == row && grid.GetColumn(v) == col)
+                           .ToList();
+
+        if (!siblings.Any())
+            return;
+
+        int minIndex = siblings.Min(v => v.ZIndex);
+        for (int i = 0; i < siblings.Count; i++)
+            ((View)siblings[i]).ZIndex -= minIndex;
+
+        var ordered = siblings.OrderBy(v => v.ZIndex).ToList();
+        for (int i = 0; i < ordered.Count; i++)
+            ((View)siblings[i]).ZIndex = i;
+
+        control.ZIndex = ordered.Count;
+    }
+
+    public static void MoveToBack(this View? control)
+    {
+        if (control == null || !control.IsInGrid())
+            return;
+        var (row, col, span) = control.GetPositionInGrid();
+        if (row < 0)
+            return;
+
+        var grid = control.GetParentGrid();
+        if (grid == null)
+            return;
+
+        var siblings = grid.Children
+                           .Where(v => grid.GetRow(v) == row && grid.GetColumn(v) == col)
+                           .ToList();
+        if (!siblings.Any())
+            return;
+
+        int minIndex = siblings.Min(v => v.ZIndex);
+        for (int i = 0; i < siblings.Count; i++)
+        {
+            ((View)siblings[i]).ZIndex -= minIndex;
+
+        }
+
+        var ordered = siblings.OrderBy(v => v.ZIndex).ToList();
+        int idx = 1;
+        foreach (var v in ordered)
+        {
+            if (v != control)
+                ((View)v).ZIndex = idx++;
+        }
+
+        control.ZIndex = 0;
+    }
+
+    private static Grid? GetParentGrid(this View? control)
+    {
+        if (control == null)
+            return null;
+        Element? parent = control.Parent;
+        while (parent != null)
+        {
+            if (parent is Grid grid)
+                return grid;
+            parent = (parent as VisualElement)?.Parent;
+        }
+        return null;
+    }
+}
+
+
+
+///// <summary>
+///// After toggling LabelVisible or UndoButton, recalc your
+///// Grid.ColumnSpan/Column so your control remains centered.
+///// </summary>
+//protected void BaseRefreshLayout()
+//{
+//    UiThreadHelper.RunOnMainThread(() =>
+//    {
+//        Field_PerformBatchUpdate(() =>
+//        {
+//            foreach (var control in Field_GetControls())
+//                if (control!.Parent is Grid grid)
+//                {
+//                    bool isFieldLabelVisible = FieldLabelVisible;
+//                    bool isButtonUndoVisible = FieldUndoButton;
+
+//                    if (isFieldLabelVisible && isButtonUndoVisible)
+//                    {
+//                        Grid.SetColumn(control!, 1);
+//                        Grid.SetColumnSpan(control!, 1);
+//                    }
+//                    else if (isFieldLabelVisible && !isButtonUndoVisible)
+//                    {
+//                        Grid.SetColumn(control!, 1);
+//                        Grid.SetColumnSpan(control!, 2);
+//                    }
+//                    else if (!isFieldLabelVisible && isButtonUndoVisible)
+//                    {
+//                        Grid.SetColumn(control!, 0);
+//                        Grid.SetColumnSpan(control!, 2);
+//                    }
+//                    else // both not visible
+//                    {
+//                        Grid.SetColumn(control!, 0);
+//                        Grid.SetColumnSpan(control!, 3);
+//                    }
+//                }
+//        });
+//    });
+
+//    Field_RefreshLayout();
+
+//}

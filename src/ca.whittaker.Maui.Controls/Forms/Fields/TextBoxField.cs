@@ -1,5 +1,6 @@
-﻿using System.Diagnostics;
-using Entry = Microsoft.Maui.Controls.Entry;
+﻿using Microsoft.Maui.Graphics.Platform;
+using System.Diagnostics;
+//using BorderEntry = Microsoft.Maui.Controls.Entry;
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
@@ -8,9 +9,46 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public partial class TextBoxField : BaseFormField<string>
 {
+    protected override void Field_ConfigAccessModeEditing()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_HidePlaceholders();
+
+            _textBox.IsVisible = true;
+            _textBox.IsEnabled = true;
+            _textBox.InputTransparent = false;
+
+            Field_RefreshLayout();
+        });
+    }
+
+    protected override void Field_ConfigAccessModeViewing()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            ControlVisualHelper.UnfocusDescendantControls(this);
+
+            _textBox.IsVisible = false;
+            _textBox.IsEnabled = false;
+
+            Field_ShowPlaceholders();
+            Field_RefreshLayout();
+        });
+    }
+
+
+    protected override string Field_GetDisplayText()
+    {
+        if (_textBox?.Text == null)
+            return string.Empty;
+        return _textBox?.Text ?? String.Empty;
+    }
+    protected override string? Field_GetCurrentValue() => _textBox.Text;
+    protected override List<View> Field_GetControls() => new List<View>() { _textBox };
     #region Fields
 
-    private Entry _textBox;
+    private UiEntry _textBox;
 
     public static readonly BindableProperty TextBoxAllLowerCaseProperty = BindableProperty.Create(
         propertyName: nameof(TextBoxAllLowerCase),
@@ -53,11 +91,16 @@ public partial class TextBoxField : BaseFormField<string>
     #region Public Constructors
     public TextBoxField() : base()
     {
-        _textBox = new Entry
+        _textBox = new UiEntry
         {
-            VerticalOptions = LayoutOptions.Center,
+            VerticalOptions = new LayoutOptions(LayoutAlignment.Fill, true),
+            HorizontalOptions = new LayoutOptions(LayoutAlignment.Fill, true),
+            ZIndex = 10
         };
-        _textBox.IsEnabled = false;
+
+        SaveBackgroundColor((SolidColorBrush?)(Color)_textBox.BackgroundColor);
+
+        _textBox.IsEnabled = true;
         _textBox.ReturnCommand = new Command(TextBox_ReturnPressedCommand);
         _textBox.TextChanged += TextBox_TextChanged;
 
@@ -65,8 +108,10 @@ public partial class TextBoxField : BaseFormField<string>
         TextBox_SetMaxLength(TextBoxMaxLength);
 
         Initialize();
+
+        SaveTextColor(this.FieldLabel?.TextColor);
+
     }
-    protected override List<View> Field_ControlMain() => new List<View>() { _textBox };
 
     #endregion Public Constructors
 
@@ -241,34 +286,6 @@ public partial class TextBoxField : BaseFormField<string>
     #endregion Private Methods
 
     #region Protected Methods
-    //TestBoxField
-    //protected override Grid Field_CreateLayoutGrid()
-    //{
-    //    var grid = new Grid
-    //    {
-    //        ColumnDefinitions =
-    //        {
-    //            new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-    //            new ColumnDefinition { Width = GridLength.Star },
-    //            new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-    //        },
-    //        RowDefinitions =
-    //        {
-    //            new RowDefinition { Height = GridLength.Auto },
-    //            new RowDefinition { Height = GridLength.Auto }
-    //        },
-    //        VerticalOptions = LayoutOptions.Fill
-    //    };
-    //    grid.Add(FieldLabel, 0, 0);
-    //    grid.Add(_textBox, 1, 0);
-    //    grid.Add(FieldButtonUndo, 2, 0);
-    //    grid.Add(FieldNotification, 0, 1);
-    //    grid.SetColumnSpan(FieldNotification, 3);
-    //    return grid;
-    //}
-
-    protected override string? Field_GetCurrentValue() => _textBox.Text;
-
     protected override string Field_GetFormatErrorMessage() =>
                 TextBoxDataType switch
                 {
@@ -284,7 +301,7 @@ public partial class TextBoxField : BaseFormField<string>
                 };
 
     protected override bool Field_HasChangedFromLast() =>
-                FieldLastValue != (_textBox.Text ?? String.Empty);
+        !FieldAreValuesEqual(FieldLastValue, _textBox.Text);
 
     protected override bool Field_HasChangedFromOriginal()
     {
@@ -325,14 +342,24 @@ public partial class TextBoxField : BaseFormField<string>
 
     protected override void Field_SetValue(string? value)
     {
-        Debug.WriteLine($"[TextBoxField] : {FieldLabelText} : Field_SetValue(value: {value})");
+        Debug.WriteLine($"[TextBoxField] : {FieldLabelText} : Field_SetValue({value})");
         UiThreadHelper.RunOnMainThread(() =>
         {
             Field_PerformBatchUpdate(() =>
             {
-                _textBox.Text = value ?? String.Empty;
+                _textBox.TextChanged -= TextBox_TextChanged;   // suppress recursion
+                _textBox.Text = value ?? string.Empty;
+                _textBox.TextChanged += TextBox_TextChanged;
+
+                if (FieldAccessMode != FieldAccessModeEnum.Editing)
+                    Field_ShowPlaceholders();
             });
         });
+    }
+
+    protected override void Field_RefreshLayout()
+    {
+
     }
 
     protected override void OnParentSet()
@@ -340,59 +367,8 @@ public partial class TextBoxField : BaseFormField<string>
         base.OnParentSet();
     }
 
-    // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
-    protected override void UpdateRow0Layout()
-    {
-        UiThreadHelper.RunOnMainThread(() =>
-        {
-            Field_PerformBatchUpdate(() =>
-            {
-                if (_textBox!.Parent is Grid grid)
-                {
-                    bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButton;
-
-                    if (isFieldLabelVisible && isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_textBox!, 1);
-                        Grid.SetColumnSpan(_textBox!, 1);
-                    }
-                    else if (isFieldLabelVisible && !isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_textBox!, 1);
-                        Grid.SetColumnSpan(_textBox!, 2);
-                    }
-                    else if (!isFieldLabelVisible && isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_textBox!, 0);
-                        Grid.SetColumnSpan(_textBox!, 2);
-                    }
-                    else // both not visible
-                    {
-                        Grid.SetColumn(_textBox!, 0);
-                        Grid.SetColumnSpan(_textBox!, 3);
-                    }
-                }
-            });
-        });
-    }
 
     #endregion Protected Methods
 
-    #region Public Methods
-
-    public override void Field_Unfocus()
-    {
-        UiThreadHelper.RunOnMainThread(() =>
-        {
-            Field_PerformBatchUpdate(() =>
-            {
-                base.Field_Unfocus();
-                _textBox?.Unfocus();
-            });
-        });
-    }
-
-    #endregion Public Methods
 }
 

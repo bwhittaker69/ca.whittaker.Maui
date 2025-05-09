@@ -263,10 +263,10 @@ public class Form : ContentView
         foreach (IBaseFormField field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
         {
             if (field is TextBoxField textBox)
-                textBox.Field_Clear();
+                textBox.Clear();
             if (field is CheckBoxField checkBox)
-                checkBox.Field_Clear();
-            field.Field_Unfocus();
+                checkBox.Clear();
+            field.Unfocus();
         }
     }
 
@@ -377,7 +377,7 @@ public class Form : ContentView
     private void FormFieldsMarkAsSaved()
     {
         foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.Field_SaveAndMarkAsReadOnly();
+            t.Save();
     }
 
     private void FormFieldsWireUp()
@@ -388,8 +388,10 @@ public class Form : ContentView
 
         foreach (var element in formElements)
         {
-            element.FieldHasChanges += OnFieldHasChanges;
-            element.FieldHasValidationChanges += OnFieldHasValidationChanges;
+            Debug.WriteLine($"[Form] : FormFieldsWireUp() : {element.FieldLabelText.ToString()} : OnFieldHasChanges");
+            Debug.WriteLine($"[Form] : FormFieldsWireUp() : {element.FieldLabelText.ToString()} : OnFieldHasValidationChanges");
+            element.OnHasChanges += OnFieldHasChanges;
+            element.OnHasValidationChanges += OnFieldHasValidationChanges;
         }
     }
 
@@ -524,15 +526,14 @@ public class Form : ContentView
 
     private void OnFormCancelButtonClicked(object? sender, EventArgs e)
     {
+        // undo any changes to all fields
+        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
+                field.Undo();
+
         // set form to editable state
         if (FormAccessMode != FormAccessModeEnum.Editable)
             FormAccessMode = FormAccessModeEnum.Editable;
 
-        // undo any changes to all fields
-        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-        {
-                field.Field_UndoValue();
-        }
 
     }
 

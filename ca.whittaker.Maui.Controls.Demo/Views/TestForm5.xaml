@@ -14,13 +14,63 @@
     <ContentPage.BindingContext>
         <vm:TestForm5ViewModel/>
     </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:EnumToBooleanConverter x:Key="EnumToBoolean" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
 
-        <VerticalStackLayout>
-                    
+        <ScrollView Orientation="Vertical">
+            <VerticalStackLayout>
 
+            <HorizontalStackLayout Spacing="20" Padding="0,0,0,10">
+                <Label Text="Label Layout:" VerticalOptions="Center" />
+                <RadioButton
+                                Content="Top"
+                                GroupName="LabelLayout"
+                                IsChecked="{Binding LabelLayout,
+                                            Converter={StaticResource EnumToBoolean},
+                                            ConverterParameter=Top,
+                                            Mode=TwoWay}" />
+                <RadioButton
+                                Content="Left"
+                                GroupName="LabelLayout"
+                                IsChecked="{Binding LabelLayout,
+                                            Converter={StaticResource EnumToBoolean},
+                                            ConverterParameter=Left,
+                                            Mode=TwoWay}" />
+            </HorizontalStackLayout>
+            
             <Label Text="TestForm5" FontSize="Header"></Label>
-            <Forms:Form x:Name="UserProfileForm" 
+
+                <Grid Padding="10" RowSpacing="5" ColumnSpacing="10">
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="FontSize" Value="Small"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Text="{Binding Userprofile_istristate}" Grid.Row="0" Grid.Column="0"/>
+                    <Label Text="{Binding Userprofile_date}"       Grid.Row="0" Grid.Column="1"/>
+
+                    <Label Text="{Binding Userprofile_email}"      Grid.Row="1" Grid.Column="0"/>
+                    <Label Text="{Binding Userprofile_userid}"     Grid.Row="1" Grid.Column="1"/>
+
+                    <Label Text="{Binding Userprofile_country}"    Grid.Row="2" Grid.Column="0"/>
+                    <Label Text="{Binding Userprofile_bio}"        Grid.Row="2" Grid.Column="1"/>
+                </Grid>
+
+                <Forms:Form x:Name="UserProfileForm" 
                             FormName="{x:Static strings:AppResources.Form_UserProfile_TItle}"
                             FormSaveButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Save}"
                             FormCancelButtonText="{x:Static strings:AppResources.Form_UserProfile_Button_Cancel}"
@@ -31,11 +81,8 @@
                             CommandParameter="">
                 <VerticalStackLayout Spacing="15" Padding="0" VerticalOptions="Center" HorizontalOptions="Fill">
 
-
-
-                    <Label Text="{Binding Userprofile_istristate}"></Label>
-
                     <Forms:CheckBoxField FieldDataSource="{Binding Userprofile_istristate}"
+                                         FieldLabelLayout="{Binding LabelLayout}"
                                          CheckBoxDataType="TriState"
                                          FieldLabelWidth="150"
                                          FieldLabelVisible="True"
@@ -44,102 +91,82 @@
                                          FieldLabelText="Checkbox">
                     </Forms:CheckBoxField>
                     
-                    
-                    <Label Text="{Binding Userprofile_date}"></Label>
-
                     <Forms:DateField
                                     FieldLabelText="Date"
                                     FieldDataSource="{Binding Userprofile_date, Mode=TwoWay}"
+                                    FieldLabelLayout="{Binding LabelLayout}"
                                     FieldLabelWidth="150"
                                     FieldLabelVisible="True"
                                     FieldUndoButton="True"
                                     FieldMandatory="True">
                     </Forms:DateField>
 
-                    <Label Text="{Binding Userprofile_date}"></Label>
-                    <Forms:DateMonthYearField FieldLabelText="Date"
-                                              FieldDataSource="{Binding Userprofile_date}"
-                                              FieldLabelWidth="150"
-                                              FieldLabelVisible="True"
-                                              FieldUndoButton="True"
-                                              FieldMandatory="True"
-                                              ></Forms:DateMonthYearField>
 
-                    <Label Text="{Binding Userprofile_email}"></Label>
+
+                    <Forms:DateMonthYearField FieldLabelText="Date"
+                                        FieldLabelLayout="{Binding LabelLayout}"
+                                        FieldDataSource="{Binding Userprofile_date}"
+                                        FieldLabelWidth="150"
+                                        FieldLabelVisible="True"
+                                        FieldUndoButton="True"
+                                        FieldMandatory="True"
+                                        ></Forms:DateMonthYearField>
 
 
                     <Forms:TextBoxField     FieldDataSource="{Binding Userprofile_email}"
-                                            TextBoxMaxLength="40"
-                                            TextBoxDataType="Email"
-                                            FieldUndoButton="True"
-                                            TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}"
-                                            FieldLabelWidth="150"
-                                            FieldLabelText="{x:Static strings:AppResources.Field_Email}"
-                                            FieldMandatory="False">
+                                    FieldLabelLayout="{Binding LabelLayout}"
+                                    TextBoxMaxLength="40"
+                                    TextBoxDataType="Email"
+                                    FieldMandatory="True"
+                                    FieldUndoButton="True"
+                                    TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}"
+                                    FieldLabelWidth="150"
+                                    FieldLabelText="{x:Static strings:AppResources.Field_Email}">
                     </Forms:TextBoxField>
-                    
-                    
-                    <Label Text="{Binding Userprofile_userid}"></Label>
+
+                    <Forms:EditorField     FieldDataSource="{Binding Userprofile_bio}"
+                                           EditorRowCount="10"
+                                           FieldLabelLayout="Top"
+                                           FieldMandatory="True"
+                                           EditorDataType="Plaintext"
+                                           EditorPlaceholder="{x:Static strings:AppResources.Field_Bio_Placeholder}"
+                                           FieldLabelWidth="150"
+                                           FieldLabelText="{x:Static strings:AppResources.Field_Bio}">
+                    </Forms:EditorField>
 
                     <Forms:DropdownField FieldDataSource="{Binding Userprofile_userid}"
+                                    DropdownPlaceholder="dropdown"
+                                    DropdownItemsSource="{Binding Userprofile_users}"
+                                    FieldLabelLayout="{Binding LabelLayout}"
+                                    FieldLabelWidth="150"
+                                    FieldLabelVisible="True"
+                                    FieldUndoButton="True"
+                                    FieldMandatory="True"
+                                    FieldLabelText="User"
+                                    DropdownItemsSourceDisplayPath="Nickname"
+                                    DropdownItemsSourcePrimaryKey="UserId">
+                    </Forms:DropdownField>
+
+                    <Forms:DropdownField FieldDataSource="{Binding Userprofile_country}"
                                          DropdownPlaceholder="dropdown"
-                                         DropdownItemsSource="{Binding Userprofile_users}"
+                                         DropdownItemsSource="{Binding Userprofile_country_items}"
+                                         FieldLabelLayout="{Binding LabelLayout}"
                                          FieldLabelWidth="150"
                                          FieldLabelVisible="True"
                                          FieldUndoButton="True"
                                          FieldMandatory="False"
-                                         FieldLabelText="User"
-                                         DropdownItemsSourceDisplayPath="Nickname"
-                                         DropdownItemsSourcePrimaryKey="UserId"
-                                         >
+                                         FieldLabelText="Country">
                     </Forms:DropdownField>
-                    
 
                 </VerticalStackLayout>
 
             </Forms:Form>
 
         </VerticalStackLayout>
-
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>
 
-
-
-<!--<Label Text="{Binding Userprofile_istristate}"></Label>
-
-                    <Forms:CheckBoxField FieldDataSource="{Binding Userprofile_istristate}"
-                                         CheckBoxDataType="TriState"
-                                         FieldLabelWidth="150"
-                                         FieldLabelVisible="False"
-                                         FieldUndoButton="True"
-                                         FieldMandatory="False"
-                                         FieldLabelText="Checkbox">
-                    </Forms:CheckBoxField>-->
-
-
-<!--<Label Text="{Binding Userprofile_date}"></Label>
-
-                    <Forms:DateField
-                                    FieldLabelText="Date"
-                                    FieldDataSource="{Binding Userprofile_date, Mode=TwoWay}"
-                                    FieldLabelWidth="150"
-                                    FieldLabelVisible="True"
-                                    FieldUndoButton="True"
-                                    FieldMandatory="True">
-                    </Forms:DateField>-->
-
-<!--<Label Text="{Binding Userprofile_email}"></Label>
-
-
-                    <Forms:TextBoxField     FieldDataSource="{Binding Userprofile_email}"
-                                            TextBoxMaxLength="40"
-                                            TextBoxDataType="Email"
-                                            TextBoxPlaceholder="{x:Static strings:AppResources.Field_Email_Placeholder}"
-                                            FieldLabelWidth="150"
-                                            FieldLabelText="{x:Static strings:AppResources.Field_Email}"
-                                            FieldMandatory="False">
-                    </Forms:TextBoxField>-->
 
 <!--
                     <Label Text="{Binding Userprofile_nickname}"></Label>

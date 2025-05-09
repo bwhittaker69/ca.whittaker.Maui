@@ -10,7 +10,6 @@ public static class ControlVisualHelper
     /// </summary>
     public static void MatchDisabledToEnabled(VisualElement root)
     {
-
         foreach (View v in root.GetVisualTreeDescendants())
         {
             foreach (VisualElement c in v.GetVisualTreeDescendants())
@@ -42,64 +41,142 @@ public static class ControlVisualHelper
         }
     }
 
-    // Disables descendant controls: Entry, Picker, Editor, and ContentView.
-    // Labels remain enabled if fieldLabelVisible is true.
-    public static void DisableDescendantControls(View root, bool fieldLabelVisible)
+    /// <summary>
+    /// Returns the Color defined for TextColor in the Normal visual state of the given element.
+    /// </summary>
+    public static Color? GetNormalTextColor(View element)
+    {
+        if (element == null)
+            throw new ArgumentNullException(nameof(element));
+
+        var groups = VisualStateManager.GetVisualStateGroups(element);
+        var common = groups?.FirstOrDefault(g => g.Name == "CommonStates");
+        if (common == null)
+            return null;
+
+        var normal = common.States.OfType<VisualState>().FirstOrDefault(s => s.Name == "Normal");
+        if (normal == null)
+            return null;
+
+        // look for a TextColor setter
+        var textSetter = normal.Setters
+            .OfType<Setter>()
+            .FirstOrDefault(s => s.Property?.PropertyName == "TextColor");
+        if (textSetter?.Value is Color c)
+            return c;
+
+        // fallback: check for ForegroundColor
+        var fgSetter = normal.Setters
+            .OfType<Setter>()
+            .FirstOrDefault(s => s.Property?.PropertyName == "ForegroundColor");
+        if (fgSetter?.Value is Color fc)
+            return fc;
+
+        return null;
+    }
+
+    // Hide descendant controls: Entry, Picker, Editor, and ContentView.
+    // everything is hidden
+    public static void DisableAllDescendantControls<T>(this BaseFormField<T> root)
     {
         foreach (var c in root.GetVisualTreeDescendants())
         {
             Debug.WriteLine($"{c.ToString()}");
-            if (c is Entry e)
-            {
-                e.IsEnabled = true;
-                e.IsReadOnly = true;
-            }
+            if (c is UiEntry e)
+                e.IsEnabled = false;
             if (c is StackLayout sl)
-                sl.IsEnabled = true;
-            if (c is Picker p)
+                sl.IsEnabled = false;
+            if (c is UiPicker p)
                 p.IsEnabled = false;
             if (c is DatePicker dp)
                 dp.IsEnabled = false;
             if (c is Editor ed)
-            {
-                ed.IsEnabled = true;
-                ed.IsReadOnly = true;
-            }
+                ed.IsEnabled = false;
             if (c is ContentView cv)
-                cv.IsEnabled = true;
+                cv.IsEnabled = false;
             // labels are always enabled
-            if (c is Label l && fieldLabelVisible)
+            if (c is Label l)
                 l.IsEnabled = true;
         }
     }
-
-    // Enables descendant controls: Entry, Picker, Editor, and ContentView.
-    // Labels remain enabled if fieldLabelVisible is true.
-    public static void EnableDescendantControls(View root, bool fieldLabelVisible)
+    public static void EnableAllDescendantControls<T>(this BaseFormField<T> root)
     {
         foreach (var c in root.GetVisualTreeDescendants())
         {
             Debug.WriteLine($"{c.ToString()}");
-            if (c is Entry e)
-            {
+            if (c is UiEntry e)
                 e.IsEnabled = true;
-                e.IsReadOnly = false;
-            }
             if (c is StackLayout sl)
                 sl.IsEnabled = true;
+            if (c is UiPicker p)
+                p.IsEnabled = true;
             if (c is DatePicker dp)
                 dp.IsEnabled = true;
-            if (c is Picker p)
-                p.IsEnabled = true;
             if (c is Editor ed)
-            {
                 ed.IsEnabled = true;
-                ed.IsReadOnly = false;
-            }
             if (c is ContentView cv)
                 cv.IsEnabled = true;
-            if (c is Label l && fieldLabelVisible)
+            // labels are always enabled
+            if (c is Label l)
                 l.IsEnabled = true;
         }
     }
+
+
+    // Hide descendant controls: Entry, Picker, Editor, and ContentView.
+    // everything is hidden
+    public static void HideAllDescendantControls<T>(this BaseFormField<T> root)
+    {
+        foreach (var c in root.GetVisualTreeDescendants())
+        {
+            Debug.WriteLine($"{c.ToString()}");
+            if (c is UiEntry e)
+                e.IsVisible = false;
+            if (c is StackLayout sl)
+                sl.IsVisible = false;
+            if (c is UiPicker p)
+                p.IsVisible = false;
+            if (c is DatePicker dp)
+                dp.IsVisible = false;
+            if (c is Editor ed)
+                ed.IsVisible = false;
+            if (c is ContentView cv)
+                cv.IsVisible = false;
+            // labels are always enabled
+            if (c is Label l)
+                l.IsVisible = true;
+        }
+    }
+
+    // Hide descendant controls: Entry, Picker, Editor, and ContentView.
+    // everything is hidden
+    public static void UnfocusDescendantControls<T>(this BaseFormField<T> root)
+    {
+        Debug.WriteLine($"Unfocus : {root.FieldLabelText} : {root.ToString()}");
+        root.Unfocus();
+        foreach (IVisualTreeElement c in root.GetVisualTreeDescendants())
+        {
+            Debug.WriteLine($"Unfocus : {root.FieldLabelText} > {c.ToString()}");
+            if (c is Grid g)
+                g.Unfocus();
+            if (c is UiEntry e)
+                e.Unfocus();
+            if (c is StackLayout sl)
+                sl.Unfocus();
+            if (c is UiPicker p)
+                p.Unfocus();
+            if (c is UiDatePicker dp)
+                dp.Unfocus();
+            if (c is CheckBox cb)
+                cb.Unfocus();
+            if (c is UiEditor ed)
+                ed.Unfocus();
+            if (c is ContentView cv)
+                cv.Unfocus();
+            // labels are always enabled
+            if (c is Label l)
+                l.Unfocus();
+        }
+    }
+
 }

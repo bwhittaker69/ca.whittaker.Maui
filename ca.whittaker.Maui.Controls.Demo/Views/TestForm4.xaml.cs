@@ -15,6 +15,6 @@ public partial class TestForm4 : ContentPage
     private void ContentPage_Disappearing(object sender, EventArgs e)
     {
         //CheckBox_IsPublic.FieldUndo();
-        CheckBox_IsPublic.Field_Unfocus();
+        CheckBox_IsPublic.Unfocus();
     }
 }

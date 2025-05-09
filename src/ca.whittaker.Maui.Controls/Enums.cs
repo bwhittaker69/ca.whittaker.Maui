@@ -46,6 +46,8 @@ namespace ca.whittaker.Maui.Controls
         Zoom_Out
     }
 
+    public enum FieldLabelLayoutEnum { Left, Top }
+
     public enum TextBoxDataTypeEnum { Plaintext, Email, Url, Richtext, Username, Integer, Numeric, Currency }
 
     public enum EditorDataTypeEnum { Plaintext, Richtext }

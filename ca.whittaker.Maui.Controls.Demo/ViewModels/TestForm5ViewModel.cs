@@ -42,6 +42,17 @@ public class TestForm5ViewModel : ObservableObject
         return testUsers;
     }
 
+    FieldLabelLayoutEnum _labelLayout = FieldLabelLayoutEnum.Top;
+    public FieldLabelLayoutEnum LabelLayout
+    {
+        get => _labelLayout;
+        set
+        {
+            if (_labelLayout == value) return;
+            _labelLayout = value;
+            OnPropertyChanged(nameof(LabelLayout));
+        }
+    }
 
 
     private List<TestUser>? _userprofile_users; 
@@ -101,7 +112,7 @@ public class TestForm5ViewModel : ObservableObject
         set => SetProperty(ref _userprofile_bio, value);
     }
 
-    private string _userprofile_country = String.Empty;
+    private string _userprofile_country = "USA";
     public string Userprofile_country
     {
         get => _userprofile_country;
@@ -114,7 +125,8 @@ public class TestForm5ViewModel : ObservableObject
         }
     }
 
-    private List<string> _userprofile_country_items = [];
+
+    private List<string> _userprofile_country_items = ["Canada", "USA"];
     public List<string> Userprofile_country_items
     {
         get => _userprofile_country_items;

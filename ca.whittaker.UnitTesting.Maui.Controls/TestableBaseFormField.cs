@@ -16,7 +16,7 @@ public class TestableFieldBase : BaseFormField<string>
     private string? _testValue;
 
     // No real UI element needed for control‐view wiring
-    protected override List<View> Field_ControlMain()
+    protected override List<View> Field_GetControls()
         => new List<View>();
 
     // Base will call this to push a value into your “control”
@@ -50,7 +50,7 @@ public class TestableFieldBase : BaseFormField<string>
         => !Equals(FieldOriginalValue, _testValue);
 
     // Layout‐adjust stub (no‐op)
-    protected override void UpdateRow0Layout()
+    protected override void RefreshLayout()
     { }
 }
 
@@ -212,7 +212,7 @@ public class TestableFieldBaseTests
         _sut.FieldOriginalValue = "orig";
         InvokeProtected(_sut, "Field_SetValue", "new");
 
-        _sut.Field_UndoValue();
+        _sut.Undo();
 
         var current = (string?)InvokeProtected(_sut, "Field_GetCurrentValue");
         Assert.That(current, Is.EqualTo("orig"));
@@ -222,7 +222,7 @@ public class TestableFieldBaseTests
     public void Field_SaveAndMarkAsReadOnly_SetsOriginalAndViewOnly()
     {
         InvokeProtected(_sut, "Field_SetValue", "saved");
-        _sut.Field_SaveAndMarkAsReadOnly();
+        _sut.Save();
 
         Assert.Multiple(() =>
         {
@@ -293,7 +293,7 @@ public class TestableFieldBaseTests
     public void FieldHasChangesEvent_Fires_WhenValueDiffersFromOriginal()
     {
         bool? sawChange = null;
-        _sut.FieldHasChanges += (_, e) => sawChange = e.HasChanged;
+        _sut.OnHasChanges += (_, e) => sawChange = e.HasChanged;
 
         // original = null; now change it
         InvokeProtected(_sut, "Field_SetValue", "new");
@@ -307,7 +307,7 @@ public class TestableFieldBaseTests
     public void FieldHasValidationChangesEvent_Fires_WhenRequiredErrorAppears()
     {
         bool? sawValid = null;
-        _sut.FieldHasValidationChanges += (_, e) => sawValid = e.Invalid == false;
+        _sut.OnHasValidationChanges += (_, e) => sawValid = e.Invalid == false;
 
         _sut.FieldMandatory = true;
         InvokeProtected(_sut, "Field_SetValue", null);

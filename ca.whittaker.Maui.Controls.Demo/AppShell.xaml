@@ -12,11 +12,11 @@
     <TabBar>
         <Tab Title="Tab1">
             <ShellContent Title="TestForm5" ContentTemplate="{DataTemplate views:TestForm5}"></ShellContent>
+            <ShellContent Title="TestForm" ContentTemplate="{DataTemplate views:TestForm}"></ShellContent>
             <ShellContent Title="TestForm4" ContentTemplate="{DataTemplate views:TestForm4}"></ShellContent>
             <ShellContent Title="TestForm3" ContentTemplate="{DataTemplate views:TestForm3}"></ShellContent>
             <ShellContent Title="TestForm2" ContentTemplate="{DataTemplate views:TestForm2}"></ShellContent>
             <ShellContent Title="TestForm1" ContentTemplate="{DataTemplate views:TestForm1}"></ShellContent>
-            <ShellContent Title="TestForm" ContentTemplate="{DataTemplate views:TestForm}"></ShellContent>
         </Tab>
     </TabBar>
 

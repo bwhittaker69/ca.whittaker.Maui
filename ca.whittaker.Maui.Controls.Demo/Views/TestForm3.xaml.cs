@@ -15,6 +15,6 @@ public partial class TestForm3 : ContentPage
     private void ContentPage_Disappearing(object sender, EventArgs e)
     {
         //TextBox_Name.FieldUndo();
-        TextBox_Name.Field_Unfocus();
+        TextBox_Name.Unfocus();
     }
 }

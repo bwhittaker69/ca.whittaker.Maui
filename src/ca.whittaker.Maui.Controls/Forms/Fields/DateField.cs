@@ -10,42 +10,133 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public partial class DateField : BaseFormField<DateTimeOffset?>, IBaseFormFieldTyped<DateTimeOffset?>
 {
+    /// <summary>
+    /// Put the control into **Editing** mode:
+    /// – make the live <see cref="_datePicker"/> visible & enabled
+    /// – hide the read‑only placeholder
+    /// – notify the layout system so the grid resizes correctly
+    /// – use <c>Field_HidePlaceholders()</c> for consistency
+    /// </summary>
+    protected override void Field_ConfigAccessModeEditing()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_HidePlaceholders();
+
+            _datePicker.IsEnabled = true;
+            _datePicker.IsVisible = true;
+            _datePicker.InputTransparent = false;
+
+            Field_RefreshLayout();
+        });
+    }
+
+    /// <summary>
+    /// Put the control into **Viewing** mode:
+    /// – disable / hide the live picker
+    /// – surface the placeholder with the display text
+    /// – ensure focus is cleared so keyboards are dismissed
+    /// – call <c>Field_RefreshLayout()</c> to recompute the grid
+    /// </summary>
+    protected override void Field_ConfigAccessModeViewing()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            if (_datePicker.IsFocused)
+                _datePicker.Unfocus();
+
+            _datePicker.IsEnabled = false;
+            _datePicker.IsVisible = false;
+
+            Field_ShowPlaceholders();   // sets text & brings to front
+            Field_RefreshLayout();
+        });
+    }
+
+    protected override string Field_GetDisplayText()
+    {
+        if (FieldDataSource.HasValue)
+            return FieldDataSource.Value.Date.ToShortDateString();
+        return string.Empty;
+    }
 
     #region Fields
 
+    private Grid _datePickerContainer;
     private DatePicker _datePicker;
 
     #endregion Fields
+
+    // Bindable property for placeholder text
+    public static readonly BindableProperty DatePlaceholderProperty = BindableProperty.Create(
+        propertyName: nameof(DatePlaceholder),
+        returnType: typeof(string),
+        declaringType: typeof(DateField),
+        defaultValue: string.Empty,
+        propertyChanged: (bindable, oldValue, newValue) =>
+            ((DateField)bindable).OnDatePlaceholderChanged(newValue?.ToString() ?? String.Empty)
+    );
+
+    private void OnDatePlaceholderChanged(string newValue)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            _placeholderEntry.Text = newValue;
+        });
+    }
+
+    private void DatePicker_DateSet(object? sender, DateChangedEventArgs e)
+    {
+        Debug.WriteLine($"[DateField] : {FieldLabelText} : DatePicker_DateSet(e.NewDate={e.NewDate})");
+
+        // 1) Push the new date back into the bindable so we get the same
+        //    suppression + change-detection logic you use in TextBoxField
+        var newOffset = e.NewDate.ToDateTimeOffset();
+        Field_SetDataSourceValue(newOffset);
+
+        // 2) Mirror the TextBoxField pattern:
+        //    update the “last value” so undo/last-change logic stays in sync
+        FieldLastValue = newOffset;
+    }
+
+    public string DatePlaceholder
+    {
+        get => (string)GetValue(DatePlaceholderProperty);
+        set => SetValue(DatePlaceholderProperty, value);
+    }
 
     #region Public Constructors
 
     public DateField()
     {
+        // 1) Container overlay
+        _datePickerContainer = new Grid();
+        _datePickerContainer.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+        _datePickerContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+
+        // 3) DatePicker behind
         _datePicker = new DatePicker
         {
             VerticalOptions = LayoutOptions.Center,
             MinimumDate = new DateTime(1900, 1, 1),
             MaximumDate = new DateTime(2100, 12, 31),
-            Date = FieldDataSource?.DateTime ?? DateTime.Today // force valid date at creation
+            Date = FieldDataSource?.DateTime ?? DateTime.Today
         };
-
         _datePicker.IsEnabled = false;
         _datePicker.DateSelected += DatePicker_DateSet;
 
-        _datePicker.DateSelected += (s, e) =>
-        {
-            Debug.WriteLine($"[DateField] : {FieldLabelText} : _datePicker.DateSelected(e.NewDate={e.NewDate})");
-        };
+        Grid.SetRow(_datePicker, 0);
+        Grid.SetColumn(_datePicker, 0);
+        _datePickerContainer.Children.Add(_datePicker);
 
         Initialize();
     }
 
-    protected override List<View> Field_ControlMain() => new List<View>() { _datePicker };
+    protected override List<View> Field_GetControls() => new List<View> { _datePickerContainer };
 
     #endregion Public Constructors
 
     #region Private Methods
-
 
     protected override void Field_SetDataSourceValue(DateTimeOffset? newValue)
     {
@@ -68,137 +159,78 @@ public partial class DateField : BaseFormField<DateTimeOffset?>, IBaseFormFieldT
         Field_UpdateNotificationMessage();
     }
 
-    private void DatePicker_DateSet(object? sender, DateChangedEventArgs e)
-    {
-        Debug.WriteLine($"[DateField] : {FieldLabelText} : DatePicker_DateSet(e.NewDate={e.NewDate})");
-
-        // 1) Push the new date back into the bindable so we get the same
-        //    suppression + change-detection logic you use in TextBoxField
-        var newOffset = e.NewDate.ToDateTimeOffset();
-        Field_SetDataSourceValue(newOffset);
-
-        // 2) Mirror the TextBoxField pattern:
-        //    update the “last value” so undo/last-change logic stays in sync
-        FieldLastValue = newOffset;
-    }
-
-
     #endregion Private Methods
 
     #region Protected Methods
-    //DateField
-    //protected override Grid Field_CreateLayoutGrid()
-    //{
-    //    var grid = new Grid
-    //    {
-    //        ColumnDefinitions =
-    //        {
-    //            new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-    //            new ColumnDefinition { Width = GridLength.Star },
-    //            new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-    //        },
-    //        RowDefinitions =
-    //        {
-    //            new RowDefinition { Height = GridLength.Auto },
-    //            new RowDefinition { Height = GridLength.Auto }
-    //        },
-    //        VerticalOptions = LayoutOptions.Fill
-    //    };
-    //    grid.Add(FieldLabel, 0, 0);
-    //    grid.Add(_datePicker, 1, 0);
-    //    grid.Add(FieldButtonUndo, 2, 0);
-    //    grid.Add(FieldNotification, 0, 1);
-    //    grid.SetColumnSpan(FieldNotification, 3);
-    //    return grid;
-    //}
 
     protected override DateTimeOffset? Field_GetCurrentValue() => _datePicker.Date;
+
     protected override string Field_GetFormatErrorMessage() => String.Empty;
 
+
+    /// <summary>Detects a change from the last value using the helper.</summary>
     protected override bool Field_HasChangedFromLast() =>
-                FieldLastValue != (_datePicker.Date);
-
-    protected override bool Field_HasChangedFromOriginal()
-    {
-
-        if (FieldOriginalValue == null)
-            return _datePicker?.Date != DateTime.MinValue;
-
-        var originalDate = FieldOriginalValue.Value.Date;
-        var currentDate = _datePicker?.Date.Date;
-
-        Debug.WriteLine($"[DateField] : {FieldLabelText} : Field_HasChangedFromOriginal() = {originalDate != currentDate}");
-
-        return originalDate != currentDate;
-    }
+            !FieldAreValuesEqual(FieldLastValue, Field_GetCurrentValue());
 
 
+    /// <summary>Detects a change from the original value using the helper.</summary>
+    protected override bool Field_HasChangedFromOriginal() =>
+            !FieldAreValuesEqual(FieldOriginalValue, Field_GetCurrentValue());
 
     protected override bool Field_HasFormatError()
     {
         return false;
     }
 
+    /// <summary>
+    /// Required‑field validation: true when mandatory **and** no value chosen.
+    /// </summary>
     protected override bool Field_HasRequiredError() =>
-                FieldMandatory && _datePicker == null;
+            FieldMandatory && Field_GetCurrentValue() == null;
 
-
-
+    /// <summary>
+    /// Pushes a new value from the VM into the picker without
+    /// triggering recursive <c>DateSelected</c> events and keeps the
+    /// placeholder in sync when in viewing mode.
+    /// </summary>
     protected override void Field_SetValue(DateTimeOffset? newDate)
-    {
-
-        if (_datePicker.Date != newDate.ToDateTime())
-        {
-            UiThreadHelper.RunOnMainThread(() =>
-            {
-                Field_PerformBatchUpdate(() =>
-                {
-                    Debug.WriteLine($"[DateField] : {FieldLabelText} : Field_SetValue(DateTimeOffset? {newDate})");
-                    _datePicker.Date = newDate.ToDateTime();
-                });
-            });
-        }
-    }
-
-
-    // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
-    protected override void UpdateRow0Layout()
     {
         UiThreadHelper.RunOnMainThread(() =>
         {
             Field_PerformBatchUpdate(() =>
             {
-                if (_datePicker!.Parent is Grid grid)
+                _datePicker.DateSelected -= DatePicker_DateSet;   // 1) prevent recursion
+                try
                 {
-                    bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButton;
-
-                    if (isFieldLabelVisible && isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_datePicker!, 1);
-                        Grid.SetColumnSpan(_datePicker!, 1);
-                    }
-                    else if (isFieldLabelVisible && !isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_datePicker!, 1);
-                        Grid.SetColumnSpan(_datePicker!, 2);
-                    }
-                    else if (!isFieldLabelVisible && isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_datePicker!, 0);
-                        Grid.SetColumnSpan(_datePicker!, 2);
-                    }
-                    else // both not visible
-                    {
-                        Grid.SetColumn(_datePicker!, 0);
-                        Grid.SetColumnSpan(_datePicker!, 3);
-                    }
+                    if (_datePicker.Date != newDate.ToDateTime())
+                        _datePicker.Date = newDate.ToDateTime();
                 }
+                finally
+                {
+                    _datePicker.DateSelected += DatePicker_DateSet; // 2) re‑attach
+                }
+
+                if (FieldAccessMode != FieldAccessModeEnum.Editing)
+                    Field_ShowPlaceholders();
             });
         });
     }
 
+    /// <summary>
+    /// Forces a re‑layout after any visibility or value change so column
+    /// widths and row heights recalculate correctly.
+    /// </summary>
+    protected override void Field_RefreshLayout()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            _datePickerContainer.InvalidateMeasure();
+            this.InvalidateMeasure();
+        });
+    }
+
     #endregion Protected Methods
+
     protected override void OnParentSet()
     {
         base.OnParentSet();
@@ -212,22 +244,6 @@ public partial class DateField : BaseFormField<DateTimeOffset?>, IBaseFormFieldT
         // 2) Re-evaluate change state now that original==current
         Field_UpdateValidationAndChangedState();
     }
-    #region Public Methods
-
-    public override void Field_Unfocus()
-    {
-        UiThreadHelper.RunOnMainThread(() =>
-        {
-            Field_PerformBatchUpdate(() =>
-            {
-                base.Field_Unfocus();
-                _datePicker?.Unfocus();
-            });
-        });
-    }
-
-    #endregion Public Methods
-
 }
 
 public static class DateTimeOffsetExtensions
@@ -239,10 +255,10 @@ public static class DateTimeOffsetExtensions
     {
         return dateTimeOffset?.DateTime ?? DateTime.Now;
     }
+
     public static DateTimeOffset? ToDateTimeOffset(this DateTime dateTime)
     {
         var offset = TimeZoneInfo.Local.GetUtcOffset(dateTime);
         return new DateTimeOffset(dateTime, offset);
     }
-
 }

@@ -59,6 +59,19 @@ public static class CheckedStateEnumExtensions
 public partial class CheckBoxField : BaseFormField<bool?>
 {
 
+    protected override void Field_ConfigAccessModeEditing()
+    {
+    }
+
+    protected override void Field_ConfigAccessModeViewing()
+    {
+    }
+
+    protected override string Field_GetDisplayText()
+    {
+        return _checkBox.IsChecked.ToString();
+    }
+
     #region Fields
 
     private Microsoft.Maui.Controls.CheckBox _checkBox;
@@ -102,7 +115,8 @@ public partial class CheckBoxField : BaseFormField<bool?>
 
         Initialize();
     }
-    protected override List<View> Field_ControlMain() // ← was returning only the CheckBox
+
+    protected override List<View> Field_GetControls() // ← was returning only the CheckBox
     {
         return new List<View> { _checkBox, _checkBoxTapOverlay };
     }
@@ -384,61 +398,49 @@ public partial class CheckBoxField : BaseFormField<bool?>
     {
         base.OnPropertyChanged(propertyName);
     }
-
-    // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
-    protected override void UpdateRow0Layout()
+    protected override void Field_RefreshLayout()
     {
-        UiThreadHelper.RunOnMainThread(() =>
-        {
-            Field_PerformBatchUpdate(() =>
-            {
-                if (_checkBoxTapOverlay!.Parent is Grid grid)
-                {
-                    bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButton;
 
-                    if (isFieldLabelVisible && isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_checkBoxTapOverlay!, 1);
-                        Grid.SetColumnSpan(_checkBoxTapOverlay!, 1);
-                    }
-                    else if (isFieldLabelVisible && !isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_checkBoxTapOverlay!, 1);
-                        Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
-                    }
-                    else if (!isFieldLabelVisible && isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_checkBoxTapOverlay!, 0);
-                        Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
-                    }
-                    else // both not visible
-                    {
-                        Grid.SetColumn(_checkBoxTapOverlay!, 0);
-                        Grid.SetColumnSpan(_checkBoxTapOverlay!, 3);
-                    }
-                }
-            });
-        });
     }
+    //// Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
+    //protected override void RefreshLayout()
+    //{
+    //    UiThreadHelper.RunOnMainThread(() =>
+    //    {
+    //        Field_PerformBatchUpdate(() =>
+    //        {
+    //            if (_checkBoxTapOverlay!.Parent is Grid grid)
+    //            {
+    //                bool isFieldLabelVisible = FieldLabelVisible;
+    //                bool isButtonUndoVisible = FieldUndoButton;
+
+    //                if (isFieldLabelVisible && isButtonUndoVisible)
+    //                {
+    //                    Grid.SetColumn(_checkBoxTapOverlay!, 1);
+    //                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 1);
+    //                }
+    //                else if (isFieldLabelVisible && !isButtonUndoVisible)
+    //                {
+    //                    Grid.SetColumn(_checkBoxTapOverlay!, 1);
+    //                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
+    //                }
+    //                else if (!isFieldLabelVisible && isButtonUndoVisible)
+    //                {
+    //                    Grid.SetColumn(_checkBoxTapOverlay!, 0);
+    //                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 2);
+    //                }
+    //                else // both not visible
+    //                {
+    //                    Grid.SetColumn(_checkBoxTapOverlay!, 0);
+    //                    Grid.SetColumnSpan(_checkBoxTapOverlay!, 3);
+    //                }
+    //            }
+    //        });
+    //    });
+    //}
 
     #endregion Protected Methods
 
-    #region Public Methods
-
-    public override void Field_Unfocus()
-    {
-        UiThreadHelper.RunOnMainThread(() =>
-        {
-            Field_PerformBatchUpdate(() =>
-            {
-                base.Field_Unfocus();
-                _checkBox?.Unfocus();
-            });
-        });
-    }
-
-    #endregion Public Methods
 
 }
 

@@ -15,7 +15,8 @@ namespace ca.whittaker.Maui.Controls.Demo
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+                })
+                .UseBorderHandlers();
 
 #if DEBUG
             //builder.Logging.AddDebug();

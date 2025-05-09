@@ -7,9 +7,51 @@ namespace ca.whittaker.Maui.Controls.Forms;
 /// </summary>
 public partial class EditorField : BaseFormField<string>
 {
+    protected override void Field_ConfigAccessModeEditing()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            Field_HidePlaceholders();
+
+            Field_PerformBatchUpdate(() =>
+            {
+                _editorBox.IsVisible = true;
+                _editorBox.IsEnabled = true;
+                _editorBox.InputTransparent = false;
+            });
+
+            Field_RefreshLayout();
+        });
+    }
+
+    protected override void Field_ConfigAccessModeViewing()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            ControlVisualHelper.UnfocusDescendantControls(this);
+
+            Field_PerformBatchUpdate(() =>
+            {
+                _editorBox.IsVisible = false;
+                _editorBox.IsEnabled = false;
+            });
+
+            Field_ShowPlaceholders();
+            Field_RefreshLayout();
+        });
+    }
+
+    protected override string Field_GetDisplayText()
+    {
+        if (_editorBox?.Text == null)
+            return string.Empty;
+        return _editorBox?.Text ?? String.Empty;
+    }
+    protected override List<View> Field_GetControls() => new List<View>() { _editorBox };
+    protected override string? Field_GetCurrentValue() => _editorBox.Text;
     #region Fields
 
-    private Editor _editorBox;
+    private UiEditor _editorBox;
 
     public static readonly BindableProperty EditorDataTypeProperty = BindableProperty.Create(
         propertyName: nameof(EditorDataType),
@@ -49,11 +91,12 @@ public partial class EditorField : BaseFormField<string>
 
     public EditorField()
     {
-        _editorBox = new Editor
+        _editorBox = new UiEditor
         {
             VerticalOptions = LayoutOptions.Center,
         };
-        _editorBox.IsEnabled = false;
+
+        _editorBox.IsEnabled = true;
         _editorBox.TextChanged += Editor_TextChanged;
 
         Editor_SetPlaceholderText(EditorPlaceholder);
@@ -61,10 +104,11 @@ public partial class EditorField : BaseFormField<string>
 
         // Initialize 
         Initialize();
+
+        SaveTextColor(FieldLabel?.TextColor);
+        SaveBorderWidth(_editorBox.BorderWidth);
+
     }
-    protected override List<View> Field_ControlMain() => new List<View>() { _editorBox };
-
-
     #endregion Public Constructors
 
     #region Properties
@@ -205,33 +249,6 @@ public partial class EditorField : BaseFormField<string>
     #endregion Private Methods
 
     #region Protected Methods
-    //EditorField
-    //protected override Grid Field_CreateLayoutGrid()
-    //{
-    //    var grid = new Grid
-    //    {
-    //        ColumnDefinitions =
-    //        {
-    //            new ColumnDefinition { Width = new GridLength(FieldLabelWidth, GridUnitType.Absolute) },
-    //            new ColumnDefinition { Width = GridLength.Star },
-    //            new ColumnDefinition { Width = new GridLength(DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 2, GridUnitType.Absolute) },
-    //        },
-    //        RowDefinitions =
-    //        {
-    //            new RowDefinition { Height = GridLength.Auto },
-    //            new RowDefinition { Height = GridLength.Auto }
-    //        },
-    //        VerticalOptions = LayoutOptions.Fill
-    //    };
-    //    grid.Add(FieldLabel, 0, 0);
-    //    grid.Add(_editorBox, 1, 0);
-    //    grid.Add(FieldButtonUndo, 2, 0);
-    //    grid.Add(FieldNotification, 0, 1);
-    //    grid.SetColumnSpan(FieldNotification, 3);
-    //    return grid;
-    //}
-
-    protected override string Field_GetCurrentValue() => _editorBox.Text;
 
     protected override string Field_GetFormatErrorMessage() =>
         EditorDataType switch
@@ -241,11 +258,13 @@ public partial class EditorField : BaseFormField<string>
             _ => throw new Exception("Invalid format, unspecified textbox field type")
         };
 
+
     protected override bool Field_HasChangedFromLast() =>
-        FieldLastValue != (_editorBox.Text ?? String.Empty);
+        !FieldAreValuesEqual(FieldLastValue, _editorBox.Text);
 
     protected override bool Field_HasChangedFromOriginal() =>
-                FieldOriginalValue != (_editorBox.Text ?? String.Empty);
+        !FieldAreValuesEqual(FieldOriginalValue, _editorBox.Text);
+
 
     protected override bool Field_HasFormatError()
     {
@@ -271,68 +290,36 @@ public partial class EditorField : BaseFormField<string>
         {
             Field_PerformBatchUpdate(() =>
             {
-                _editorBox.Text = value ?? String.Empty;
+                _editorBox.TextChanged -= Editor_TextChanged;
+                _editorBox.Text = value ?? string.Empty;
+                _editorBox.TextChanged += Editor_TextChanged;
+
+                if (FieldAccessMode != FieldAccessModeEnum.Editing)
+                    Field_ShowPlaceholders();
             });
         });
     }
+
+    protected override void Field_RefreshLayout()
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            if (Content is Grid grid)
+            {
+                grid.InvalidateMeasure();
+            }
+            InvalidateMeasure();
+        });
+    }
+
 
     protected override void OnParentSet()
     {
         base.OnParentSet();
     }
 
-    // Update the _editorBox layout in row 0 based on the visibility of FieldLabel and ButtonUndo.
-    protected override void UpdateRow0Layout()
-    {
-        UiThreadHelper.RunOnMainThread(() =>
-        {
-            Field_PerformBatchUpdate(() =>
-            {
-                if (_editorBox!.Parent is Grid grid)
-                {
-                    bool isFieldLabelVisible = FieldLabelVisible;
-                    bool isButtonUndoVisible = FieldUndoButton;
-
-                    if (isFieldLabelVisible && isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_editorBox!, 1);
-                        Grid.SetColumnSpan(_editorBox!, 1);
-                    }
-                    else if (isFieldLabelVisible && !isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_editorBox!, 1);
-                        Grid.SetColumnSpan(_editorBox!, 2);
-                    }
-                    else if (!isFieldLabelVisible && isButtonUndoVisible)
-                    {
-                        Grid.SetColumn(_editorBox!, 0);
-                        Grid.SetColumnSpan(_editorBox!, 2);
-                    }
-                    else // both not visible
-                    {
-                        Grid.SetColumn(_editorBox!, 0);
-                        Grid.SetColumnSpan(_editorBox!, 3);
-                    }
-                }
-            });
-        });
-    }
 
     #endregion Protected Methods
 
-    #region Public Methods
 
-    public override void Field_Unfocus()
-    {
-        UiThreadHelper.RunOnMainThread(() =>
-        {
-            Field_PerformBatchUpdate(() =>
-            {
-                base.Field_Unfocus();
-                _editorBox?.Unfocus();
-            });
-        });
-    }
-
-    #endregion Public Methods
 }
