@@ -216,8 +216,8 @@ public partial class TextBoxField : BaseFormField<string>
     {
         string filteredValue = InputValidator.FilterUsernameFilter(TextBoxDataType == TextBoxDataTypeEnum.Username,
                                     InputValidator.FilterEmailFilter(TextBoxDataType == TextBoxDataTypeEnum.Email,
-                                        InputValidator.FilterAllLowercase(TextBoxAllLowerCase == true,
-                                            InputValidator.FilterAllowWhiteSpace(TextBoxAllowWhiteSpace == true,
+                                        InputValidator.FilterAllLowercase(TextBoxAllLowerCase != TextBoxAllLowerCase,
+                                            InputValidator.FilterAllowWhiteSpace(TextBoxAllowWhiteSpace != TextBoxAllowWhiteSpace,
                                                 InputValidator.FilterPlaintext(TextBoxDataType == TextBoxDataTypeEnum.Plaintext,
                                                     InputValidator.FilterRichtext(TextBoxDataType == TextBoxDataTypeEnum.Richtext,
                                                         InputValidator.FilterNumeric(TextBoxDataType == TextBoxDataTypeEnum.Numeric,
@@ -242,8 +242,8 @@ public partial class TextBoxField : BaseFormField<string>
                     _textBox.Text = filteredValue;
                 });
             });
+            Field_SetDataSourceValue(filteredValue);
         }
-        Field_SetDataSourceValue(filteredValue);
     }
 
     private void TextBox_ReturnPressedCommand(object obj)

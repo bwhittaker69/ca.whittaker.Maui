@@ -12,7 +12,7 @@ public partial class DateField : BaseFormField<DateTimeOffset?>, IBaseFormFieldT
 {
     /// <summary>
     /// Put the control into **Editing** mode:
-    /// – make the live <see cref="_datePicker"/> visible & enabled
+    /// – make the live <see cref="_datePicker"/> visible and  enabled
     /// – hide the read‑only placeholder
     /// – notify the layout system so the grid resizes correctly
     /// – use <c>Field_HidePlaceholders()</c> for consistency
