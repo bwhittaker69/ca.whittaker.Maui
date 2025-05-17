@@ -140,7 +140,6 @@ public partial class DateField : BaseFormField<DateTimeOffset?>, IBaseFormFieldT
 
     protected override void Field_SetDataSourceValue(DateTimeOffset? newValue)
     {
-        Debug.WriteLine($"[DateField] : {FieldLabelText} : Field_SetDataSourceValue(DateTimeOffset? {newValue})");
 
         // 1) Suppress the static change-callback
         FieldSuppressDataSourceCallback = true;
@@ -235,7 +234,6 @@ public partial class DateField : BaseFormField<DateTimeOffset?>, IBaseFormFieldT
     {
         base.OnParentSet();
 
-        Debug.WriteLine($"[DateField] : {FieldLabelText} : OnParentSet() – aligning original to current picker value");
 
         // 1) Take whatever the DatePicker is showing now as the ORIGINAL
         //    so that initial change-detector sees no difference.

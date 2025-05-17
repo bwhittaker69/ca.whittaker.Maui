@@ -290,7 +290,6 @@ public partial class CheckBoxField : BaseFormField<bool?>
 
     private void OnCheckBoxTapped(object? sender, TappedEventArgs e)
     {
-        Debug.WriteLine($"OnCheckBox_Tapped");
         if (FieldAccessMode != FieldAccessModeEnum.Editing) return;
         // cycle state…
         var next = CalcNextCheckedStateEnum(); /* compute next CheckedStateEnum */;

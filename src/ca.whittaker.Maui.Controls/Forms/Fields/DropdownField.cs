@@ -391,7 +391,6 @@ public partial class DropdownField : BaseFormField<object>
 
     private void OnDropdownSelectedIndexChanged(object? sender, EventArgs e)
     {
-        Debug.WriteLine($"[DropdownField] : {FieldLabelText} : OnDropdownSelectedIndexChanged index:{_pickerControl.SelectedIndex} item:{Field_GetDisplayText()}");
         ProcessDropdownSelectedIndexChanged();
     }
 
@@ -427,7 +426,6 @@ public partial class DropdownField : BaseFormField<object>
     }
     protected override void Field_SetValue(object? selectedItem)
     {
-        Debug.WriteLine($"[DropdownField] : {FieldLabelText} : Field_SetValue(selectedItem: {selectedItem})");
 
         if (DropdownItemsSource == null) 
             return;
@@ -580,7 +578,6 @@ public class SelectedItemPrimaryKeyConverter : IValueConverter
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error in SelectedItemPrimaryKeyConverter.Convert: {ex.Message}");
             return null;
         }
     }
@@ -590,13 +587,11 @@ public class SelectedItemPrimaryKeyConverter : IValueConverter
     {
         if (value == null || parameter == null || string.IsNullOrEmpty(PrimaryKeyName))
         {
-            Debug.WriteLine("ConvertBack: value, parameter, or PrimaryKeyName is null.");
             return null;
         }
 
         if (!(parameter is IEnumerable items))
         {
-            Debug.WriteLine($"ConvertBack: parameter is not IEnumerable. Actual type: {parameter.GetType()}");
             return null;
         }
 

@@ -106,6 +106,7 @@ public class Form : ContentView
     #region Events
 
     // Declare the event to notify subscribers when the form is saved.
+    public event EventHandler<EventArgs>? FormSaving;
     public event EventHandler<FormSavedEventArgs>? FormSaved;
 
     #endregion Events
@@ -188,7 +189,6 @@ public class Form : ContentView
         {
             if (oldValue == null || !oldValue.Equals(newValue))
             {
-                Debug.WriteLine($"[Form] : OnFormAccessModeChanged({newAccessMode.ToString()})");
                 switch (newAccessMode)
                 {
                     case FormAccessModeEnum.Editable:
@@ -312,7 +312,6 @@ public class Form : ContentView
             return;
 
         _formStatusEvaluating = true;
-        Debug.WriteLine("[Form] : FormEvaluateStatus()");
         FormHasErrors = !FormFieldsCheckAreValid();
         FormHasChanges = !FormFieldsCheckArePristine();
         FormConfigButtonStates();
@@ -388,8 +387,6 @@ public class Form : ContentView
 
         foreach (var element in formElements)
         {
-            Debug.WriteLine($"[Form] : FormFieldsWireUp() : {element.FieldLabelText.ToString()} : OnFieldHasChanges");
-            Debug.WriteLine($"[Form] : FormFieldsWireUp() : {element.FieldLabelText.ToString()} : OnFieldHasValidationChanges");
             element.OnHasChanges += OnFieldHasChanges;
             element.OnHasValidationChanges += OnFieldHasValidationChanges;
         }
@@ -515,10 +512,6 @@ public class Form : ContentView
 
     private void OnFieldHasChanges(object? sender, HasChangesEventArgs e)
     {
-        if (sender is IBaseFormField field)
-        {
-            Debug.WriteLine($"[Form] FieldHasChanges fired from: {field.FieldLabelText}, NewState: {e.HasChanged} {e}");
-        }
         FormEvaluateStatus();
     }
 

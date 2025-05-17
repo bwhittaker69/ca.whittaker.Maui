@@ -9,7 +9,7 @@ public class SigninButton : ButtonBase, IButtonBase
 {
 
     public static readonly BindableProperty SigninButtonTypeProperty = BindableProperty.Create(
-        propertyName: nameof(SigninButtonType),
+        propertyName: nameof(SigninButton),
         returnType: typeof(SiginButtonTypeEnum),
         declaringType: typeof(ButtonBase),
         defaultValue: SiginButtonTypeEnum.Generic,

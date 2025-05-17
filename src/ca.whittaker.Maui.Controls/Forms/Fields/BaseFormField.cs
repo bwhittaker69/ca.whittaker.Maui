@@ -383,7 +383,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
     protected void Initialize()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Initialize()");
         BaseField_WireFocusEvents(Field_GetControlsFromGrid());
         BaseField_InitializeDataSource();
 
@@ -451,7 +450,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         set
         {
             SetValue(FieldDataSourceProperty, value);
-            Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : FieldDataSource set to: {value}");
         }
     }
 
@@ -630,7 +628,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         {
             if (!oldValue.Equals(newValue))
             {
-                Debug.WriteLine($"[BaseFormField] : {element.FieldLabelText} : OnBaseFieldEnabledPropertyChanged({newValue})");
                 if (newEnabledState)
                     element.Field_ConfigEnabled();
                 else
@@ -646,7 +643,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     {
         if (bindable is BaseFormField<T> element && element.FieldLabel != null)
         {
-            Debug.WriteLine($"[BaseFormField] : {element.FieldLabelText} : OnBaseFieldLabelTextPropertyChanged({newValue})");
             element.FieldLabel.Text = newValue?.ToString() ?? "";
         }
     }
@@ -660,7 +656,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         {
             if (!oldValue.Equals(newValue))
             {
-                Debug.WriteLine($"[BaseFormField] : {element.FieldLabelText} : OnBaseFieldLabelVisiblePropertyChanged({newValue})");
                 element.FieldLabel!.IsVisible = fieldLabelVisible;
             }
         }
@@ -684,7 +679,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         {
             if (!oldValue.Equals(newValue))
             {
-                Debug.WriteLine($"[BaseFormField] : {element.FieldLabelText} : OnBaseFieldUndoButtonVisiblePropertyChanged({newValue})");
                 element.FieldButtonUndo!.IsVisible = fieldUndoButtonVisible;
             }
         }
@@ -704,14 +698,12 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
             // Respect FieldReadOnly: force ViewOnly if read-only
             if (elementAccessModeChanged.FieldReadOnly && newAccessMode != FieldAccessModeEnum.Hidden)
             {
-                Debug.WriteLine($"[BaseFormField] : {elementAccessModeChanged.FieldLabelText} : ReadOnly prevents switching to {newAccessMode}, forcing ViewOnly");
                 elementAccessModeChanged.Field_ConfigAccessModeViewing();
                 return;
             }
 
             if (!oldValue.Equals(newValue))
             {
-                Debug.WriteLine($"[BaseFormField] : {elementAccessModeChanged.FieldLabelText} : OnFieldAccessModePropertyChanged({newValue})");
                 switch (newAccessMode)
                 {
                     case FieldAccessModeEnum.ViewOnly:
@@ -749,7 +741,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     private void BaseFieldEvaluateToRaiseHasChangesEvent()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseFieldEvaluateToRaiseHasChangesEvent()");
 
         if (_baseFieldEvaluateToRaiseHasChangesEventing)
             return;
@@ -761,7 +752,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
         if (_baseFieldPreviousHasChangedFromOriginal != hasChangedFromOriginal)
         {
-            //Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseFieldEvaluateToRaiseHasChangesEvent()");
             if (FieldButtonUndo != null && FieldUndoButton)
             {
                 if (FieldAccessMode == FieldAccessModeEnum.Editing)
@@ -777,7 +767,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
                 }
             }
             _baseFieldPreviousHasChangedFromOriginal = hasChangedFromOriginal;
-            //Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Setting FieldChangeState = {(hasChangedFromOriginal ? "Changed" : "NotChanged")}");
             FieldChangeState = hasChangedFromOriginal ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
             Field_NotifyHasChanges(hasChangedFromOriginal);
         }
@@ -797,7 +786,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         var currentFieldValidationState = currentFieldHasInvalidData ? ValidationStateEnum.FormatError : ValidationStateEnum.Valid;
         if (_baseFieldPreviouslyHasInvalidData != currentFieldHasInvalidData || forceRaise || _baseFieldPreviouslyHasValidationState != currentFieldValidationState)
         {
-            Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseFieldEvaluateToRaiseValidationChangesEvent( {currentFieldHasInvalidData} )");
             _baseFieldPreviouslyHasInvalidData = currentFieldHasInvalidData;
             _baseFieldPreviouslyHasValidationState = currentFieldValidationState;
             FieldValidationState = currentFieldValidationState;
@@ -811,7 +799,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     private void OnBaseFieldButtonUndoPressed(object? sender, EventArgs e)
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnFieldButtonUndoPressed() - attempt revert");
         if (FieldAccessMode == FieldAccessModeEnum.Editing)
         {
             try
@@ -830,7 +817,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     private void BaseConfigAccessModeHidden()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseFieldConfigAccessModeHidden()");
         this.HideAllDescendantControls();
         if (FieldButtonUndo != null) FieldButtonUndo.Hide();
     }
@@ -879,11 +865,9 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
             var s1 = original as string ?? string.Empty;
             var s2 = current as string ?? string.Empty;
 
-            Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : FieldAreValuesEqual(Comparing strings (forced cast): Original='{s1}', Current='{s2}')");
             return string.Equals(s1.Trim(), s2.Trim(), StringComparison.Ordinal);
         }
 
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : FieldAreValuesEqual(Comparing objects: Original='{original}', Current='{current}')");
         return Equals(original, current);
     }
 
@@ -892,7 +876,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     protected void Field_ConfigDisabled()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_ConfigDisabled()");
         FieldAccessMode = FieldAccessModeEnum.ViewOnly;
         //this.ViewingModeDescendantControls(FieldLabelVisible);
     }
@@ -902,13 +885,11 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     protected void Field_ConfigEnabled()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_ConfigEnabled()");
         FieldAccessMode = FieldAccessModeEnum.ViewOnly;
     }
 
     protected override void OnBindingContextChanged()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnBindingContextChanged()");
         base.OnBindingContextChanged();
         // no more resetting FieldIsOriginalValueSet here
     }
@@ -991,7 +972,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     protected virtual void Field_OriginalValue_SetToClear()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_OriginalValue_SetToClear()");
         FieldOriginalValue = default(T);
         Field_SetValue(FieldOriginalValue);
     }
@@ -1012,7 +992,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
     protected virtual void Field_SetDataSourceValue(T? newValue)
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_SetDataSourceValue({newValue})");
 
         FieldSuppressDataSourceCallback = true;
         FieldDataSource = newValue;
@@ -1026,7 +1005,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     protected void Field_UpdateNotificationMessage()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateNotificationMessage()");
         bool show = false;
         string msg = string.Empty;
 
@@ -1068,7 +1046,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     protected void Field_UpdateValidationAndChangedState(bool forceRaiseValidationChangesEvent = false)
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateValidationAndChangedState({forceRaiseValidationChangesEvent})");
         if (_baseFieldUpdateValidationAndChangedStating)
             return;
         _baseFieldUpdateValidationAndChangedStating = true;
@@ -1082,7 +1059,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// <inheritdoc/>
     protected override void OnParentSet()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnParentSet()");
         base.OnParentSet();
 
         // only build once, after derived ctor has created its controls
@@ -1144,7 +1120,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// <inheritdoc/>
     protected void Field_UpdateLabelWidth(double newWidth)
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateLabelWidth(newWidth: {newWidth})");
         if (Content is Grid grid && grid.ColumnDefinitions.Count > 0)
         {
             UiThreadHelper.RunOnMainThread(() =>
@@ -1162,7 +1137,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// <inheritdoc/>
     protected void Field_UpdateWidth(double newWidth)
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_UpdateWidth(newWidth: {newWidth})");
         if (Content is Grid grid && grid.ColumnDefinitions.Count > 1)
             UiThreadHelper.RunOnMainThread(() =>
             {
@@ -1278,7 +1252,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     private bool BaseField_HasValidData()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_HasValidData()");
         // Evaluate all error conditions and return false if any found.
         bool fail = Field_HasFormatError() || Field_HasRequiredError();
         return !fail;
@@ -1286,14 +1259,12 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
     private void BaseField_InitializeDataSource()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_InitializeDataSource()");
         FieldOriginalValue = FieldDataSource;
         Field_SetValue(FieldDataSource);
     }
 
     private void BaseField_OriginalValue_Reset()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : BaseField_OriginalValue_Reset()");
         FieldDataSource = FieldOriginalValue;
         Field_SetValue(FieldOriginalValue);
         Field_SetDataSourceValue(FieldOriginalValue);
@@ -1305,7 +1276,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     private void BaseField_OriginalValue_SetToCurrentValue()
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : Field_OriginalValue_SetToCurrentValue()");
         FieldOriginalValue = Field_GetCurrentValue();
     }
 
@@ -1333,7 +1303,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     private static void OnBaseFieldDataSourcePropertyChangedStatic(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (BaseFormField<T>)bindable;
-        Debug.WriteLine($"[BaseFormField] : {control.FieldLabelText} : OnBaseFieldDataSourcePropertyChangedStatic(old='{oldValue}', new='{newValue}')");
 
         // 1) ignore any updates that fire before the VM is bound
         if (control.BindingContext == null)
@@ -1370,7 +1339,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     private void OnBaseFieldInitializeFieldDataSourceSet(T? initialValue)
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnBaseInitializeFieldDataSourceSet(initialValue {initialValue})");
         FieldOriginalValue = initialValue;
     }
 
@@ -1380,7 +1348,6 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     private void OnBaseFieldDataSourceChanged(T? newValue, T? oldValue)
     {
-        Debug.WriteLine($"[BaseFormField] : {FieldLabelText} : OnBaseFieldDataSourceChanged(oldValue {newValue}, oldValue {oldValue})");
         Field_SetValue(newValue);
         FieldLastValue = newValue;
     }

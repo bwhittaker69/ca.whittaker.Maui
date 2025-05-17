@@ -81,7 +81,6 @@ public static class ControlVisualHelper
     {
         foreach (var c in root.GetVisualTreeDescendants())
         {
-            Debug.WriteLine($"{c.ToString()}");
             if (c is UiEntry e)
                 e.IsEnabled = false;
             if (c is StackLayout sl)
@@ -103,7 +102,6 @@ public static class ControlVisualHelper
     {
         foreach (var c in root.GetVisualTreeDescendants())
         {
-            Debug.WriteLine($"{c.ToString()}");
             if (c is UiEntry e)
                 e.IsEnabled = true;
             if (c is StackLayout sl)
@@ -129,7 +127,6 @@ public static class ControlVisualHelper
     {
         foreach (var c in root.GetVisualTreeDescendants())
         {
-            Debug.WriteLine($"{c.ToString()}");
             if (c is UiEntry e)
                 e.IsVisible = false;
             if (c is StackLayout sl)
@@ -152,11 +149,9 @@ public static class ControlVisualHelper
     // everything is hidden
     public static void UnfocusDescendantControls<T>(this BaseFormField<T> root)
     {
-        Debug.WriteLine($"Unfocus : {root.FieldLabelText} : {root.ToString()}");
         root.Unfocus();
         foreach (IVisualTreeElement c in root.GetVisualTreeDescendants())
         {
-            Debug.WriteLine($"Unfocus : {root.FieldLabelText} > {c.ToString()}");
             if (c is Grid g)
                 g.Unfocus();
             if (c is UiEntry e)

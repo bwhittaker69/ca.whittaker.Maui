@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ca.whittaker.Maui.Controls
 {
     public enum SiginButtonTypeEnum { Generic, Facebook, Linkedin, Google, Tiktok, Microsoft, Apple }
+    public enum RegisterButtonTypeEnum { Generic, Email, SMS }
 
     /// <summary>
     /// Defines the icon to be displayed on a button (e.g., Save, Edit, Cancel, etc.).<br/>
@@ -36,6 +37,7 @@ namespace ca.whittaker.Maui.Controls
         Phone_Flip,
         Record_Circle,
         Refresh,
+        Register,
         Replace2,
         Save,
         Signin,

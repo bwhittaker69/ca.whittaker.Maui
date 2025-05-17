@@ -160,7 +160,6 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error setting date: {ex.Message}");
         }
     }
 

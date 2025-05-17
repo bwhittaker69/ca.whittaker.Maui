@@ -305,7 +305,6 @@ public partial class TextBoxField : BaseFormField<string>
 
     protected override bool Field_HasChangedFromOriginal()
     {
-        Debug.WriteLine($"[TextBoxField] : {FieldLabelText} : Field_HasChangedFromOriginal() = {!FieldAreValuesEqual(FieldOriginalValue, _textBox?.Text)}");
         return !FieldAreValuesEqual(FieldOriginalValue, _textBox?.Text);
     }
 
@@ -342,7 +341,6 @@ public partial class TextBoxField : BaseFormField<string>
 
     protected override void Field_SetValue(string? value)
     {
-        Debug.WriteLine($"[TextBoxField] : {FieldLabelText} : Field_SetValue({value})");
         UiThreadHelper.RunOnMainThread(() =>
         {
             Field_PerformBatchUpdate(() =>
