@@ -149,18 +149,13 @@ public partial class DateMonthYearField : BaseFormField<DateTimeOffset?>
 
         int month = _monthPicker.SelectedIndex + 1;
         int year = int.Parse(_yearPicker?.SelectedItem?.ToString() ?? String.Empty);
-        try
-        {
-            DateTimeOffset? newDate; 
-            if (FieldDataSource != null)
-                newDate = ChangeYearMonth((DateTimeOffset)FieldDataSource, year, month);
-            else
-                newDate = new DateTime(year, month, FieldDataSource == null ? 1 : FieldDataSource.Value.Day);
-            Field_SetDataSourceValue(newDate);
-        }
-        catch (Exception ex)
-        {
-        }
+
+        DateTimeOffset? newDate; 
+        if (FieldDataSource != null)
+            newDate = ChangeYearMonth((DateTimeOffset)FieldDataSource, year, month);
+        else
+            newDate = new DateTime(year, month, FieldDataSource == null ? 1 : FieldDataSource.Value.Day);
+        Field_SetDataSourceValue(newDate);
     }
 
     /// <summary>

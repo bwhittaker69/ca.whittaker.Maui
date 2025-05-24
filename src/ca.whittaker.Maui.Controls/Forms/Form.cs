@@ -106,7 +106,7 @@ public class Form : ContentView
     #region Events
 
     // Declare the event to notify subscribers when the form is saved.
-    public event EventHandler<EventArgs>? FormSaving;
+    //public event EventHandler<EventArgs>? FormSaving;
     public event EventHandler<FormSavedEventArgs>? FormSaved;
 
     #endregion Events

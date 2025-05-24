@@ -576,7 +576,7 @@ public class SelectedItemPrimaryKeyConverter : IValueConverter
             PropertyInfo? prop = value.GetType().GetProperty(PrimaryKeyName);
             return prop?.GetValue(value);
         }
-        catch (Exception ex)
+        catch
         {
             return null;
         }
