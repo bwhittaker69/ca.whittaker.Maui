@@ -242,8 +242,8 @@ public partial class TextBoxField : BaseFormField<string>
                     _textBox.Text = filteredValue;
                 });
             });
-            Field_SetDataSourceValue(filteredValue);
         }
+        Field_SetDataSourceValue(filteredValue);
     }
 
     private void TextBox_ReturnPressedCommand(object obj)
