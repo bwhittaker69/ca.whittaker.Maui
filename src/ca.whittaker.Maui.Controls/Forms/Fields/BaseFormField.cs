@@ -47,6 +47,8 @@ public interface IBaseFormFieldTyped<T> : IBaseFormField
 /// </summary>
 public interface IBaseFormField
 {
+    void Refresh();
+    
     /// <summary>How the user can interact with this field.</summary>
     FieldAccessModeEnum FieldAccessMode { get; set; }
 
@@ -1355,6 +1357,14 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     #endregion Private Methods
 
     #region Public Methods
+    public void Refresh()
+    {
+        // This method updates the UI from the current FieldDataSource value
+        Field_SetValue(FieldDataSource);
+        Field_UpdateValidationAndChangedState();
+        Field_UpdateNotificationMessage();
+    }
+
     /// <inheritdoc/>
     public void Clear()
     {
@@ -1501,49 +1511,3 @@ public static class ViewGridExtensions
         return null;
     }
 }
-
-
-
-///// <summary>
-///// After toggling LabelVisible or UndoButton, recalc your
-///// Grid.ColumnSpan/Column so your control remains centered.
-///// </summary>
-//protected void BaseRefreshLayout()
-//{
-//    UiThreadHelper.RunOnMainThread(() =>
-//    {
-//        Field_PerformBatchUpdate(() =>
-//        {
-//            foreach (var control in Field_GetControls())
-//                if (control!.Parent is Grid grid)
-//                {
-//                    bool isFieldLabelVisible = FieldLabelVisible;
-//                    bool isButtonUndoVisible = FieldUndoButton;
-
-//                    if (isFieldLabelVisible && isButtonUndoVisible)
-//                    {
-//                        Grid.SetColumn(control!, 1);
-//                        Grid.SetColumnSpan(control!, 1);
-//                    }
-//                    else if (isFieldLabelVisible && !isButtonUndoVisible)
-//                    {
-//                        Grid.SetColumn(control!, 1);
-//                        Grid.SetColumnSpan(control!, 2);
-//                    }
-//                    else if (!isFieldLabelVisible && isButtonUndoVisible)
-//                    {
-//                        Grid.SetColumn(control!, 0);
-//                        Grid.SetColumnSpan(control!, 2);
-//                    }
-//                    else // both not visible
-//                    {
-//                        Grid.SetColumn(control!, 0);
-//                        Grid.SetColumnSpan(control!, 3);
-//                    }
-//                }
-//        });
-//    });
-
-//    Field_RefreshLayout();
-
-//}

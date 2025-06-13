@@ -589,6 +589,14 @@ public class Form : ContentView
             SaveCommand.Execute(SaveCommandParameter);
 
     }
+    /// <summary>
+    /// Recursively calls Refresh() on all fields in the form.
+    /// </summary>
+    public void RefreshAllFields()
+    {
+        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
+            field.Refresh();
+    }
 
     protected override void OnParentSet()
     {
