@@ -9,7 +9,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<MauiVersion>$(MauiVersion)</MauiVersion>
+		<MauiVersion>9.0.90</MauiVersion>
 		<SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences>
 		<NoWarn>$(NoWarn);CA1416</NoWarn>
 		
