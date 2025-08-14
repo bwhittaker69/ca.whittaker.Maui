@@ -60,9 +60,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.7" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="$(CommunityToolkitMvvm)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MicrosoftMauiControls)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="$(MicrosoftExtensionsLoggingDebug)" />
 	</ItemGroup>
 
 	<ItemGroup>
