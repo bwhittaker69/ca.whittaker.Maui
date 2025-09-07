@@ -109,8 +109,6 @@ namespace ca.whittaker.Maui.Controls
     /// </summary>
     public enum FormAccessModeEnum { Editable, Editing, ViewOnly, Hidden }
 
-    public enum ButtonStyleEnum { IconOnly, IconAndText, TextOnly }
-
     public enum SizeEnum
     {
         XXXSmall = -20,

@@ -3,8 +3,10 @@ using Microsoft.Maui;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls.PlatformConfiguration.TizenSpecific;
 using System.Reflection;
+using VisualElement = Microsoft.Maui.Controls.VisualElement;
 
 namespace ca.whittaker.Maui.Controls.Buttons;
+
 public interface IButtonBase : IButton
 {
     #region Properties
@@ -12,7 +14,6 @@ public interface IButtonBase : IButton
     ButtonIconEnum? ButtonIcon { get; set; }
     SizeEnum? ButtonSize { get; set; }
     ButtonStateEnum? ButtonState { get; set; }
-    ButtonStyleEnum? ButtonStyle { get; set; }
     string DisabledText { get; set; }
     string PressedText { get; set; }
     string Text { get; set; }
@@ -46,11 +47,13 @@ public static class TypeHelper
 
     #endregion Public Methods
 }
+
 public abstract class ButtonBase : Button, IButtonBase
 {
     #region Fields
 
     private bool _updateUI = false;
+
     public static readonly BindableProperty ButtonIconProperty = BindableProperty.Create(
         propertyName: nameof(ButtonIcon),
         returnType: typeof(ButtonIconEnum?),
@@ -71,13 +74,6 @@ public abstract class ButtonBase : Button, IButtonBase
         declaringType: typeof(ButtonBase),
         defaultValue: ButtonStateEnum.Enabled,
         defaultBindingMode: BindingMode.OneWay);
-
-    public static readonly BindableProperty ButtonStyleProperty = BindableProperty.Create(
-    propertyName: nameof(ButtonStyle),
-    returnType: typeof(ButtonStyleEnum?),
-    declaringType: typeof(ButtonBase),
-    defaultValue: ButtonStyleEnum.IconAndText,
-    defaultBindingMode: BindingMode.OneWay);
 
     public static readonly BindableProperty DisabledTextProperty = BindableProperty.Create(
         propertyName: nameof(DisabledText),
@@ -102,7 +98,7 @@ public abstract class ButtonBase : Button, IButtonBase
 
     #endregion Fields
 
-    #region Public Constructors
+    #region Ctor
 
     public ButtonBase(ButtonIconEnum buttonType) : base()
     {
@@ -110,11 +106,14 @@ public abstract class ButtonBase : Button, IButtonBase
         base.PropertyChanged += Button_PropertyChanged;
     }
 
-    #endregion Public Constructors
+    #endregion Ctor
 
     #region Properties
 
-    private double heightMultiplier => DeviceInfo.Platform == DevicePlatform.WinUI ? 2.8 : 1.0;
+    // previously used 2.8 factor for windows, now no longer appropriate with newer MAUI
+    private double heightMultiplier => DeviceInfo.Platform == DevicePlatform.WinUI ? 1.0 : 1.0;
+    private const double DefaultSpacing = 0d;
+
     public ButtonIconEnum? ButtonIcon
     {
         get => (ButtonIconEnum?)GetValue(ButtonIconProperty);
@@ -126,16 +125,13 @@ public abstract class ButtonBase : Button, IButtonBase
         get => (SizeEnum?)GetValue(ButtonSizeProperty);
         set => SetValue(ButtonSizeProperty, value);
     }
+
     public ButtonStateEnum? ButtonState
     {
         get => (ButtonStateEnum?)GetValue(ButtonStateProperty);
         set => SetValue(ButtonStateProperty, value);
     }
-    public ButtonStyleEnum? ButtonStyle
-    {
-        get => (ButtonStyleEnum?)GetValue(ButtonStyleProperty);
-        set => SetValue(ButtonStyleProperty, value);
-    }
+
     public string DisabledText
     {
         get => (string)GetValue(DisabledTextProperty);
@@ -156,7 +152,7 @@ public abstract class ButtonBase : Button, IButtonBase
 
     #endregion Properties
 
-    #region Private Methods
+    #region Private Methods (DRY core)
 
     private void Button_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -166,109 +162,108 @@ public abstract class ButtonBase : Button, IButtonBase
             || (e.PropertyName == nameof(WidthRequest))
             || (e.PropertyName == nameof(HeightRequest))
             || (e.PropertyName == nameof(Text)))
+        {
             UpdateUI();
+        }
     }
 
-    private void ConfigureDisabled()
+    private void ReapplyLayout()
+    {
+        InvalidateMeasure();
+        (Parent as VisualElement)?.InvalidateMeasure();
+    }
+
+    private void ApplyVisual(bool isEnabled, bool isVisible, ButtonStateEnum stateForIcon)
     {
         void _update()
         {
             base.BatchBegin();
-            base.IsEnabled = false;
-            base.IsVisible = true;
+            base.IsEnabled = isEnabled;
+            base.IsVisible = isVisible;
 
             if (ButtonSize != null)
             {
                 base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
-                if (ButtonStyle != ButtonStyleEnum.TextOnly)
-                {
-                    if (ButtonIcon != null)
-                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
-                }
-                else
-                    base.ImageSource = null;
 
-                if ((ButtonStyle == ButtonStyleEnum.IconAndText || ButtonStyle == ButtonStyleEnum.TextOnly)
-                    && !string.IsNullOrEmpty(Text))
-                {
-                    base.Text = Text;
-                }
-            }
-            base.BatchCommit();
-        }
-        UiThreadHelper.RunOnMainThread(_update);
-    }
-
-    private void ConfigureEnabled()
-    {
-        void _update()
-        {
-            base.BatchBegin();
-            base.IsEnabled = true;
-            base.IsVisible = true;
-
-            if (ButtonSize != null)
-            {
-                base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
-                if (ButtonStyle != ButtonStyleEnum.TextOnly)
-                {
-                    if (ButtonIcon != null)
-                        base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Enabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
-                }
-                else
-                    base.ImageSource = null;
-
-                if ((ButtonStyle == ButtonStyleEnum.IconAndText || ButtonStyle == ButtonStyleEnum.TextOnly)
-                    && !string.IsNullOrEmpty(Text))
-                {
-                    base.Text = Text;
-                }
-
-                if (ButtonStyle == ButtonStyleEnum.IconAndText && !string.IsNullOrEmpty(Text))
-                {
-                    base.ContentLayout = new ButtonContentLayout(ButtonContentLayout.ImagePosition.Left, 10);
-                }
-
-            }
-            base.BatchCommit();
-        }
-        UiThreadHelper.RunOnMainThread(_update);
-
-    }
-
-    private void ConfigureHidden()
-    {
-        void _update()
-        {
-            base.BatchBegin();
-            base.IsEnabled = true;
-            base.IsVisible = false;
-            base.BatchCommit();
-        }
-        UiThreadHelper.RunOnMainThread(_update);
-    }
-
-    private void ConfigurePressed()
-    {
-        if (ButtonSize != null)
-        {
-            void _update()
-            {
-                base.BatchBegin();
-                base.HeightRequest = DeviceHelper.GetImageSizeForDevice((SizeEnum)ButtonSize) * heightMultiplier;
+                // Image
                 if (ButtonIcon != null)
                 {
-                    base.ImageSource = new ResourceHelper().GetImageSource(ButtonStateEnum.Disabled, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
+                    base.ImageSource = new ResourceHelper().GetImageSource(stateForIcon, (ButtonIconEnum)ButtonIcon, (SizeEnum)ButtonSize);
                 }
-                base.BatchCommit();
+
+                // Text (prefer state-specific text if provided)
+                string? text = stateForIcon switch
+                {
+                    ButtonStateEnum.Disabled when !string.IsNullOrWhiteSpace(DisabledText) => DisabledText,
+                    ButtonStateEnum.Pressed when !string.IsNullOrWhiteSpace(PressedText) => PressedText,
+                    _ => Text
+                };
+
+                var pos = base.ContentLayout.Position;
+
+
+
+                if (!string.IsNullOrEmpty(text))
+                {
+                    switch (pos)
+                    {
+                        case ButtonContentLayout.ImagePosition.Right:
+                            base.Text = String.Concat(text, "  ");
+                            break;
+                        case ButtonContentLayout.ImagePosition.Left:
+                            base.Text = String.Concat("  ", text);
+                            break;
+                    }
+                }
+
+                // Spacing only matters if both image and text are present
+                bool hasImage = ButtonIcon != null;
+                bool hasText = !string.IsNullOrEmpty(base.Text);
+
+                if (hasImage && hasText)
+                {
+                    base.ContentLayout = new ButtonContentLayout(pos, 0d);
+                    Handler?.UpdateValue(nameof(Button.ContentLayout));
+                    ReapplyLayout();
+
+                    if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                        base.Padding = new Thickness(0);
+                }
             }
-            UiThreadHelper.RunOnMainThread(_update);
+
+            base.BatchCommit();
         }
+
+        UiThreadHelper.RunOnMainThread(_update);
     }
 
-    #endregion Private Methods
+    #endregion Private Methods (DRY core)
 
-    #region Protected Methods
+    #region Configure Methods (thin wrappers)
+
+    private void ConfigureEnabled()
+        => ApplyVisual(isEnabled: true, isVisible: true, stateForIcon: ButtonStateEnum.Enabled);
+
+    private void ConfigureDisabled()
+        => ApplyVisual(isEnabled: false, isVisible: true, stateForIcon: ButtonStateEnum.Disabled);
+
+    private void ConfigurePressed()
+        => ApplyVisual(isEnabled: true, isVisible: true, stateForIcon: ButtonStateEnum.Pressed);
+
+    private void ConfigureHidden()
+        => ApplyVisual(isEnabled: true, isVisible: false, stateForIcon: ButtonStateEnum.Enabled);
+
+    #endregion Configure Methods
+
+    #region Protected Overrides
+
+    protected override void OnHandlerChanged()
+    {
+        base.OnHandlerChanged();
+        if (Handler != null)
+            UpdateUI(); // re-apply after native view exists
+        ReapplyLayout();
+    }
 
     protected override void OnParentSet()
     {
@@ -276,7 +271,7 @@ public abstract class ButtonBase : Button, IButtonBase
         UpdateUI();
     }
 
-    #endregion Protected Methods
+    #endregion Protected Overrides
 
     #region Public Methods
 
@@ -291,42 +286,30 @@ public abstract class ButtonBase : Button, IButtonBase
         if (ButtonState != ButtonStateEnum.Enabled)
             ButtonState = ButtonStateEnum.Enabled;
     }
+
     public void Hide()
     {
         if (ButtonState != ButtonStateEnum.Hidden)
             ButtonState = ButtonStateEnum.Hidden;
     }
+
     public void UpdateUI()
     {
-        if (this._updateUI) return;
-        this._updateUI = true;
+        if (_updateUI) return;
+        _updateUI = true;
+
         if (ButtonState != null)
         {
             switch (ButtonState)
             {
-                case ButtonStateEnum.Enabled:
-                    {
-                        ConfigureEnabled();
-                        break;
-                    }
-                case ButtonStateEnum.Disabled:
-                    {
-                        ConfigureDisabled();
-                        break;
-                    }
-                case ButtonStateEnum.Pressed:
-                    {
-                        ConfigurePressed();
-                        break;
-                    }
-                case ButtonStateEnum.Hidden:
-                    {
-                        ConfigureHidden();
-                        break;
-                    }
+                case ButtonStateEnum.Enabled: ConfigureEnabled(); break;
+                case ButtonStateEnum.Disabled: ConfigureDisabled(); break;
+                case ButtonStateEnum.Pressed: ConfigurePressed(); break;
+                case ButtonStateEnum.Hidden: ConfigureHidden(); break;
             }
         }
-        this._updateUI = false;
+
+        _updateUI = false;
     }
 
     #endregion Public Methods
