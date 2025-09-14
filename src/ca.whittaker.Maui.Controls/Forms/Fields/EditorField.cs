@@ -93,7 +93,10 @@ public partial class EditorField : BaseFormField<string>
     {
         _editorBox = new UiEditor
         {
-            VerticalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Fill,   // CHANGED (was Center)
+            HorizontalOptions = LayoutOptions.Fill,
+            MinimumHeightRequest = 0,
+            MinimumWidthRequest = 0
         };
 
         _editorBox.IsEnabled = true;
@@ -230,10 +233,16 @@ public partial class EditorField : BaseFormField<string>
         {
             Field_PerformBatchUpdate(() =>
             {
-                _editorBox.HeightRequest = (int)newValue * DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 1.1;
+                // Only apply a row-based height when no explicit FieldHeightRequest was set
+                if (!(FieldHeightRequest is double h) || h <= 0)
+                {
+                    _editorBox.HeightRequest =
+                        (int)newValue * DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 1.1;
+                }
             });
         });
     }
+
 
     private void SetEditorValue(string? value)
     {
@@ -311,11 +320,21 @@ public partial class EditorField : BaseFormField<string>
             InvalidateMeasure();
         });
     }
-
+    private void SyncInnerEditorHeightFromField()
+    {
+        if (FieldHeightRequest is double h && h > 0)
+        {
+            _editorBox.AutoSize = EditorAutoSizeOption.Disabled; // <- important
+            _editorBox.MinimumHeightRequest = 0;
+            _editorBox.HeightRequest = h;
+            _editorBox.VerticalOptions = LayoutOptions.Fill;
+        }
+    }
 
     protected override void OnParentSet()
     {
         base.OnParentSet();
+        SyncInnerEditorHeightFromField();
     }
 
 

@@ -202,6 +202,17 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     #endregion Protected Fields
 
     #region Bindable Properties
+
+    public static readonly BindableProperty FieldHeightRequestProperty =
+        BindableProperty.Create(
+            propertyName: nameof(FieldHeightRequest),
+            returnType: typeof(double?),
+            declaringType: typeof(BaseFormField<T>),
+            defaultValue: null,
+            defaultBindingMode: BindingMode.TwoWay,
+            propertyChanged: OnBaseFieldHeightRequestPropertyChanged);
+
+
     /// <summary>Property for controlling how the field is accessed.</summary>
     public static readonly BindableProperty FieldAccessModeProperty = BindableProperty.Create(
         propertyName: nameof(FieldAccessMode),
@@ -259,13 +270,9 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         propertyChanged: OnBaseFieldLabelVisiblePropertyChanged);
 
     /// <summary>Property for the width of the field's label.</summary>
-    public static readonly BindableProperty FieldLabelWidthProperty = BindableProperty.Create(
-        propertyName: nameof(FieldLabelWidth),
-        returnType: typeof(double?),
-        declaringType: typeof(BaseFormField<T>),
-        defaultValue: 100d,
-        defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: OnBaseFieldLabelWidthPropertyChanged);
+    public static readonly BindableProperty FieldLabelWidthProperty =
+        BindableProperty.Create(nameof(FieldLabelWidth), typeof(double), typeof(BaseFormField<T>), 100d,
+            defaultBindingMode: BindingMode.TwoWay, propertyChanged: OnBaseFieldLabelWidthPropertyChanged);
 
     /// <summary>Property indicating if the field is mandatory.</summary>
     public static readonly BindableProperty FieldMandatoryProperty = BindableProperty.Create(
@@ -299,13 +306,10 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         defaultBindingMode: BindingMode.TwoWay);
 
     /// <summary>Property for controlling the overall width of the field.</summary>
-    public static readonly BindableProperty FieldWidthProperty = BindableProperty.Create(
-        propertyName: nameof(FieldWidth),
-        returnType: typeof(double?),
-        declaringType: typeof(BaseFormField<T>),
-        defaultValue: 100d,
-        defaultBindingMode: BindingMode.TwoWay,
-        propertyChanged: OnBaseFieldWidthPropertyChanged);
+    public static readonly BindableProperty FieldWidthProperty =
+        BindableProperty.Create(nameof(FieldWidth), typeof(double), typeof(BaseFormField<T>), 100d,
+            defaultBindingMode: BindingMode.TwoWay, propertyChanged: OnBaseFieldWidthPropertyChanged);
+
 
     public static readonly BindableProperty FieldLabelLayoutProperty =
         BindableProperty.Create(
@@ -422,6 +426,12 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         get => (ChangeStateEnum)GetValue(FieldChangeStateProperty);
         set => SetValue(FieldChangeStateProperty, value);
     }
+    public double? FieldHeightRequest
+    {
+        get => (double?)GetValue(FieldHeightRequestProperty);
+        set => SetValue(FieldHeightRequestProperty, value);
+    }
+
 
     /// <inheritdoc/>
     public ICommand FieldCommand
@@ -470,11 +480,8 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     }
 
     /// <inheritdoc/>
-    public double FieldLabelWidth
-    {
-        get => (double)GetValue(FieldLabelWidthProperty);
-        set => SetValue(FieldLabelWidthProperty, value);
-    }
+    public double FieldLabelWidth { get => (double)GetValue(FieldLabelWidthProperty); set => SetValue(FieldLabelWidthProperty, value); }
+
 
     /// <inheritdoc/>
     public bool FieldMandatory
@@ -505,11 +512,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     }
 
     /// <inheritdoc/>
-    public double FieldWidth
-    {
-        get => (double)GetValue(FieldWidthProperty);
-        set => SetValue(FieldWidthProperty, value);
-    }
+    public double FieldWidth { get => (double)GetValue(FieldWidthProperty); set => SetValue(FieldWidthProperty, value); }
 
     /// <inheritdoc/>
     public new LayoutOptions HorizontalOptions
@@ -517,7 +520,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         get => base.HorizontalOptions;
         set
         {
-            if (Children.FirstOrDefault() is Grid grid)
+            if (Content is Grid grid)
                 grid.HorizontalOptions = value;
             base.HorizontalOptions = value;
         }
@@ -592,7 +595,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
     private void ApplyFieldLabelLayout()
     {
-        if (_layoutGrid == null) return;
+        if (_layoutGrid == null || FieldLabel is null) return; // CHANGED: defensive check
 
         // Label left layout
         if (FieldLabelLayout == FieldLabelLayoutEnum.Left)
@@ -621,6 +624,22 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         }
     }
 
+    protected override void OnPropertyChanged(string? propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+
+        if (propertyName == nameof(IsEnabled))
+        {
+            bool newEnabledState = IsEnabled;
+            // Reuse existing logic
+            if (newEnabledState)
+                Field_ConfigEnabled();
+            else
+                Field_ConfigDisabled();
+        }
+    }
+
+
     /// <summary>
     /// Invoked when the field enabled property changes.
     /// </summary>
@@ -635,6 +654,15 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
                 else
                     element.Field_ConfigDisabled();
             }
+        }
+    }
+    private static void OnBaseFieldHeightRequestPropertyChanged(
+        BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is BaseFormField<T> element)
+        {
+            var h = (double?)newValue;
+            element.Field_ApplyHeightRequest(h);
         }
     }
 
@@ -691,41 +719,38 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// </summary>
     private static void OnBaseFieldAccessModePropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        // Property Changed: FieldAccessModeEnum
-        if (bindable is BaseFormField<T> elementAccessModeChanged && newValue is FieldAccessModeEnum newAccessMode)
+        if (bindable is BaseFormField<T> element && newValue is FieldAccessModeEnum newAccessMode)
         {
-            #region 
-            elementAccessModeChanged.Field_UpdateNotificationMessage();
-
-            // Respect FieldReadOnly: force ViewOnly if read-only
-            if (elementAccessModeChanged.FieldReadOnly && newAccessMode != FieldAccessModeEnum.Hidden)
+            // Respect FieldReadOnly: force Viewing when not Hidden
+            if (element.FieldReadOnly && newAccessMode != FieldAccessModeEnum.Hidden)
             {
-                elementAccessModeChanged.Field_ConfigAccessModeViewing();
+                element.Field_ConfigAccessModeViewing();
+                element.Field_UpdateNotificationMessage(); // CHANGED: update after switching
                 return;
             }
 
-            if (!oldValue.Equals(newValue))
+            if (!Equals(oldValue, newValue))
             {
                 switch (newAccessMode)
                 {
                     case FieldAccessModeEnum.ViewOnly:
-                        elementAccessModeChanged.Field_ConfigAccessModeViewing();
-                        return;
+                        element.Field_ConfigAccessModeViewing();
+                        break;
 
                     case FieldAccessModeEnum.Editing:
-                        elementAccessModeChanged.Field_ConfigAccessModeEditing();
-                        return;
+                        element.Field_ConfigAccessModeEditing();
+                        break;
 
                     case FieldAccessModeEnum.Editable:
-                        elementAccessModeChanged.Field_ConfigAccessModeViewing();
-                        return;
+                        element.Field_ConfigAccessModeViewing();
+                        break;
 
                     case FieldAccessModeEnum.Hidden:
-                        elementAccessModeChanged.BaseConfigAccessModeHidden();
-                        return;
+                        element.BaseConfigAccessModeHidden();
+                        break;
                 }
+                element.Field_UpdateNotificationMessage(); // CHANGED: update after switching
             }
-            #endregion 
         }
     }
 
@@ -741,16 +766,15 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// <summary>
     /// Evaluates whether a change event should be raised.
     /// </summary>
+    // REPLACE the whole method with this
     private void BaseFieldEvaluateToRaiseHasChangesEvent()
     {
-
         if (_baseFieldEvaluateToRaiseHasChangesEventing)
             return;
 
         _baseFieldEvaluateToRaiseHasChangesEventing = true;
 
-        bool hasChangedFromOriginal = Field_HasChangedFromOriginal();
-        bool hasChangedFromLast = Field_HasChangedFromLast();
+        bool hasChangedFromOriginal = Field_HasChangedFromOriginal(); // CHANGED: removed hasChangedFromLast
 
         if (_baseFieldPreviousHasChangedFromOriginal != hasChangedFromOriginal)
         {
@@ -768,12 +792,16 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
                     FieldButtonUndo.Hide();
                 }
             }
+
             _baseFieldPreviousHasChangedFromOriginal = hasChangedFromOriginal;
             FieldChangeState = hasChangedFromOriginal ? ChangeStateEnum.Changed : ChangeStateEnum.NotChanged;
             Field_NotifyHasChanges(hasChangedFromOriginal);
         }
+
         _baseFieldEvaluateToRaiseHasChangesEventing = false;
     }
+
+
 
     /// <summary>
     /// Evaluates whether a validation change event should be raised.
@@ -872,6 +900,28 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
         return Equals(original, current);
     }
+    protected void Field_ApplyHeightRequest(double? height)
+    {
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            var h = (height.HasValue && height.Value > 0) ? height.Value : -1;
+
+            // Container
+            this.HeightRequest = h;
+            if (Content is Grid g) g.HeightRequest = h;
+
+            // NEW: also size the actual field controls so the visible input matches
+            foreach (var ctl in Field_GetControlsFromGrid())
+            {
+                ctl.MinimumHeightRequest = 0;   // avoid platform minimums
+                ctl.HeightRequest = h;
+                ctl.VerticalOptions = LayoutOptions.Fill; // let it use the height
+            }
+
+            Field_RefreshLayout();
+        });
+    }
+
 
     /// <summary>
     /// Disables user interaction on this field.
@@ -1073,11 +1123,18 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         // keep the UI in sync if a design-time value is already present
         Field_SetValue(FieldDataSource);
 
+        if (FieldHeightRequest != null)
+            Field_ApplyHeightRequest(FieldHeightRequest);
+
         OnBaseFieldAccessModePropertyChanged(
             bindable: this,
             oldValue: FieldAccessMode,  // or something else if you have an "old" value
             newValue: FieldAccessMode
         );
+
+        // NEW: clear WinUI/Android enforced minimums for this field + all its children.
+        // Safe to call multiple times; the helper guards against duplicates.
+        MinSizeHelper.ClearMinimumsRecursively(this);
     }
 
     /// <inheritdoc/>
@@ -1267,10 +1324,11 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
     private void BaseField_OriginalValue_Reset()
     {
-        FieldDataSource = FieldOriginalValue;
-        Field_SetValue(FieldOriginalValue);
+        // Only do the suppressing path once.
         Field_SetDataSourceValue(FieldOriginalValue);
+        Field_SetValue(FieldOriginalValue); // optional if your Field_SetDataSourceValue doesn't already push UI
     }
+
 
 
     /// <summary>
@@ -1348,7 +1406,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     /// Called on every FieldDataSource change (after initial).
     /// Default implementation synchronizes UI; override to inject custom logic but call base.Sync if needed.
     /// </summary>
-    private void OnBaseFieldDataSourceChanged(T? newValue, T? oldValue)
+    private void OnBaseFieldDataSourceChanged(T? oldValue, T? newValue)
     {
         Field_SetValue(newValue);
         FieldLastValue = newValue;
@@ -1393,6 +1451,14 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
 
     #endregion Public Methods
+
+    private double ResolveButtonHeight(SizeEnum size) =>
+        DeviceHelper.GetImageSizeForDevice(size);   // e.g. Small/Normal ≈ 44, Large ≈ 52
+
+    private double ResolveIconSize(SizeEnum size) =>
+        DeviceHelper.GetImageSizeForDevice(size);   // e.g. 12–28 px depending on size
+
+
 }
 
 public static class ViewGridExtensions
@@ -1435,38 +1501,44 @@ public static class ViewGridExtensions
     {
         if (control == null || !control.IsInGrid())
             return;
-        var (row, col, span) = control.GetPositionInGrid();
-        if (row < 0)
+
+        var (row, col, _) = control.GetPositionInGrid();
+        if (row < 0 || col < 0)
             return;
 
         var grid = control.GetParentGrid();
         if (grid == null)
             return;
 
+        // Filter to View FIRST so we can use Controls Grid attached properties
         var siblings = grid.Children
-                           .Where(v => grid.GetRow(v) == row && grid.GetColumn(v) == col)
+                           .OfType<View>()
+                           .Where(v =>
+                               Microsoft.Maui.Controls.Grid.GetRow(v) == row &&
+                               Microsoft.Maui.Controls.Grid.GetColumn(v) == col)
                            .ToList();
 
-        if (!siblings.Any())
+        if (siblings.Count == 0)
             return;
 
+        // Normalize ZIndex so the smallest becomes 0
         int minIndex = siblings.Min(v => v.ZIndex);
-        for (int i = 0; i < siblings.Count; i++)
-            ((View)siblings[i]).ZIndex -= minIndex;
+        foreach (var v in siblings)
+            v.ZIndex -= minIndex;
 
-        var ordered = siblings.OrderBy(v => v.ZIndex).ToList();
-        for (int i = 0; i < ordered.Count; i++)
-            ((View)siblings[i]).ZIndex = i;
-
-        control.ZIndex = ordered.Count;
+        // Put target on top (one higher than current max among siblings)
+        int maxZ = siblings.Where(v => v != control).DefaultIfEmpty(control).Max(v => v.ZIndex);
+        control.ZIndex = maxZ + 1;
     }
+
 
     public static void MoveToBack(this View? control)
     {
         if (control == null || !control.IsInGrid())
             return;
-        var (row, col, span) = control.GetPositionInGrid();
-        if (row < 0)
+
+        var (row, col, _) = control.GetPositionInGrid();
+        if (row < 0 || col < 0)
             return;
 
         var grid = control.GetParentGrid();
@@ -1474,28 +1546,28 @@ public static class ViewGridExtensions
             return;
 
         var siblings = grid.Children
-                           .Where(v => grid.GetRow(v) == row && grid.GetColumn(v) == col)
-                           .ToList();
-        if (!siblings.Any())
+            .OfType<View>()
+            .Where(v =>
+                Microsoft.Maui.Controls.Grid.GetRow(v) == row &&
+                Microsoft.Maui.Controls.Grid.GetColumn(v) == col)
+            .ToList();
+
+        if (siblings.Count == 0)
             return;
 
-        int minIndex = siblings.Min(v => v.ZIndex);
-        for (int i = 0; i < siblings.Count; i++)
-        {
-            ((View)siblings[i]).ZIndex -= minIndex;
+        // Normalize to start at 0
+        int minZ = siblings.Min(v => v.ZIndex);
+        foreach (var v in siblings) v.ZIndex -= minZ;
 
-        }
+        // Everything except target gets bumped up starting at 1
+        int z = 1;
+        foreach (var v in siblings.OrderBy(v => v == control ? int.MinValue : v.ZIndex))
+            if (v != control) v.ZIndex = z++;
 
-        var ordered = siblings.OrderBy(v => v.ZIndex).ToList();
-        int idx = 1;
-        foreach (var v in ordered)
-        {
-            if (v != control)
-                ((View)v).ZIndex = idx++;
-        }
-
+        // Target goes to the back
         control.ZIndex = 0;
     }
+
 
     private static Grid? GetParentGrid(this View? control)
     {

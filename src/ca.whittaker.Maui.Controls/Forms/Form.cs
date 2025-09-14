@@ -38,7 +38,6 @@ public class Form : ContentView
     private Label? _formLabel;
     private Label? _formLabelNotification;
     private bool _formStatusEvaluating = false;
-    private readonly SizeEnum DefaultButtonSize = SizeEnum.Normal;
 
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
@@ -49,6 +48,14 @@ public class Form : ContentView
         nameof(Command),
         typeof(ICommand),
         typeof(Form));
+
+    public static readonly BindableProperty FormButtonSizeProperty = BindableProperty.Create(
+        nameof(FormButtonSize),
+        typeof(SizeEnum),
+        typeof(Form),
+        defaultValue: SizeEnum.Small,
+        defaultBindingMode: BindingMode.TwoWay,
+        propertyChanged: OnFormButtonSizeChanged);
 
     public static readonly BindableProperty FormAccessModeProperty = BindableProperty.Create(
         nameof(FormAccessMode),
@@ -131,6 +138,12 @@ public class Form : ContentView
         set => SetValue(FormAccessModeProperty, value);
     }
 
+    public SizeEnum FormButtonSize
+    {
+        get => (SizeEnum)GetValue(FormButtonSizeProperty);
+        set => SetValue(FormButtonSizeProperty, value);
+    }
+
     public string FormCancelButtonText
     {
         get => (string)GetValue(FormCancelButtonTextProperty);
@@ -183,6 +196,25 @@ public class Form : ContentView
 
     #region Private Methods
 
+    private static void OnFormButtonSizeChanged(BindableObject bindable, object? oldValue, object? newValue)
+    {
+        if (bindable is not Form form || newValue is not SizeEnum newSize)
+            return;
+
+        UiThreadHelper.RunOnMainThread(() =>
+        {
+            if (form._formButtonEditAction != null) form._formButtonEditAction.ButtonSize = newSize;
+            if (form._formButtonCancelAction != null) form._formButtonCancelAction.ButtonSize = newSize;
+            if (form._formButtonSaveAction != null) form._formButtonSaveAction.ButtonSize = newSize;
+
+            // ensure visual refresh
+            form._formButtonEditAction?.UpdateUI();
+            form._formButtonCancelAction?.UpdateUI();
+            form._formButtonSaveAction?.UpdateUI();
+        });
+    }
+
+
     private static void OnFormAccessModeChanged(BindableObject bindable, object? oldValue, object? newValue)
     {
         if (bindable is Form form && newValue is FormAccessModeEnum newAccessMode)
@@ -215,13 +247,7 @@ public class Form : ContentView
     private static void OnFormCancelButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is Form form && newValue is string newText)
-        {
-            UiThreadHelper.RunOnMainThread(() =>
-            {
-                if (form._formButtonSaveAction != null)
-                    form._formButtonSaveAction.Text = newText;
-            });
-        }
+            UiThreadHelper.RunOnMainThread(() => { form._formButtonCancelAction!.Text = newText; });
     }
 
     private static void OnFormEditButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
@@ -252,11 +278,9 @@ public class Form : ContentView
     private static void OnFormSaveButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is Form form && newValue is string newText)
-        {
-            if (form._formButtonCancelAction != null)
-                UiThreadHelper.RunOnMainThread(() => { form._formButtonCancelAction.Text = newText; });
-        }
+            UiThreadHelper.RunOnMainThread(() => { form._formButtonSaveAction!.Text = newText; });
     }
+
 
     private void FormClear()
     {
@@ -304,6 +328,9 @@ public class Form : ContentView
             if (_formButtonEditAction != null)
                 _formButtonEditAction.ButtonState = ButtonStateEnum.Hidden;
         }
+        _formButtonCancelAction?.UpdateUI();
+        _formButtonSaveAction?.UpdateUI();
+        _formButtonEditAction?.UpdateUI();
     }
 
     private void FormEvaluateStatus()
@@ -317,6 +344,9 @@ public class Form : ContentView
         FormConfigButtonStates();
         _formStatusEvaluating = false;
     }
+    private static bool IsVerticalStack(Layout layout) =>
+        layout is VerticalStackLayout ||
+        (layout is StackLayout s && s.Orientation == StackOrientation.Vertical);
 
     private bool FormFieldsCheckArePristine()
     {
@@ -391,123 +421,170 @@ public class Form : ContentView
             element.OnHasValidationChanges += OnFieldHasValidationChanges;
         }
     }
+    private Grid BuildHeaderGrid()
+    {
+
+        double dHeight = Convert.ToDouble(FormButtonSize);
+
+        // --- Buttons ---
+        _formButtonEditAction = new EditButton
+        {
+            Text = FormEditButtonText,
+            ButtonSize = FormButtonSize,
+            BackgroundColor = Colors.Transparent,
+            BorderWidth = 0,
+            Margin = 5,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            ButtonState = ButtonStateEnum.Enabled,
+            ButtonIcon = ButtonIconEnum.Edit,
+            IsVisible = true
+        };
+        _formButtonEditAction.Clicked += OnFormEditButtonClicked;
+        _formButtonEditAction.UpdateUI();
+
+        _formButtonSaveAction = new SaveButton
+        {
+            Text = FormSaveButtonText,
+            ButtonSize = FormButtonSize,
+            BackgroundColor = Colors.Transparent,
+            BorderWidth = 0,
+            Margin = 5,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            ButtonState = ButtonStateEnum.Hidden,
+            ButtonIcon = ButtonIconEnum.Save,
+            IsVisible = true
+        };
+        _formButtonSaveAction.Clicked += OnFormSaveButtonClicked;
+        _formButtonSaveAction.UpdateUI();
+
+        _formButtonCancelAction = new CancelButton
+        {
+            Text = FormCancelButtonText,
+            ButtonSize = FormButtonSize,
+            BackgroundColor = Colors.Transparent,
+            BorderWidth = 0,
+            Margin = 5,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            ButtonState = ButtonStateEnum.Hidden,
+            ButtonIcon = ButtonIconEnum.Cancel,
+            IsVisible = true
+        };
+        _formButtonCancelAction.Clicked += OnFormCancelButtonClicked;
+        _formButtonCancelAction.UpdateUI();
+
+        // --- Labels ---
+        _formLabelNotification = new Label
+        {
+            Text = string.Empty,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            IsVisible = false,
+            TextColor = Colors.Red
+        };
+
+        _formLabel = new Label
+        {
+            Text = FormName,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            IsVisible = !string.IsNullOrEmpty(FormName)
+        };
+        
+        // --- Header Grid layout ---
+        var header = new Grid
+        {
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Fill,
+            
+            Margin = new Thickness(5),
+            RowDefinitions =
+            {
+                new RowDefinition { Height = GridLength.Auto }, // 0: title
+                new RowDefinition { Height = GridLength.Auto }, // 1: buttons row (save/cancel)
+                new RowDefinition { Height = GridLength.Auto }, // 2: edit button row
+                new RowDefinition { Height = GridLength.Auto }  // 3: notification
+            },
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Star }
+            }
+        };
+
+        // Row 0: title (span both columns)
+        header.Add(_formLabel, 0, 0);
+        Grid.SetColumnSpan(_formLabel, 2);
+
+        // Row 1: left = cancel, right = save
+        header.Add(_formButtonCancelAction, 0, 1);
+        header.Add(_formButtonSaveAction, 1, 1);
+
+        // Row 2: edit button centered, span both columns
+        header.Add(_formButtonEditAction, 0, 2);
+        Grid.SetColumnSpan(_formButtonEditAction, 2);
+
+        // Row 3: notification (span both columns)
+        header.Add(_formLabelNotification, 0, 3);
+        Grid.SetColumnSpan(_formLabelNotification, 2);
+
+        // reflect current state
+        FormConfigButtonStates();
+
+        return header;
+    }
+
 
     private void FormInitialize()
     {
         void _initializeUI()
         {
-            _formButtonEditAction = new EditButton
-            {
-                Text = FormEditButtonText,
-                ButtonSize = DefaultButtonSize,
-                BackgroundColor = Colors.Transparent,
-                BorderWidth = 0,
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center,
-                ButtonState = ButtonStateEnum.Enabled,
-                ButtonIcon = ButtonIconEnum.Edit,
-                IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
-            };
-            _formButtonEditAction.Clicked += OnFormEditButtonClicked;
-            _formButtonEditAction.UpdateUI();
+            var header = BuildHeaderGrid(); // your existing header grid creation
 
-            _formButtonCancelAction = new CancelButton
+            if (Content is Layout existing)
             {
-                Text = FormSaveButtonText,
-                ButtonSize = DefaultButtonSize,
-                BackgroundColor = Colors.Transparent,
-                BorderWidth = 0,
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center,
-                ButtonState = ButtonStateEnum.Hidden,
-                ButtonIcon = ButtonIconEnum.Save,
-                IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
-            };
-            _formButtonCancelAction.Clicked += OnFormSaveButtonClicked;
-            _formButtonCancelAction.UpdateUI();
-
-            _formButtonSaveAction = new SaveButton
-            {
-                Text = FormCancelButtonText,
-                ButtonSize = DefaultButtonSize,
-                BackgroundColor = Colors.Transparent,
-                BorderWidth = 0,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                ButtonState = ButtonStateEnum.Hidden,
-                ButtonIcon = ButtonIconEnum.Cancel,
-                IsVisible = FormAccessMode == FormAccessModeEnum.Editable,
-            };
-            _formButtonSaveAction.Clicked += OnFormCancelButtonClicked;
-            _formButtonSaveAction.UpdateUI();
-
-            _formLabelNotification = new Label
-            {
-                Text = "",
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                IsVisible = false,
-                TextColor = Colors.Red,
-            };
-
-            _formLabel = new Label
-            {
-                Text = FormName,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                IsVisible = !string.IsNullOrEmpty(FormName)
-            };
-
-            var gridLayout = new Grid
-            {
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Fill,
-                Margin = new Thickness(5),
-                RowDefinitions =
+                if (IsVerticalStack(existing))
                 {
-                    new RowDefinition { Height = GridLength.Auto },
-                    new RowDefinition { Height = GridLength.Auto },
-                    new RowDefinition { Height = GridLength.Auto },
-                    new RowDefinition { Height = GridLength.Auto }
-                },
-                ColumnDefinitions =
-                {
-                    new ColumnDefinition { Width = GridLength.Star },
-                    new ColumnDefinition { Width = GridLength.Star }
+                    // just insert header at the top
+                    if (existing.Children.Any())
+                        existing.Children.Insert(0, header);
+                    else
+                        existing.Children.Add(header);
                 }
-            };
-
-            gridLayout.Add(_formLabel, 0, 0);
-            gridLayout.Add(_formButtonCancelAction, 0, 1);
-            gridLayout.Add(_formButtonSaveAction, 1, 1);
-            gridLayout.Add(_formButtonEditAction, 0, 2);
-            gridLayout.Add(_formLabelNotification, 0, 3);
-            gridLayout.SetColumnSpan(_formLabel, 2);
-            gridLayout.SetColumnSpan(_formLabelNotification, 2);
-            gridLayout.SetColumnSpan(_formButtonEditAction, 2);
-
-            if (Content is Layout existingLayout)
-            {
-                if (existingLayout.Children.Any())
-                    existingLayout.Children.Insert(0, gridLayout);
                 else
-                    existingLayout.Children.Add(gridLayout);
+                {
+                    // wrap non-stacking layouts (like Grid) with a vertical stack
+                    var wrapper = new VerticalStackLayout { Spacing = 0, Padding = 0 };
+                    Content = wrapper;                 // this detaches 'existing' from ContentView
+                    wrapper.Children.Add(header);
+                    wrapper.Children.Add(existing);
+                }
             }
-            else if (Content is View existingElement)
+            else if (Content is View singleView)
             {
-                var containerLayout = new StackLayout();
-                containerLayout.Children.Add(existingElement);
-                containerLayout.Children.Add(gridLayout);
-                Content = containerLayout;
+                // wrap a lone view
+                var wrapper = new VerticalStackLayout { Spacing = 0, Padding = 0 };
+                Content = wrapper;                     // detaches 'singleView' from ContentView
+                wrapper.Children.Add(header);
+                wrapper.Children.Add(singleView);
             }
             else
             {
-                Content = gridLayout;
+                // no content yet — create a stack with just the header
+                Content = new VerticalStackLayout
+                {
+                    Spacing = 0,
+                    Padding = 0,
+                    Children = { header }
+                };
             }
         }
 
         UiThreadHelper.RunOnMainThread(_initializeUI);
         FormFieldsWireUp();
+        ApplyMinSizeFixes();
     }
 
     private void OnFieldHasChanges(object? sender, HasChangesEventArgs e)
@@ -605,6 +682,20 @@ public class Form : ContentView
         FormEvaluateStatus();
         OnFormAccessModeChanged(bindable: this, oldValue: null, newValue: FormAccessMode);
     }
+    private void ApplyMinSizeFixes()
+    {
+        // Hit everything that already exists
+        foreach (var v in this.GetVisualTreeDescendants().OfType<View>())
+            MinSizeHelper.ClearMinimumsRecursively(v);         // calls your OnHandlerChanged logic per control
+
+        // And anything that appears later
+        this.DescendantAdded += (_, e) =>
+        {
+            if (e.Element is View v)
+                MinSizeHelper.ClearMinimumsRecursively(v);
+        };
+    }
+
 
     #endregion Protected Methods
 }
