@@ -393,7 +393,7 @@ public partial class CheckBoxField : BaseFormField<bool?>
     }
 
 
-    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+    protected override void OnPropertyChanged([CallerMemberName] string? propertyName = "")
     {
         base.OnPropertyChanged(propertyName);
     }
