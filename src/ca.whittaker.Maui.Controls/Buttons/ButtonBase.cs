@@ -1,4 +1,6 @@
-﻿using Microsoft.Maui.Controls;
+﻿#undef BUTTONBASE_TRACE   
+
+using Microsoft.Maui.Controls;
 using Microsoft.Maui;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls.PlatformConfiguration.TizenSpecific;
@@ -97,7 +99,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
         base.PropertyChanged += Button_PropertyChanged;
         this.Loaded += async (_, __) =>
         {
-            Debug.WriteLine($"[ButtonBase] Loaded -> calling SafeUpdateUIAsync. (Text='{Text}', Size={ButtonSize}, State={ButtonState})");
+            DLog($"[ButtonBase] Loaded -> calling SafeUpdateUIAsync. (Text='{Text}', Size={ButtonSize}, State={ButtonState})");
             await SafeUpdateUIAsync();
         };
 
@@ -162,7 +164,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
             || (e.PropertyName == nameof(HeightRequest))
             || (e.PropertyName == nameof(Text)))
         {
-            Debug.WriteLine($"[ButtonBase] PropertyChanged: {e.PropertyName}");
+            DLog($"[ButtonBase] PropertyChanged: {e.PropertyName}");
             UpdateUI();
         }
     }
@@ -196,7 +198,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
 
                 var buttonH = ResolveButtonHeight(ButtonSize);
                 var iconPx = ResolveIconSize(ButtonSize);
-                Debug.WriteLine($"[ButtonBase] ApplyVisualAsync START state={stateForIcon}, buttonH={buttonH}, iconPx={iconPx}");
+                DLog($"[ButtonBase] ApplyVisualAsync START state={stateForIcon}, buttonH={buttonH}, iconPx={iconPx}");
 
                 // Button sizing
                 base.HeightRequest = buttonH; // or MinimumHeightRequest = buttonH
@@ -214,11 +216,11 @@ public abstract partial class ButtonBase : Button, IButtonBase
                     if (base.ImageSource is FontImageSource fis)
                     {
                         fis.Size = iconPx;
-                        Debug.WriteLine($"[ButtonBase] ApplyVisualAsync set FontImageSource.Size={fis.Size}");
+                        DLog($"[ButtonBase] ApplyVisualAsync set FontImageSource.Size={fis.Size}");
                     }
                     else
                     {
-                        Debug.WriteLine($"[ButtonBase] ApplyVisualAsync set Bitmap ImageSource (no intrinsic dp control).");
+                        DLog($"[ButtonBase] ApplyVisualAsync set Bitmap ImageSource (no intrinsic dp control).");
                     }
                 }
 
@@ -282,7 +284,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
     private async Task SafeUpdateUIAsync()
     {
         await this.WaitUntilReadyAsync();
-        Debug.WriteLine("[ButtonBase] SafeUpdateUIAsync -> UpdateUI()");
+        DLog("[ButtonBase] SafeUpdateUIAsync -> UpdateUI()");
         UpdateUI();
     }
 
@@ -314,7 +316,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
 
 
 
-        Debug.WriteLine($"[ButtonBase] OnHandlerChanged (Handler!=null -> {Handler != null})");
+        DLog($"[ButtonBase] OnHandlerChanged (Handler!=null -> {Handler != null})");
         if (Handler != null)
             _ = SafeUpdateUIAsync();
         ReapplyLayout();
@@ -327,14 +329,14 @@ public abstract partial class ButtonBase : Button, IButtonBase
     protected override void OnParentSet()
     {
         base.OnParentSet();
-        Debug.WriteLine("[ButtonBase] OnParentSet -> SafeUpdateUIAsync()");
+        DLog("[ButtonBase] OnParentSet -> SafeUpdateUIAsync()");
         _ = SafeUpdateUIAsync();
     }
 
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
-        Debug.WriteLine($"[ButtonBase] OnSizeAllocated width={width:F1}, height={height:F1}");
+        DLog($"[ButtonBase] OnSizeAllocated width={width:F1}, height={height:F1}");
         DumpSize("OnSizeAllocated");
     }
 
@@ -342,7 +344,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
     {
         if (b is ButtonBase btn && nv is SizeEnum)
         {
-            Debug.WriteLine($"[ButtonBase] OnButtonSizeChanged ov={ov}, nv={nv}");
+            DLog($"[ButtonBase] OnButtonSizeChanged ov={ov}, nv={nv}");
             btn.ApplyIconSizingToButton();
             btn.ReapplyLayout();
             btn.DumpSize("OnButtonSizeChanged END");
@@ -376,7 +378,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
     {
         var buttonH = ResolveButtonHeight(ButtonSize);
         var iconPx = ResolveIconSize(ButtonSize);
-        Debug.WriteLine($"[ButtonBase] ApplyIconSizingToButton buttonH={buttonH}, iconPx={iconPx}");
+        DLog($"[ButtonBase] ApplyIconSizingToButton buttonH={buttonH}, iconPx={iconPx}");
 
         if (buttonH > 0)
         {
@@ -393,7 +395,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
             // force invalidate on some platforms
             ImageSource = null;
             ImageSource = fis;
-            Debug.WriteLine($"[ButtonBase] ApplyIconSizingToButton set FontImageSource.Size={fis.Size}");
+            DLog($"[ButtonBase] ApplyIconSizingToButton set FontImageSource.Size={fis.Size}");
         }
 
         DumpSize("ApplyIconSizingToButton END");
@@ -404,7 +406,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
         if (_updateUI) return;
         _updateUI = true;
 
-        Debug.WriteLine($"[ButtonBase] UpdateUI ENTER (State={ButtonState}, Size={ButtonSize}, Text='{Text}')");
+        DLog($"[ButtonBase] UpdateUI ENTER (State={ButtonState}, Size={ButtonSize}, Text='{Text}')");
 
         if (ButtonState != null)
         {
@@ -442,7 +444,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
         var isFontImg = ImageSource is FontImageSource;
         var fontImgSize = (ImageSource as FontImageSource)?.Size;
 
-        Debug.WriteLine(
+        DLog(
             $"[ButtonBase] {where} :: " +
             $"Text='{Text}', SizeEnum={ButtonSize}, State={ButtonState}, " +
             $"HeightReq={HeightRequest:F1}, MinH={MinimumHeightRequest:F1}, " +
@@ -455,4 +457,15 @@ public abstract partial class ButtonBase : Button, IButtonBase
     }
 
     #endregion Sizing helpers
+
+    [Conditional("DEBUG")]
+    [Conditional("BUTTONBASE_TRACE")]
+    private static void DLog(string message)
+    {
+#if BUTTONBASE_TRACE
+        Debug.WriteLine(message);
+#endif
+    }
+
 }
+
