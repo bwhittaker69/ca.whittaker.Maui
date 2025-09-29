@@ -53,4 +53,120 @@
 	  </Compile>
 	</ItemGroup>
 
+
+
+	<PropertyGroup>
+		<!-- Root of your source images -->
+		<ImagesRoot>$(MSBuildProjectDirectory)\Resources\Images</ImagesRoot>
+
+		<!-- Source set: all PNGs whose name contains "72" -->
+		<BaseSetDir>$(ImagesRoot)\size72</BaseSetDir>
+
+		<!-- ImageMagick executable -->
+		<MagickExe Condition="'$(MagickExe)'==''">C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe</MagickExe>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Declare the target sizes; flip <Enabled>true/false</Enabled> per size -->
+		<TargetSize Include="12">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="16">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="29">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="32">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="36">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="40">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="48">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="58">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="64">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="76">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="80">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="87">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="96">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="108">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="120">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="128">
+			<Enabled>false</Enabled>
+		</TargetSize>
+
+		<!-- Source images -->
+		<BaseImages Include="$(BaseSetDir)\*72*.png" />
+	</ItemGroup>
+
+	<!-- Entry point: runs once, expands into a call per size -->
+	<Target Name="ProcessAllImageSizes"
+			BeforeTargets="CoreCompile">
+		<!-- Pick only enabled sizes (missing <Enabled> counts as true) -->
+		<ItemGroup>
+			<SizesToDo Include="@(TargetSize)"
+					   Condition=" '%(TargetSize.Enabled)' == '' or %(TargetSize.Enabled) " />
+		</ItemGroup>
+
+		<Message Text="Resizing sizes: @(SizesToDo->'%(Identity)', ', ')" Importance="High" Condition="'@(SizesToDo)' != ''" />
+
+		<!-- Call ProcessSize target for each size -->
+		<MSBuild Projects="$(MSBuildProjectFile)"
+				 Targets="ProcessSize"
+				 Properties="CurrentSize=%(SizesToDo.Identity)" />
+	</Target>
+
+	<!-- Called once per size (CurrentSize) -->
+	<Target Name="ProcessSize"
+			Condition="'$(CurrentSize)' != ''">
+
+		<PropertyGroup>
+			<OutDir>$(ImagesRoot)\size$(CurrentSize)</OutDir>
+		</PropertyGroup>
+
+		<!-- Always clean the output directory first -->
+		<RemoveDir Directories="$(OutDir)" Condition="Exists('$(OutDir)')" />
+		<MakeDir   Directories="$(OutDir)" />
+
+		<!-- Do per-file work; incremental if BaseImages unchanged -->
+		<Message Text="Generating $(OutDir)\*.png from @(BaseImages->'%(Filename)%(Extension)', ', ')" Importance="Low" />
+
+		<!-- Batch over files; rename by replacing '72' with $(CurrentSize) -->
+		<Exec Command="&quot;$(MagickExe)&quot; &quot;%(BaseImages.FullPath)&quot; -resize $(CurrentSize)x$(CurrentSize) &quot;$(OutDir)\$([System.String]::Copy('%(BaseImages.Filename)').Replace('72','$(CurrentSize)'))%(BaseImages.Extension)&quot;"
+			  StandardOutputImportance="Low"
+			  StandardErrorImportance="High"
+			  WorkingDirectory="$(MSBuildProjectDirectory)">
+			<!-- Re-run when inputs change -->
+			<Output TaskParameter="Outputs" ItemName="__unused"/>
+		</Exec>
+	</Target>
+
+
+
+
+
+
+
 </Project>

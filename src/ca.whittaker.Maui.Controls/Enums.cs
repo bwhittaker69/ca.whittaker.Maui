@@ -108,7 +108,26 @@ namespace ca.whittaker.Maui.Controls
     /// - ViewOnly/Hidden hide all buttons.<br/>
     /// </summary>
     public enum FormAccessModeEnum { Editable, Editing, ViewOnly, Hidden }
-
+    public enum ButtonSizeEnum
+    {
+        Size12 = 12,
+        Size16 = 16,
+        Size29 = 29,
+        Size32 = 32,
+        Size36 = 36,
+        Size40 = 40,
+        Size48 = 48,
+        Size58 = 58,
+        Size64 = 64,
+        Size72 = 72,
+        Size76 = 76,
+        Size80 = 80,
+        Size87 = 87,
+        Size96 = 96,
+        Size108 = 108,
+        Size120 = 120,
+        Size128 = 128
+    }
     public enum SizeEnum
     {
         XXXSmall = -20,
@@ -120,4 +139,10 @@ namespace ca.whittaker.Maui.Controls
         XLarge = 10,
         XXLarge = 15
     }
+    public static class ButtonSizeEnumExtensions
+    {
+        public static int ToDip(this ButtonSizeEnum s) => DeviceHelper.GetDipSize(s);
+        public static int ToPx(this ButtonSizeEnum s) => DeviceHelper.GetPixelSize(s);
+    }
+
 }

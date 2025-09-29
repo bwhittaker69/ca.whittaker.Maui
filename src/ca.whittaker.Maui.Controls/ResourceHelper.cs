@@ -37,7 +37,7 @@ namespace ca.whittaker.Maui.Controls
             // Determine image size based on device screen density.
             int size = DeviceHelper.GetImageSizeForDevice(sizeEnum);
 
-            string resourceName = $"{assemblyName}.Resources.Images.{baseButtonType.ToString().ToLowerInvariant()}_{size}{theme}{state}.png";
+            string resourceName = $"{assemblyName}.Resources.Images.size{size}.{baseButtonType.ToString().ToLowerInvariant()}_{size}{theme}{state}.png";
 #if DEBUGOUT
             Debug.WriteLine($"Attempting to load resource: {resourceName}");
 #endif
