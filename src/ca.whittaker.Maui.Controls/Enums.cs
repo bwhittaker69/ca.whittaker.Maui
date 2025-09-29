@@ -112,6 +112,7 @@ namespace ca.whittaker.Maui.Controls
     {
         Size12 = 12,
         Size16 = 16,
+        Size18 = 18,
         Size29 = 29,
         Size32 = 32,
         Size36 = 36,

@@ -35,9 +35,9 @@ namespace ca.whittaker.Maui.Controls
             string state = GetResourceState(buttonState);
 
             // Determine image size based on device screen density.
-            int size = DeviceHelper.GetImageSizeForDevice(sizeEnum);
+            int resourceBucket = DeviceHelper.GetImageAssetBucket(sizeEnum);
 
-            string resourceName = $"{assemblyName}.Resources.Images.size{size}.{baseButtonType.ToString().ToLowerInvariant()}_{size}{theme}{state}.png";
+            string resourceName = $"{assemblyName}.Resources.Images.size{resourceBucket}.{baseButtonType.ToString().ToLowerInvariant()}_{resourceBucket}{theme}{state}.png";
 #if DEBUGOUT
             Debug.WriteLine($"Attempting to load resource: {resourceName}");
 #endif
