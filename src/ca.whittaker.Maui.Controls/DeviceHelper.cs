@@ -105,14 +105,18 @@ public static class DeviceHelper
 
     private static double DetermineBaseDip(double density, DeviceIdiom idiom, double minDip)
     {
-        double baseDip = idiom switch
-        {
-            DeviceIdiom.Desktop => 64,
-            DeviceIdiom.TV => 72,
-            DeviceIdiom.Tablet => 56,
-            DeviceIdiom.Watch => 36,
-            _ => 48,
-        };
+        double baseDip;
+
+        if (idiom == DeviceIdiom.Desktop)
+            baseDip = 64;
+        else if (idiom == DeviceIdiom.TV)
+            baseDip = 72;
+        else if (idiom == DeviceIdiom.Tablet)
+            baseDip = 56;
+        else if (idiom == DeviceIdiom.Watch)
+            baseDip = 36;
+        else
+            baseDip = 48;
 
         if (density <= 1.1)
             baseDip = Math.Max(baseDip - 4, 32);
