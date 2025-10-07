@@ -1,5 +1,6 @@
 ﻿using ca.whittaker.Maui.Controls.Buttons;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Input;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -196,24 +197,49 @@ public class Form : ContentView
 
     #region Private Methods
 
-    private static void OnFormButtonSizeChanged(BindableObject bindable, object? oldValue, object? newValue)
+    private static ButtonSizeEnum ResolveEffective(SizeEnum requested)
+        => DeviceHelper.GetButtonSizeForDevice(requested, enforceMinTouchTarget: true);
+
+    // Sets ButtonSize whether the control expects SizeEnum or ButtonSizeEnum
+    private static void ApplyButtonSizeSmart(object? button, SizeEnum requested)
     {
-        if (bindable is not Form form || newValue is not SizeEnum newSize)
-            return;
+        if (button is null) return;
 
-        UiThreadHelper.RunOnMainThread(() =>
+        var prop = button.GetType().GetProperty("ButtonSize", BindingFlags.Instance | BindingFlags.Public);
+        if (prop is null || !prop.CanWrite) return;
+
+        if (prop.PropertyType == typeof(SizeEnum))
         {
-            if (form._formButtonEditAction != null) form._formButtonEditAction.ButtonSize = newSize;
-            if (form._formButtonCancelAction != null) form._formButtonCancelAction.ButtonSize = newSize;
-            if (form._formButtonSaveAction != null) form._formButtonSaveAction.ButtonSize = newSize;
+            // Control expects logical scale; just pass through
+            prop.SetValue(button, requested);
+        }
+        else if (prop.PropertyType == typeof(ButtonSizeEnum))
+        {
+            // Control expects DIP bucket; resolve then assign
+            prop.SetValue(button, ResolveEffective(requested));
+        }
 
-            // ensure visual refresh
-            form._formButtonEditAction?.UpdateUI();
-            form._formButtonCancelAction?.UpdateUI();
-            form._formButtonSaveAction?.UpdateUI();
-        });
+        // Nudge minimum touch height (platform-aware) for accessibility
+        var hitDip = DeviceHelper.GetImageSizeForDevice(requested, enforceMinTouchTarget: true) + 6;
+        if (button is VisualElement ve)
+            ve.MinimumHeightRequest = hitDip;
+
+        // Call UpdateUI if present
+        var update = button.GetType().GetMethod("UpdateUI", BindingFlags.Instance | BindingFlags.Public);
+        update?.Invoke(button, null);
     }
 
+    private void ApplyAllButtons(SizeEnum requested)
+    {
+        ApplyButtonSizeSmart(_formButtonEditAction, requested);
+        ApplyButtonSizeSmart(_formButtonCancelAction, requested);
+        ApplyButtonSizeSmart(_formButtonSaveAction, requested);
+    }
+    private static void OnFormButtonSizeChanged(BindableObject bindable, object? oldValue, object? newValue)
+    {
+        if (bindable is not Form form || newValue is not SizeEnum requested) return;
+        UiThreadHelper.RunOnMainThread(() => form.ApplyAllButtons(requested));
+    }
 
     private static void OnFormAccessModeChanged(BindableObject bindable, object? oldValue, object? newValue)
     {
@@ -424,13 +450,14 @@ public class Form : ContentView
     private Grid BuildHeaderGrid()
     {
 
-        double dHeight = Convert.ToDouble(FormButtonSize);
+        int dip = DeviceHelper.GetImageSizeForDevice(FormButtonSize, enforceMinTouchTarget: true);
+        // or, if you specifically need the enum of DIPs:
+        var dipEnum = ResolveEffective(FormButtonSize);
 
         // --- Buttons ---
         _formButtonEditAction = new EditButton
         {
             Text = FormEditButtonText,
-            ButtonSize = FormButtonSize,
             BackgroundColor = Colors.Transparent,
             BorderWidth = 0,
             Margin = 5,
@@ -442,11 +469,11 @@ public class Form : ContentView
         };
         _formButtonEditAction.Clicked += OnFormEditButtonClicked;
         _formButtonEditAction.UpdateUI();
+        ApplyButtonSizeSmart(_formButtonEditAction, FormButtonSize);
 
         _formButtonSaveAction = new SaveButton
         {
             Text = FormSaveButtonText,
-            ButtonSize = FormButtonSize,
             BackgroundColor = Colors.Transparent,
             BorderWidth = 0,
             Margin = 5,
@@ -458,11 +485,11 @@ public class Form : ContentView
         };
         _formButtonSaveAction.Clicked += OnFormSaveButtonClicked;
         _formButtonSaveAction.UpdateUI();
+        ApplyButtonSizeSmart(_formButtonSaveAction, FormButtonSize);
 
         _formButtonCancelAction = new CancelButton
         {
             Text = FormCancelButtonText,
-            ButtonSize = FormButtonSize,
             BackgroundColor = Colors.Transparent,
             BorderWidth = 0,
             Margin = 5,
@@ -474,6 +501,7 @@ public class Form : ContentView
         };
         _formButtonCancelAction.Clicked += OnFormCancelButtonClicked;
         _formButtonCancelAction.UpdateUI();
+        ApplyButtonSizeSmart(_formButtonCancelAction, FormButtonSize);
 
         // --- Labels ---
         _formLabelNotification = new Label

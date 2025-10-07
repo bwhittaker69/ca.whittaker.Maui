@@ -74,6 +74,9 @@
 		<TargetSize Include="16">
 			<Enabled>false</Enabled>
 		</TargetSize>
+		<TargetSize Include="24">
+			<Enabled>false</Enabled>
+		</TargetSize>
 		<TargetSize Include="29">
 			<Enabled>false</Enabled>
 		</TargetSize>
@@ -87,6 +90,9 @@
 			<Enabled>false</Enabled>
 		</TargetSize>
 		<TargetSize Include="48">
+			<Enabled>false</Enabled>
+		</TargetSize>
+		<TargetSize Include="56">
 			<Enabled>false</Enabled>
 		</TargetSize>
 		<TargetSize Include="58">
@@ -121,26 +127,22 @@
 		<BaseImages Include="$(BaseSetDir)\*72*.png" />
 	</ItemGroup>
 
+
 	<!-- Entry point: runs once, expands into a call per size -->
-	<Target Name="ProcessAllImageSizes"
-			BeforeTargets="CoreCompile">
+	<Target Name="ProcessAllImageSizes" BeforeTargets="CoreCompile">
 		<!-- Pick only enabled sizes (missing <Enabled> counts as true) -->
 		<ItemGroup>
-			<SizesToDo Include="@(TargetSize)"
-					   Condition=" '%(TargetSize.Enabled)' == '' or %(TargetSize.Enabled) " />
+			<SizesToDo Include="@(TargetSize)" Condition=" '%(TargetSize.Enabled)' == '' or %(TargetSize.Enabled) " />
 		</ItemGroup>
 
 		<Message Text="Resizing sizes: @(SizesToDo->'%(Identity)', ', ')" Importance="High" Condition="'@(SizesToDo)' != ''" />
 
 		<!-- Call ProcessSize target for each size -->
-		<MSBuild Projects="$(MSBuildProjectFile)"
-				 Targets="ProcessSize"
-				 Properties="CurrentSize=%(SizesToDo.Identity)" />
+		<MSBuild Projects="$(MSBuildProjectFile)" Targets="ProcessSize" Properties="CurrentSize=%(SizesToDo.Identity)" />
 	</Target>
 
 	<!-- Called once per size (CurrentSize) -->
-	<Target Name="ProcessSize"
-			Condition="'$(CurrentSize)' != ''">
+	<Target Name="ProcessSize" Condition="'$(CurrentSize)' != ''">
 
 		<PropertyGroup>
 			<OutDir>$(ImagesRoot)\size$(CurrentSize)</OutDir>
@@ -148,18 +150,15 @@
 
 		<!-- Always clean the output directory first -->
 		<RemoveDir Directories="$(OutDir)" Condition="Exists('$(OutDir)')" />
-		<MakeDir   Directories="$(OutDir)" />
+		<MakeDir Directories="$(OutDir)" />
 
 		<!-- Do per-file work; incremental if BaseImages unchanged -->
 		<Message Text="Generating $(OutDir)\*.png from @(BaseImages->'%(Filename)%(Extension)', ', ')" Importance="Low" />
 
 		<!-- Batch over files; rename by replacing '72' with $(CurrentSize) -->
-		<Exec Command="&quot;$(MagickExe)&quot; &quot;%(BaseImages.FullPath)&quot; -resize $(CurrentSize)x$(CurrentSize) &quot;$(OutDir)\$([System.String]::Copy('%(BaseImages.Filename)').Replace('72','$(CurrentSize)'))%(BaseImages.Extension)&quot;"
-			  StandardOutputImportance="Low"
-			  StandardErrorImportance="High"
-			  WorkingDirectory="$(MSBuildProjectDirectory)">
+		<Exec Command="&quot;$(MagickExe)&quot; &quot;%(BaseImages.FullPath)&quot; -resize $(CurrentSize)x$(CurrentSize) &quot;$(OutDir)\$([System.String]::Copy('%(BaseImages.Filename)').Replace('72','$(CurrentSize)'))%(BaseImages.Extension)&quot;" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="$(MSBuildProjectDirectory)">
 			<!-- Re-run when inputs change -->
-			<Output TaskParameter="Outputs" ItemName="__unused"/>
+			<Output TaskParameter="Outputs" ItemName="__unused" />
 		</Exec>
 	</Target>
 
