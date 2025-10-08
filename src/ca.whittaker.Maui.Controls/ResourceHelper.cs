@@ -243,3 +243,285 @@ namespace ca.whittaker.Maui.Controls
         public void Dispose() => GC.SuppressFinalize(this);
     }
 }
+
+
+
+
+////#define DEBUGOUT
+//using System.Collections.Concurrent;
+//using System.Collections.Generic;
+//using System.Diagnostics;
+//using System.IO;
+//using System.Reflection;
+//using System.Threading;
+//using System.Threading.Tasks;
+//using Microsoft.Maui.Controls;
+//using Microsoft.Maui.Graphics;
+
+//namespace ca.whittaker.Maui.Controls
+//{
+//    public sealed record ImageAsset(ImageSource Source, int DipSize);
+
+//    public sealed class ResourceHelper : IDisposable
+//    {
+//        private static readonly ConcurrentDictionary<string, Lazy<ImageSource?>> _imageCache =
+//            new(StringComparer.Ordinal);
+
+//        private static string AssemblyNameOf(object o)
+//            => o.GetType().Assembly?.GetName()?.Name ?? string.Empty;
+
+//        private static IEnumerable<string> BuildResourceCandidates(
+//            string asmName,
+//            string iconName,
+//            int bucketPx,
+//            string themeSuffix,
+//            string stateSuffix)
+//        {
+//            var baseName = $"{asmName}.Resources.Images.size{bucketPx}.{iconName}_{bucketPx}";
+//            var candidates = new[]
+//            {
+//                themeSuffix + stateSuffix,
+//                themeSuffix,
+//                stateSuffix,
+//                string.Empty
+//            };
+
+//            var seen = new HashSet<string>(StringComparer.Ordinal);
+
+//            foreach (var suffix in candidates)
+//            {
+//                var resourceName = suffix.Length > 0
+//                    ? $"{baseName}{suffix}.png"
+//                    : $"{baseName}.png";
+
+//                if (seen.Add(resourceName))
+//                    yield return resourceName;
+//            }
+//        }
+
+//        private ImageAsset? TryLoadAsset(
+//            Assembly asm,
+//            string asmName,
+//            string iconName,
+//            int bucketPx,
+//            int dip,
+//            string themeSuffix,
+//            string stateSuffix,
+//            CancellationToken cancellationToken)
+//        {
+//            var tried = new List<string>();
+
+//            foreach (var resourceName in BuildResourceCandidates(asmName, iconName, bucketPx, themeSuffix, stateSuffix))
+//            {
+//                cancellationToken.ThrowIfCancellationRequested();
+
+//                tried.Add(resourceName);
+
+//                var source = GetOrLoadImage(asm, resourceName);
+//                if (source != null)
+//                    return new ImageAsset(source, dip);
+//            }
+
+//            Debug.WriteLine($"[ResourceHelper] Unable to locate resource for {iconName} ({bucketPx}px). Tried: {string.Join(", ", tried)}");
+//            return null;
+//        }
+
+//        private static ImageSource? GetOrLoadImage(Assembly asm, string resourceName)
+//        {
+//            var loader = _imageCache.GetOrAdd(resourceName, name =>
+//                new Lazy<ImageSource?>(() => LoadImageSource(asm, name), LazyThreadSafetyMode.ExecutionAndPublication));
+
+//            return loader.Value;
+//        }
+
+//        private static ImageSource? LoadImageSource(Assembly asm, string resourceName)
+//        {
+//            try
+//            {
+//                using var resourceStream = asm.GetManifestResourceStream(resourceName);
+//                if (resourceStream == null)
+//                    return null;
+
+//                using var memory = new MemoryStream();
+//                resourceStream.CopyTo(memory);
+//                var bytes = memory.ToArray();
+
+//                if (bytes.Length == 0)
+//                    return null;
+
+//                return new StreamImageSource
+//                {
+//                    Stream = token =>
+//                    {
+//                        token.ThrowIfCancellationRequested();
+//                        return Task.FromResult<Stream>(new MemoryStream(bytes, writable: false));
+//                    }
+//                };
+//            }
+//            catch (Exception ex)
+//            {
+//                Debug.WriteLine($"[ResourceHelper] Failed to load {resourceName}: {ex}");
+//                return null;
+//            }
+//        }
+
+//        // ----------------- High-level API -----------------
+
+//        /// <summary>
+//        /// Returns an ImageAsset containing the image and the DIP size the UI should use for layout.
+//        /// </summary>
+//        public ImageAsset? GetImageAsset(
+//            ButtonStateEnum state,
+//            ButtonIconEnum icon,
+//            SizeEnum size,
+//            CancellationToken cancellationToken = default)
+//        {
+//            cancellationToken.ThrowIfCancellationRequested();
+
+//            var asm = GetType().Assembly;
+//            var asmName = AssemblyNameOf(this);
+
+//            var (dip, bucketPx) = DeviceHelper.GetLayoutAndBucket(size);
+//            var suffixTheme = GetResourceThemeSuffix();
+//            var suffixState = GetResourceStateSuffix(state);
+//            var iconName = icon.ToString().ToLowerInvariant();
+
+//#if DEBUGOUT
+//            Debug.WriteLine($"[ResourceHelper] Request: dip={dip}, bucket={bucketPx}, icon={iconName}");
+//#endif
+
+//            return TryLoadAsset(asm, asmName, iconName, bucketPx, dip, suffixTheme, suffixState, cancellationToken);
+//        }
+
+//        /// <summary>
+//        /// Convenience factory: returns an Image with Width/Height set to the correct DIP size.
+//        /// </summary>
+//        public Image? CreateImage(ButtonStateEnum state, ButtonIconEnum icon, SizeEnum size, CancellationToken ct = default)
+//        {
+//            var asset = GetImageAsset(state, icon, size, ct);
+//            if (asset is null) return null;
+
+//            return new Image
+//            {
+//                Source = asset.Source,
+//                WidthRequest = asset.DipSize,
+//                HeightRequest = asset.DipSize,
+//                MinimumWidthRequest = asset.DipSize,     // <— ensure WinUI respects it
+//                MinimumHeightRequest = asset.DipSize,
+//                Aspect = Aspect.AspectFit
+//            };
+//        }
+
+//        /// <summary>
+//        /// Convenience factory: returns an ImageButton sized and padded correctly (fixes WinUI inflation).
+//        /// </summary>
+//        public ImageButton? CreateImageButton(ButtonStateEnum state, ButtonIconEnum icon, SizeEnum size, CancellationToken ct = default)
+//        {
+//            var asset = GetImageAsset(state, icon, size, ct);
+//            if (asset is null) return null;
+
+//            return new ImageButton
+//            {
+//                Source = asset.Source,
+//                WidthRequest = asset.DipSize,
+//                HeightRequest = asset.DipSize,
+//                MinimumWidthRequest = asset.DipSize,     // <— clamp WinUI default MinHeight/MinWidth
+//                MinimumHeightRequest = asset.DipSize,
+//                Padding = 0,
+//                BorderWidth = 0,
+//                CornerRadius = 0,
+//                BackgroundColor = Colors.Transparent
+//            };
+//        }
+
+//        public Image? CreateImageForText(
+//       ButtonStateEnum state, ButtonIconEnum icon, SizeEnum size,
+//       double fontSize, CancellationToken ct = default)
+//        {
+//            ct.ThrowIfCancellationRequested();
+
+//            var asm = GetType().Assembly;
+//            var asmName = AssemblyNameOf(this);
+
+//            var (dip, bucketPx) = DeviceHelper.GetIconForText(size, fontSize);
+
+//            var suffixTheme = GetResourceThemeSuffix();
+//            var suffixState = GetResourceStateSuffix(state);
+//            var iconName = icon.ToString().ToLowerInvariant();
+
+//#if DEBUGOUT
+//    Debug.WriteLine($"[ResourceHelper] CreateImageForText dip={dip}, bucket={bucketPx}, icon={iconName}");
+//#endif
+
+//            var asset = TryLoadAsset(asm, asmName, iconName, bucketPx, dip, suffixTheme, suffixState, ct);
+//            if (asset is null) return null;
+
+//            return new Image
+//            {
+//                Source = asset.Source,
+//                WidthRequest = asset.DipSize,
+//                HeightRequest = asset.DipSize,
+//                MinimumWidthRequest = asset.DipSize,
+//                MinimumHeightRequest = asset.DipSize,
+//                Aspect = Aspect.AspectFit
+//            };
+//        }
+
+//        public ImageButton? CreateImageButtonForText(
+//            ButtonStateEnum state, ButtonIconEnum icon, SizeEnum size,
+//            double fontSize, CancellationToken ct = default)
+//        {
+//            var img = CreateImageForText(state, icon, size, fontSize, ct);
+//            if (img is null) return null;
+
+//            return new ImageButton
+//            {
+//                Source = img.Source,
+//                WidthRequest = img.WidthRequest,
+//                HeightRequest = img.HeightRequest,
+//                MinimumWidthRequest = img.MinimumWidthRequest,
+//                MinimumHeightRequest = img.MinimumHeightRequest,
+//                Padding = 0,
+//                BorderWidth = 0,
+//                CornerRadius = 0,
+//                BackgroundColor = Colors.Transparent
+//            };
+//        }
+
+//        // ----------------- Legacy-style API (kept for compatibility) -----------------
+
+//        /// <summary>
+//        /// Legacy: returns ImageSource only. Prefer GetImageAsset/CreateImage/CreateImageButton to ensure correct layout size.
+//        /// </summary>
+//        public ImageSource? GetImageSource(
+//            ButtonStateEnum buttonState,
+//            ButtonIconEnum baseButtonType,
+//            SizeEnum sizeEnum,
+//            CancellationToken cancellationToken = default)
+//        {
+//            // Delegate to new API and discard DIP (callers must set Width/Height if they use this).
+//            return GetImageAsset(buttonState, baseButtonType, sizeEnum, cancellationToken)?.Source;
+//        }
+
+//        // ----------------- Theme/State helpers -----------------
+
+//        private static string GetResourceThemeSuffix()
+//        {
+//            var theme = GetCurrentTheme();
+//            return theme == AppTheme.Dark ? "_dark" : "_light";
+//        }
+
+//        private static string GetResourceStateSuffix(ButtonStateEnum state)
+//            => state == ButtonStateEnum.Disabled ? "_disabled" : string.Empty;
+
+//        private static AppTheme GetCurrentTheme()
+//        {
+//            try { return Application.Current?.RequestedTheme ?? AppTheme.Unspecified; }
+//            catch { return AppTheme.Unspecified; }
+//        }
+
+//        // ----------------- IDisposable -----------------
+
+//        public void Dispose() => GC.SuppressFinalize(this);
+//    }
+//}

@@ -1,5 +1,5 @@
-﻿using ca.whittaker.Maui.Controls.Buttons;
-using System.Diagnostics;
+﻿using System;
+using ca.whittaker.Maui.Controls.Buttons;
 using System.Windows.Input;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -392,10 +392,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         BaseField_WireFocusEvents(Field_GetControlsFromGrid());
         BaseField_InitializeDataSource();
 
-        UiThreadHelper.RunOnMainThread(() =>
-        {
-            _placeholderEntrySpacer.MoveToBack();
-        });
+        InvokeOnMainThread(() => _placeholderEntrySpacer.MoveToBack());
 
     }
 
@@ -593,6 +590,18 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     private const int col1 = 0, col2 = 1, col3 = 2;
     private const int row1 = 0, row2 = 1, row3 = 2;
 
+    private static void InvokeOnMainThread(Action action) => UiThreadHelper.RunOnMainThread(action);
+
+    private void RunOnMainThreadBatch(Action batchAction) => InvokeOnMainThread(() => Field_PerformBatchUpdate(batchAction));
+
+    private void WithUndoButton(Action<UndoButton> action)
+    {
+        if (FieldButtonUndo == null)
+            return;
+
+        action(FieldButtonUndo);
+    }
+
     private void ApplyFieldLabelLayout()
     {
         if (_layoutGrid == null || FieldLabel is null) return; // CHANGED: defensive check
@@ -778,19 +787,22 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
         if (_baseFieldPreviousHasChangedFromOriginal != hasChangedFromOriginal)
         {
-            if (FieldButtonUndo != null && FieldUndoButton)
+            if (FieldUndoButton)
             {
-                if (FieldAccessMode == FieldAccessModeEnum.Editing)
+                WithUndoButton(undo =>
                 {
-                    if (hasChangedFromOriginal)
-                        FieldButtonUndo.Enabled();
+                    if (FieldAccessMode == FieldAccessModeEnum.Editing)
+                    {
+                        if (hasChangedFromOriginal)
+                            undo.Enabled();
+                        else
+                            undo.Disabled();
+                    }
                     else
-                        FieldButtonUndo.Disabled();
-                }
-                else
-                {
-                    FieldButtonUndo.Hide();
-                }
+                    {
+                        undo.Hide();
+                    }
+                });
             }
 
             _baseFieldPreviousHasChangedFromOriginal = hasChangedFromOriginal;
@@ -848,7 +860,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     private void BaseConfigAccessModeHidden()
     {
         this.HideAllDescendantControls();
-        if (FieldButtonUndo != null) FieldButtonUndo.Hide();
+        WithUndoButton(undo => undo.Hide());
     }
 
 
@@ -902,7 +914,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     }
     protected void Field_ApplyHeightRequest(double? height)
     {
-        UiThreadHelper.RunOnMainThread(() =>
+        InvokeOnMainThread(() =>
         {
             var h = (height.HasValue && height.Value > 0) ? height.Value : -1;
 
@@ -1074,7 +1086,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
             }
         }
 
-        UiThreadHelper.RunOnMainThread(() =>
+        InvokeOnMainThread(() =>
         {
             Field_PerformBatchUpdate(() =>
             {
@@ -1084,12 +1096,11 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
                     FieldNotification.IsVisible = show;
                 }
 
-                // Collapse / expand the dedicated notification row
                 if (_layoutGrid != null)
                     _layoutGrid.RowDefinitions[row3].Height = show ? GridLength.Auto : 0;
             });
 
-            Field_RefreshLayout();   // force re‑measure so overall height updates
+            Field_RefreshLayout();   // force re-measure so overall height updates
         });
     }
 
@@ -1156,7 +1167,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
     protected void Field_ShowPlaceholders()
     {
-        UiThreadHelper.RunOnMainThread(() =>
+        InvokeOnMainThread(() =>
         {
             _placeholderEntry.IsVisible = true;
             _placeholderEntry.Text = Field_GetDisplayText();
@@ -1167,7 +1178,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
 
     protected void Field_HidePlaceholders()
     {
-        UiThreadHelper.RunOnMainThread(() =>
+        InvokeOnMainThread(() =>
         {
         _placeholderEntry.IsVisible = false;
         _placeholderEntry.MoveToBack();
@@ -1181,14 +1192,11 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     {
         if (Content is Grid grid && grid.ColumnDefinitions.Count > 0)
         {
-            UiThreadHelper.RunOnMainThread(() =>
+            RunOnMainThreadBatch(() =>
             {
-                Field_PerformBatchUpdate(() =>
-                {
-                    grid.ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
-                    if (FieldLabel != null)
-                        FieldLabel.WidthRequest = newWidth;
-                });
+                grid.ColumnDefinitions[0].Width = new GridLength(newWidth, GridUnitType.Absolute);
+                if (FieldLabel != null)
+                    FieldLabel.WidthRequest = newWidth;
             });
         }
     }
@@ -1197,13 +1205,8 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
     protected void Field_UpdateWidth(double newWidth)
     {
         if (Content is Grid grid && grid.ColumnDefinitions.Count > 1)
-            UiThreadHelper.RunOnMainThread(() =>
-            {
-                Field_PerformBatchUpdate(() =>
-                {
-                    grid.ColumnDefinitions[1].Width = new GridLength(newWidth, GridUnitType.Absolute);
-                });
-            });
+            RunOnMainThreadBatch(() =>
+                grid.ColumnDefinitions[1].Width = new GridLength(newWidth, GridUnitType.Absolute));
     }
 
 
@@ -1445,7 +1448,7 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         BaseField_OriginalValue_Reset();
         Field_UpdateValidationAndChangedState(true);
         Field_UpdateNotificationMessage();
-        FieldButtonUndo!.ButtonState = ButtonStateEnum.Disabled;
+        WithUndoButton(undo => undo.ButtonState = ButtonStateEnum.Disabled);
         BaseFieldEvaluateToRaiseHasChangesEvent();
     }
 
@@ -1459,127 +1462,4 @@ public abstract class BaseFormField<T> : ContentView, IBaseFormFieldTyped<T>
         DeviceHelper.GetImageSizeForDevice(size);   // e.g. 12–28 px depending on size
 
 
-}
-
-public static class ViewGridExtensions
-{
-
-    private static bool IsInGrid(this View? control)
-    {
-        if (control == null)
-            return false;
-        Element? parent = control.Parent;
-        while (parent != null)
-        {
-            if (parent is Grid)
-                return true;
-            parent = (parent as VisualElement)?.Parent;
-        }
-        return false;
-    }
-
-    private static (int row, int col, int colSpan) GetPositionInGrid(this View? control)
-    {
-        if (control == null)
-            return (-1, -1, 1);
-        Element? parent = control.Parent;
-        while (parent != null)
-        {
-            if (parent is Grid grid)
-            {
-                int row = grid.GetRow(control);
-                int col = grid.GetColumn(control);
-                int span = grid.GetColumnSpan(control);
-                return (row, col, span);
-            }
-            parent = (parent as VisualElement)?.Parent;
-        }
-        return (-1, -1, 1);
-    }
-
-    public static void BringToFront(this View? control)
-    {
-        if (control == null || !control.IsInGrid())
-            return;
-
-        var (row, col, _) = control.GetPositionInGrid();
-        if (row < 0 || col < 0)
-            return;
-
-        var grid = control.GetParentGrid();
-        if (grid == null)
-            return;
-
-        // Filter to View FIRST so we can use Controls Grid attached properties
-        var siblings = grid.Children
-                           .OfType<View>()
-                           .Where(v =>
-                               Microsoft.Maui.Controls.Grid.GetRow(v) == row &&
-                               Microsoft.Maui.Controls.Grid.GetColumn(v) == col)
-                           .ToList();
-
-        if (siblings.Count == 0)
-            return;
-
-        // Normalize ZIndex so the smallest becomes 0
-        int minIndex = siblings.Min(v => v.ZIndex);
-        foreach (var v in siblings)
-            v.ZIndex -= minIndex;
-
-        // Put target on top (one higher than current max among siblings)
-        int maxZ = siblings.Where(v => v != control).DefaultIfEmpty(control).Max(v => v.ZIndex);
-        control.ZIndex = maxZ + 1;
-    }
-
-
-    public static void MoveToBack(this View? control)
-    {
-        if (control == null || !control.IsInGrid())
-            return;
-
-        var (row, col, _) = control.GetPositionInGrid();
-        if (row < 0 || col < 0)
-            return;
-
-        var grid = control.GetParentGrid();
-        if (grid == null)
-            return;
-
-        var siblings = grid.Children
-            .OfType<View>()
-            .Where(v =>
-                Microsoft.Maui.Controls.Grid.GetRow(v) == row &&
-                Microsoft.Maui.Controls.Grid.GetColumn(v) == col)
-            .ToList();
-
-        if (siblings.Count == 0)
-            return;
-
-        // Normalize to start at 0
-        int minZ = siblings.Min(v => v.ZIndex);
-        foreach (var v in siblings) v.ZIndex -= minZ;
-
-        // Everything except target gets bumped up starting at 1
-        int z = 1;
-        foreach (var v in siblings.OrderBy(v => v == control ? int.MinValue : v.ZIndex))
-            if (v != control) v.ZIndex = z++;
-
-        // Target goes to the back
-        control.ZIndex = 0;
-    }
-
-
-    private static Grid? GetParentGrid(this View? control)
-    {
-        if (control == null)
-            return null;
-        Element? parent = control.Parent;
-        while (parent != null)
-        {
-            if (parent is Grid grid)
-                return grid;
-            parent = (parent as VisualElement)?.Parent;
-        }
-        return null;
-    }
 }

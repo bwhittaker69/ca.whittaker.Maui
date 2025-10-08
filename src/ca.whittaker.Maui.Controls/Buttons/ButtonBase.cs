@@ -1,4 +1,4 @@
-﻿#undef BUTTONBASE_TRACE   
+﻿#define BUTTONBASE_TRACE   
 
 using Microsoft.Maui.Controls;
 using Microsoft.Maui;
@@ -43,8 +43,22 @@ public static class TypeHelper
 public abstract partial class ButtonBase : Button, IButtonBase
 {
     #region Fields
+    private readonly SemaphoreSlim _updateGate = new(1, 1);
 
-    private bool _updateUI = false;
+    public void SafeUpdateUI() => _ = SafeUpdateUIAsync();
+    public static readonly BindableProperty EnforceMinTouchTargetProperty =
+        BindableProperty.Create(
+            nameof(EnforceMinTouchTarget),
+            typeof(bool),
+            typeof(ButtonBase),
+            true, // default for touch
+            propertyChanged: (_, __, ___) => ((ButtonBase)_).SafeUpdateUI());
+
+    public bool EnforceMinTouchTarget
+    {
+        get => (bool)GetValue(EnforceMinTouchTargetProperty);
+        set => SetValue(EnforceMinTouchTargetProperty, value);
+    }
 
     public static readonly BindableProperty ButtonIconProperty = BindableProperty.Create(
         nameof(ButtonIcon),
@@ -155,6 +169,10 @@ public abstract partial class ButtonBase : Button, IButtonBase
 
     #region Private Methods (DRY core)
 
+
+
+
+
     private void Button_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if ((e.PropertyName == nameof(ButtonState))
@@ -187,6 +205,8 @@ public abstract partial class ButtonBase : Button, IButtonBase
 
         ApplyIconSizingToButton();
 
+        bool enforceMin = EnforceMinTouchTarget;
+
         _lastUiTask = _lastUiTask.ContinueWith(async _ =>
         {
             await MainThread.InvokeOnMainThreadAsync(() =>
@@ -196,8 +216,8 @@ public abstract partial class ButtonBase : Button, IButtonBase
                 base.IsEnabled = isEnabled;
                 base.IsVisible = isVisible;
 
-                var buttonH = ResolveButtonHeight(ButtonSize);
-                var iconPx = ResolveIconSize(ButtonSize);
+                var buttonH = ResolveButtonHeight(ButtonSize, enforceMin);
+                var iconPx = ResolveIconSize(ButtonSize, enforceMin);
                 DLog($"[ButtonBase] ApplyVisualAsync START state={stateForIcon}, buttonH={buttonH}, iconPx={iconPx}");
 
                 // Button sizing
@@ -281,11 +301,34 @@ public abstract partial class ButtonBase : Button, IButtonBase
 
     #region Protected Overrides
 
-    private async Task SafeUpdateUIAsync()
+    private readonly SemaphoreSlim _uiGate = new(1, 1);
+    private bool _updating;
+
+    public async Task SafeUpdateUIAsync(CancellationToken ct = default)
     {
-        await this.WaitUntilReadyAsync();
-        DLog("[ButtonBase] SafeUpdateUIAsync -> UpdateUI()");
-        UpdateUI();
+        // always run on the UI thread
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            if (_updating) return;               // re-entry guard
+            _updating = true;
+            try
+            {
+                await _uiGate.WaitAsync(ct);     // serialize callers
+                try
+                {
+                    // do the minimal work and avoid property flip-flop:
+                    UpdateUI();                  // only sets props if values actually change
+                }
+                finally
+                {
+                    _uiGate.Release();
+                }
+            }
+            finally
+            {
+                _updating = false;
+            }
+        });
     }
 
     protected override void OnHandlerChanged()
@@ -376,19 +419,17 @@ public abstract partial class ButtonBase : Button, IButtonBase
 
     private void ApplyIconSizingToButton()
     {
-        var buttonH = ResolveButtonHeight(ButtonSize);
-        var iconPx = ResolveIconSize(ButtonSize);
-        DLog($"[ButtonBase] ApplyIconSizingToButton buttonH={buttonH}, iconPx={iconPx}");
+        var enforceMin = EnforceMinTouchTarget;
+        var buttonDip = DeviceHelper.GetImageSizeForDevice(ButtonSize, enforceMin);
+        var minHeight = enforceMin ? Math.Max(buttonDip, 44) : buttonDip;
+        var iconPx = ResolveIconSize(ButtonSize, enforceMin);
 
-        if (buttonH > 0)
-        {
-            if (HeightRequest < buttonH)
-                HeightRequest = buttonH; // or set MinimumHeightRequest instead if you prefer
-
-            MinimumHeightRequest = Math.Max(MinimumHeightRequest, buttonH);
-        }
+        HeightRequest = buttonDip;
+        MinimumHeightRequest = minHeight;
         MinimumWidthRequest = Math.Max(MinimumWidthRequest, iconPx);
 
+        DLog($"[ButtonBase] ApplyIconSizingToButton buttonH={buttonDip}, iconPx={iconPx}");
+        
         if (ImageSource is FontImageSource fis)
         {
             fis.Size = iconPx;
@@ -403,43 +444,43 @@ public abstract partial class ButtonBase : Button, IButtonBase
 
     public void UpdateUI()
     {
-        if (_updateUI) return;
-        _updateUI = true;
-
-        DLog($"[ButtonBase] UpdateUI ENTER (State={ButtonState}, Size={ButtonSize}, Text='{Text}')");
-
-        if (ButtonState != null)
+        if (_updating) return;
+        try
         {
-            switch (ButtonState)
+            _updating = true;
+            DLog($"[ButtonBase] UpdateUI ENTER (State={ButtonState}, Size={ButtonSize}, Text='{Text}')");
+
+            if (ButtonState != null)
             {
-                case ButtonStateEnum.Enabled: ConfigureEnabled(); break;
-                case ButtonStateEnum.Disabled: ConfigureDisabled(); break;
-                case ButtonStateEnum.Pressed: ConfigurePressed(); break;
-                case ButtonStateEnum.Hidden: ConfigureHidden(); break;
+                switch (ButtonState)
+                {
+                    case ButtonStateEnum.Enabled: ConfigureEnabled(); break;
+                    case ButtonStateEnum.Disabled: ConfigureDisabled(); break;
+                    case ButtonStateEnum.Pressed: ConfigurePressed(); break;
+                    case ButtonStateEnum.Hidden: ConfigureHidden(); break;
+                }
             }
+
+            ApplyIconSizingToButton();
+
+            DumpSize("UpdateUI EXIT");
         }
-
-        ApplyIconSizingToButton();
-
-        _updateUI = false;
-
-        DumpSize("UpdateUI EXIT");
+        finally { _updating = false; }
     }
 
     #endregion Public Methods
 
     #region Sizing helpers
 
-    private double ResolveButtonHeight(SizeEnum size) =>
-        DeviceHelper.GetImageSizeForDevice(size) * (DeviceInfo.Platform == DevicePlatform.WinUI ? 1.0 : 1.0);
+    private double ResolveButtonHeight(SizeEnum size, bool enforceMin) => DeviceHelper.GetImageSizeForDevice(size, enforceMin) * (DeviceInfo.Platform == DevicePlatform.WinUI ? 1.0 : 1.0);
 
-    private double ResolveIconSize(SizeEnum size)
+    private double ResolveIconSize(SizeEnum size, bool enforceMin)
     {
-        var h = DeviceHelper.GetImageSizeForDevice(size);
+        var h = DeviceHelper.GetImageSizeForDevice(size, enforceMin);
         return Math.Round(h * 0.55); // e.g., ~24 inside a 44 button
     }
 
-    private void DumpSize(string where)
+    private void DumpSize(string where, bool enforceMin = true)
     {
         var isFontImg = ImageSource is FontImageSource;
         var fontImgSize = (ImageSource as FontImageSource)?.Size;
@@ -452,7 +493,7 @@ public abstract partial class ButtonBase : Button, IButtonBase
             $"Actual=({Width:F1}x{Height:F1}), " +
             $"ImageSource={(ImageSource == null ? "null" : (isFontImg ? "FontImageSource" : "Bitmap"))}, " +
             $"FontImgSize={(isFontImg ? fontImgSize?.ToString("F1") : "-")}, " +
-            $"ButtonH={ResolveButtonHeight(ButtonSize):F1}, IconPx={ResolveIconSize(ButtonSize):F1}, " +
+            $"ButtonH={ResolveButtonHeight(ButtonSize, enforceMin):F1}, IconPx={ResolveIconSize(ButtonSize, enforceMin):F1}, " +
             $"Platform={DeviceInfo.Platform}");
     }
 

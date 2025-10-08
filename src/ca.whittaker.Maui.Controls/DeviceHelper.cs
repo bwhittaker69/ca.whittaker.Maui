@@ -6,6 +6,47 @@ namespace ca.whittaker.Maui.Controls;
 
 public static class DeviceHelper
 {
+    public static int GetImageSizeForDevice(SizeEnum size, bool enforceMinTouchTarget = false)
+    {
+        var isDesktop = DeviceInfo.Platform == DevicePlatform.WinUI && DeviceInfo.Idiom == DeviceIdiom.Desktop;
+
+        if (isDesktop && !enforceMinTouchTarget)
+        {
+            return size switch
+            {
+                SizeEnum.XXSmall => 28,
+                SizeEnum.XSmall => 32,
+                SizeEnum.Small => 36,
+                SizeEnum.Normal => 40,
+                SizeEnum.Large => 48,
+                _ => 40
+            };
+        }
+
+        // touch-friendly map
+        return size switch
+        {
+            SizeEnum.XXSmall => 40,
+            SizeEnum.XSmall => 40,
+            SizeEnum.Small => 40,
+            SizeEnum.Normal => 40,
+            SizeEnum.Large => 48,
+            _ => 40
+        };
+    }
+
+    public static ButtonSizeEnum GetButtonSizeForDevice(SizeEnum size, bool enforceMinTouchTarget = false)
+    {
+        // Keep your existing enum mapping; the dip calculation above is what drives height/icon.
+        // If you map by dip somewhere else, make sure it uses GetImageSizeForDevice(...).
+        return (ButtonSizeEnum)size;
+    }
+
+
+    public static ButtonSizeEnum GetButtonSizeEnumForDevice(SizeEnum scaleFactor, bool enforceMinTouchTarget = true)
+        => GetSizeForDevice<ButtonSizeEnum>(scaleFactor, enforceMinTouchTarget);
+
+
     public enum UiScaleProfile { Compact, Comfortable, Touch }
 
     // Raster buckets you ship
@@ -20,18 +61,18 @@ public static class DeviceHelper
     // Optional global overrides
     public static UiScaleProfile? GlobalScaleProfileOverride { get; set; }
 
-    public static (int Dip, int BucketPx) GetLayoutAndBucket(SizeEnum sizeEnum)
+    public static (int Dip, int BucketPx) GetLayoutAndBucket(SizeEnum sizeEnum, bool enforceMinTouchTarget = true)
     {
-        var dip = GetImageSizeForDevice(sizeEnum);
+        var dip = GetImageSizeForDevice(sizeEnum, enforceMinTouchTarget);
         var bucketEnum = GetImageAssetBucket(sizeEnum);
         var bucketPx = Convert.ToInt32(bucketEnum);
         return (dip, bucketPx);
     }
 
     public static (int Dip, int BucketPx) GetIconForText(
-        SizeEnum sizeEnum, double fontSize, double lineHeightFactor = 1.2, double maxRatio = 0.92)
+        SizeEnum sizeEnum, double fontSize, double lineHeightFactor = 1.2, double maxRatio = 0.92, bool enforceMinTouchTarget = true)
     {
-        var dipTarget = GetImageSizeForDevice(sizeEnum);
+        var dipTarget = GetImageSizeForDevice(sizeEnum, enforceMinTouchTarget);
         var textHeightDip = Math.Max(1, fontSize * lineHeightFactor);
         var clampedDip = (int)Math.Floor(Math.Min(dipTarget, textHeightDip * maxRatio));
 
@@ -75,12 +116,6 @@ public static class DeviceHelper
     }
 
     // ===== Public API =======================================================
-
-    public static int GetImageSizeForDevice(SizeEnum scaleFactor, bool enforceMinTouchTarget = true)
-        => GetDipSize(GetButtonSizeForDevice(scaleFactor, enforceMinTouchTarget));
-
-    public static ButtonSizeEnum GetButtonSizeForDevice(SizeEnum scaleFactor, bool enforceMinTouchTarget = true)
-        => GetSizeForDevice<ButtonSizeEnum>(scaleFactor, enforceMinTouchTarget);
 
     public static ImageSizes GetImageAssetBucket(SizeEnum scaleFactor, bool enforceMinTouchTarget = true)
     {

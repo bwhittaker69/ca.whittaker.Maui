@@ -1,6 +1,7 @@
-﻿using ca.whittaker.Maui.Controls.Buttons;
-using System.Diagnostics;
-using System.Reflection;
+﻿using System;
+using ca.whittaker.Maui.Controls.Buttons;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 
 namespace ca.whittaker.Maui.Controls.Forms;
@@ -32,13 +33,19 @@ namespace ca.whittaker.Maui.Controls.Forms;
 public class Form : ContentView
 {
     #region Fields
-
+    public Form()
+    {
+        base.HorizontalOptions = LayoutOptions.Fill;
+        base.VerticalOptions = LayoutOptions.Start; // size to content
+    }
     private SaveButton? _formButtonSaveAction;
     private EditButton? _formButtonEditAction;
     private CancelButton? _formButtonCancelAction;
     private Label? _formLabel;
     private Label? _formLabelNotification;
-    private bool _formStatusEvaluating = false;
+    private bool _formStatusEvaluating;
+
+    private static readonly Thickness _buttonMargin = new(5);
 
     public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
         nameof(CommandParameter),
@@ -197,48 +204,86 @@ public class Form : ContentView
 
     #region Private Methods
 
-    private static ButtonSizeEnum ResolveEffective(SizeEnum requested)
-        => DeviceHelper.GetButtonSizeForDevice(requested, enforceMinTouchTarget: true);
-
-    // Sets ButtonSize whether the control expects SizeEnum or ButtonSizeEnum
-    private static void ApplyButtonSizeSmart(object? button, SizeEnum requested)
+    private static void ApplyButtonSizing(ButtonBase? button, SizeEnum requested)
     {
         if (button is null) return;
 
-        var prop = button.GetType().GetProperty("ButtonSize", BindingFlags.Instance | BindingFlags.Public);
-        if (prop is null || !prop.CanWrite) return;
+        button.EnforceMinTouchTarget = true;
+        button.ButtonSize = requested;
 
-        if (prop.PropertyType == typeof(SizeEnum))
-        {
-            // Control expects logical scale; just pass through
-            prop.SetValue(button, requested);
-        }
-        else if (prop.PropertyType == typeof(ButtonSizeEnum))
-        {
-            // Control expects DIP bucket; resolve then assign
-            prop.SetValue(button, ResolveEffective(requested));
-        }
+        var targetHeight = DeviceHelper.GetImageSizeForDevice(requested, enforceMinTouchTarget: true);
+        button.HeightRequest = targetHeight;
+        button.MinimumHeightRequest = Math.Max(button.MinimumHeightRequest, Math.Max(targetHeight, 44));
 
-        // Nudge minimum touch height (platform-aware) for accessibility
-        var hitDip = DeviceHelper.GetImageSizeForDevice(requested, enforceMinTouchTarget: true) + 6;
-        if (button is VisualElement ve)
-            ve.MinimumHeightRequest = hitDip;
+        var targetWidth = Math.Max(button.MinimumWidthRequest, targetHeight * 2);
+        button.MinimumWidthRequest = targetWidth;
+        if (button.WidthRequest <= 0 || button.WidthRequest < targetWidth)
+            button.WidthRequest = targetWidth;
 
-        // Call UpdateUI if present
-        var update = button.GetType().GetMethod("UpdateUI", BindingFlags.Instance | BindingFlags.Public);
-        update?.Invoke(button, null);
+        button.UpdateUI();
     }
 
-    private void ApplyAllButtons(SizeEnum requested)
+    private void ApplyAllButtonSizing()
     {
-        ApplyButtonSizeSmart(_formButtonEditAction, requested);
-        ApplyButtonSizeSmart(_formButtonCancelAction, requested);
-        ApplyButtonSizeSmart(_formButtonSaveAction, requested);
+        ApplyButtonSizing(_formButtonEditAction, FormButtonSize);
+        ApplyButtonSizing(_formButtonCancelAction, FormButtonSize);
+        ApplyButtonSizing(_formButtonSaveAction, FormButtonSize);
+    }
+
+    private IEnumerable<IBaseFormField> EnumerateFields()
+        => this.GetVisualTreeDescendants().OfType<IBaseFormField>();
+
+    private void ForEachField(Action<IBaseFormField> action)
+    {
+        foreach (var field in EnumerateFields())
+            action(field);
+    }
+
+    private void SetFormAccessMode(FormAccessModeEnum accessMode)
+    {
+        if (FormAccessMode != accessMode)
+            FormAccessMode = accessMode;
+    }
+
+    private static void UpdateButtonState(ButtonBase? button, ButtonStateEnum state)
+    {
+        if (button is null) return;
+        if (button.ButtonState != state)
+            button.ButtonState = state;
+        button.UpdateUI();
+    }
+
+    private static void UpdateButtonText(ButtonBase? button, string text)
+    {
+        if (button is null) return;
+        button.Text = text;
+        button.UpdateUI();
+    }
+
+    private TButton CreateActionButton<TButton>(string text, ButtonIconEnum icon, EventHandler handler, ButtonStateEnum initialState)
+        where TButton : ButtonBase, IButtonBase, new()
+    {
+        var button = new TButton
+        {
+            Text = text,
+            BackgroundColor = Colors.Transparent,
+            BorderWidth = 0,
+            Margin = _buttonMargin,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            ButtonState = initialState,
+            ButtonIcon = icon,
+            IsVisible = true
+        };
+
+        button.Clicked += handler;
+        ApplyButtonSizing(button, FormButtonSize);
+        return button;
     }
     private static void OnFormButtonSizeChanged(BindableObject bindable, object? oldValue, object? newValue)
     {
         if (bindable is not Form form || newValue is not SizeEnum requested) return;
-        UiThreadHelper.RunOnMainThread(() => form.ApplyAllButtons(requested));
+        UiThreadHelper.RunOnMainThread(form.ApplyAllButtonSizing);
     }
 
     private static void OnFormAccessModeChanged(BindableObject bindable, object? oldValue, object? newValue)
@@ -273,7 +318,7 @@ public class Form : ContentView
     private static void OnFormCancelButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is Form form && newValue is string newText)
-            UiThreadHelper.RunOnMainThread(() => { form._formButtonCancelAction!.Text = newText; });
+            UiThreadHelper.RunOnMainThread(() => UpdateButtonText(form._formButtonCancelAction, newText));
     }
 
     private static void OnFormEditButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
@@ -282,8 +327,7 @@ public class Form : ContentView
         {
             UiThreadHelper.RunOnMainThread(() =>
             {
-                if (form._formButtonEditAction != null)
-                    form._formButtonEditAction.Text = newText;
+                UpdateButtonText(form._formButtonEditAction, newText);
             });
         }
     }
@@ -304,59 +348,55 @@ public class Form : ContentView
     private static void OnFormSaveButtonTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is Form form && newValue is string newText)
-            UiThreadHelper.RunOnMainThread(() => { form._formButtonSaveAction!.Text = newText; });
+            UiThreadHelper.RunOnMainThread(() => UpdateButtonText(form._formButtonSaveAction, newText));
     }
 
 
     private void FormClear()
     {
-        foreach (IBaseFormField field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
+        ForEachField(field =>
         {
-            if (field is TextBoxField textBox)
-                textBox.Clear();
-            if (field is CheckBoxField checkBox)
-                checkBox.Clear();
+            switch (field)
+            {
+                case TextBoxField textBox:
+                    textBox.Clear();
+                    break;
+                case CheckBoxField checkBox:
+                    checkBox.Clear();
+                    break;
+            }
+
             field.Unfocus();
-        }
+        });
     }
 
     private void FormConfigButtonStates()
     {
-        if (FormAccessMode == FormAccessModeEnum.Editable)
+        switch (FormAccessMode)
         {
-            // Editable: show only the edit button
-            if (_formButtonCancelAction != null)
-                _formButtonCancelAction.ButtonState = ButtonStateEnum.Hidden;
-            if (_formButtonSaveAction != null)
-                _formButtonSaveAction.ButtonState = ButtonStateEnum.Hidden;
-            if (_formButtonEditAction != null)
-                _formButtonEditAction.ButtonState = ButtonStateEnum.Enabled;
-        }
-        else if (FormAccessMode == FormAccessModeEnum.Editing)
-        {
-            // Editing: show save and cancel buttons
-            if (_formButtonCancelAction != null)
-                _formButtonCancelAction.ButtonState = FormHasChanges
+            case FormAccessModeEnum.Editable:
+                UpdateButtonState(_formButtonCancelAction, ButtonStateEnum.Hidden);
+                UpdateButtonState(_formButtonSaveAction, ButtonStateEnum.Hidden);
+                UpdateButtonState(_formButtonEditAction, ButtonStateEnum.Enabled);
+                break;
+
+            case FormAccessModeEnum.Editing:
+                var cancelState = FormHasChanges
                     ? (FormHasErrors ? ButtonStateEnum.Disabled : ButtonStateEnum.Enabled)
                     : ButtonStateEnum.Disabled;
-            if (_formButtonSaveAction != null)
-                _formButtonSaveAction.ButtonState = ButtonStateEnum.Enabled;
-            if (_formButtonEditAction != null)
-                _formButtonEditAction.ButtonState = ButtonStateEnum.Hidden;
+
+                UpdateButtonState(_formButtonCancelAction, cancelState);
+                UpdateButtonState(_formButtonSaveAction, ButtonStateEnum.Enabled);
+                UpdateButtonState(_formButtonEditAction, ButtonStateEnum.Hidden);
+                break;
+
+            case FormAccessModeEnum.ViewOnly:
+            case FormAccessModeEnum.Hidden:
+                UpdateButtonState(_formButtonCancelAction, ButtonStateEnum.Hidden);
+                UpdateButtonState(_formButtonSaveAction, ButtonStateEnum.Hidden);
+                UpdateButtonState(_formButtonEditAction, ButtonStateEnum.Hidden);
+                break;
         }
-        else if (FormAccessMode == FormAccessModeEnum.ViewOnly || FormAccessMode == FormAccessModeEnum.Hidden)
-        {
-            // ViewOnly/Hidden: hide all buttons
-            if (_formButtonCancelAction != null)
-                _formButtonCancelAction.ButtonState = ButtonStateEnum.Hidden;
-            if (_formButtonSaveAction != null)
-                _formButtonSaveAction.ButtonState = ButtonStateEnum.Hidden;
-            if (_formButtonEditAction != null)
-                _formButtonEditAction.ButtonState = ButtonStateEnum.Hidden;
-        }
-        _formButtonCancelAction?.UpdateUI();
-        _formButtonSaveAction?.UpdateUI();
-        _formButtonEditAction?.UpdateUI();
     }
 
     private void FormEvaluateStatus()
@@ -376,27 +416,22 @@ public class Form : ContentView
 
     private bool FormFieldsCheckArePristine()
     {
-        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-        {
-            if (field.FieldChangeState == ChangeStateEnum.Changed)
-                return false;
-        }
-        return true;
+        return EnumerateFields().All(field => field.FieldChangeState != ChangeStateEnum.Changed);
     }
 
     private bool FormFieldsCheckAreValid() =>
-                    this.GetVisualTreeDescendants().OfType<IBaseFormField>().All(field => field.FieldValidationState == ValidationStateEnum.Valid);
+        EnumerateFields().All(field => field.FieldValidationState == ValidationStateEnum.Valid);
 
     /// <summary>
     /// puts form into "read" mode with edit button visible
     /// </summary>
     private void FormFieldsConfigAccessEditable()
     {
-        foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
+        ForEachField(field =>
         {
-            if (!t.FieldReadOnly)
-                t.FieldAccessMode = FieldAccessModeEnum.Editable;
-        }
+            if (!field.FieldReadOnly)
+                field.FieldAccessMode = FieldAccessModeEnum.Editable;
+        });
     }
 
     /// <summary>
@@ -404,8 +439,7 @@ public class Form : ContentView
     /// </summary>
     private void FormFieldsConfigAccessEditing()
     {
-        foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.FieldAccessMode = FieldAccessModeEnum.Editing;
+        ForEachField(field => field.FieldAccessMode = FieldAccessModeEnum.Editing);
     }
 
     /// <summary>
@@ -413,8 +447,7 @@ public class Form : ContentView
     /// </summary>
     private void FormFieldsConfigAccessHidden()
     {
-        foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.FieldAccessMode = FieldAccessModeEnum.Hidden;
+        ForEachField(field => field.FieldAccessMode = FieldAccessModeEnum.Hidden);
     }
 
     /// <summary>
@@ -422,8 +455,7 @@ public class Form : ContentView
     /// </summary>
     private void FormFieldsConfigViewOnlyMode()
     {
-        foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.FieldAccessMode = FieldAccessModeEnum.ViewOnly;
+        ForEachField(field => field.FieldAccessMode = FieldAccessModeEnum.ViewOnly);
     }
 
     /// <summary>
@@ -431,77 +463,40 @@ public class Form : ContentView
     /// </summary>
     private void FormFieldsMarkAsSaved()
     {
-        foreach (IBaseFormField t in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            t.Save();
+        ForEachField(field => field.Save());
     }
 
     private void FormFieldsWireUp()
     {
-        var formElements = this.GetVisualTreeDescendants().OfType<IBaseFormField>();
-        if (!formElements.Any())
+        var fields = EnumerateFields().ToList();
+        if (!fields.Any())
             throw new InvalidOperationException("Form missing controls");
 
-        foreach (var element in formElements)
+        foreach (var field in fields)
         {
-            element.OnHasChanges += OnFieldHasChanges;
-            element.OnHasValidationChanges += OnFieldHasValidationChanges;
+            field.OnHasChanges += OnFieldHasChanges;
+            field.OnHasValidationChanges += OnFieldHasValidationChanges;
         }
     }
     private Grid BuildHeaderGrid()
     {
+        _formButtonEditAction = CreateActionButton<EditButton>(
+            FormEditButtonText,
+            ButtonIconEnum.Edit,
+            OnFormEditButtonClicked,
+            ButtonStateEnum.Enabled);
 
-        int dip = DeviceHelper.GetImageSizeForDevice(FormButtonSize, enforceMinTouchTarget: true);
-        // or, if you specifically need the enum of DIPs:
-        var dipEnum = ResolveEffective(FormButtonSize);
+        _formButtonSaveAction = CreateActionButton<SaveButton>(
+            FormSaveButtonText,
+            ButtonIconEnum.Save,
+            OnFormSaveButtonClicked,
+            ButtonStateEnum.Hidden);
 
-        // --- Buttons ---
-        _formButtonEditAction = new EditButton
-        {
-            Text = FormEditButtonText,
-            BackgroundColor = Colors.Transparent,
-            BorderWidth = 0,
-            Margin = 5,
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center,
-            ButtonState = ButtonStateEnum.Enabled,
-            ButtonIcon = ButtonIconEnum.Edit,
-            IsVisible = true
-        };
-        _formButtonEditAction.Clicked += OnFormEditButtonClicked;
-        _formButtonEditAction.UpdateUI();
-        ApplyButtonSizeSmart(_formButtonEditAction, FormButtonSize);
-
-        _formButtonSaveAction = new SaveButton
-        {
-            Text = FormSaveButtonText,
-            BackgroundColor = Colors.Transparent,
-            BorderWidth = 0,
-            Margin = 5,
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            ButtonState = ButtonStateEnum.Hidden,
-            ButtonIcon = ButtonIconEnum.Save,
-            IsVisible = true
-        };
-        _formButtonSaveAction.Clicked += OnFormSaveButtonClicked;
-        _formButtonSaveAction.UpdateUI();
-        ApplyButtonSizeSmart(_formButtonSaveAction, FormButtonSize);
-
-        _formButtonCancelAction = new CancelButton
-        {
-            Text = FormCancelButtonText,
-            BackgroundColor = Colors.Transparent,
-            BorderWidth = 0,
-            Margin = 5,
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center,
-            ButtonState = ButtonStateEnum.Hidden,
-            ButtonIcon = ButtonIconEnum.Cancel,
-            IsVisible = true
-        };
-        _formButtonCancelAction.Clicked += OnFormCancelButtonClicked;
-        _formButtonCancelAction.UpdateUI();
-        ApplyButtonSizeSmart(_formButtonCancelAction, FormButtonSize);
+        _formButtonCancelAction = CreateActionButton<CancelButton>(
+            FormCancelButtonText,
+            ButtonIconEnum.Cancel,
+            OnFormCancelButtonClicked,
+            ButtonStateEnum.Hidden);
 
         // --- Labels ---
         _formLabelNotification = new Label
@@ -525,8 +520,9 @@ public class Form : ContentView
         var header = new Grid
         {
             HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Fill,
-            
+            VerticalOptions = LayoutOptions.Start,
+            ColumnSpacing = 10,
+            RowSpacing = 6,
             Margin = new Thickness(5),
             RowDefinitions =
             {
@@ -537,8 +533,8 @@ public class Form : ContentView
             },
             ColumnDefinitions =
             {
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = GridLength.Star }
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = GridLength.Auto }
             }
         };
 
@@ -584,7 +580,7 @@ public class Form : ContentView
                 else
                 {
                     // wrap non-stacking layouts (like Grid) with a vertical stack
-                    var wrapper = new VerticalStackLayout { Spacing = 0, Padding = 0 };
+                    var wrapper = new VerticalStackLayout { Spacing = 0, Padding = 0, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Start };
                     Content = wrapper;                 // this detaches 'existing' from ContentView
                     wrapper.Children.Add(header);
                     wrapper.Children.Add(existing);
@@ -593,7 +589,7 @@ public class Form : ContentView
             else if (Content is View singleView)
             {
                 // wrap a lone view
-                var wrapper = new VerticalStackLayout { Spacing = 0, Padding = 0 };
+                var wrapper = new VerticalStackLayout { Spacing = 0, Padding = 0, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Start };
                 Content = wrapper;                     // detaches 'singleView' from ContentView
                 wrapper.Children.Add(header);
                 wrapper.Children.Add(singleView);
@@ -605,6 +601,8 @@ public class Form : ContentView
                 {
                     Spacing = 0,
                     Padding = 0,
+                    HorizontalOptions = LayoutOptions.Fill,
+                    VerticalOptions = LayoutOptions.Start,
                     Children = { header }
                 };
             }
@@ -625,20 +623,13 @@ public class Form : ContentView
     private void OnFormCancelButtonClicked(object? sender, EventArgs e)
     {
         // undo any changes to all fields
-        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-                field.Undo();
-
-        // set form to editable state
-        if (FormAccessMode != FormAccessModeEnum.Editable)
-            FormAccessMode = FormAccessModeEnum.Editable;
-
-
+        ForEachField(field => field.Undo());
+        SetFormAccessMode(FormAccessModeEnum.Editable);
     }
 
     private void OnFormEditButtonClicked(object? sender, EventArgs e)
     {
-        if (FormAccessMode != FormAccessModeEnum.Editing)
-            FormAccessMode = FormAccessModeEnum.Editing;
+        SetFormAccessMode(FormAccessModeEnum.Editing);
     }
 
     private void OnFormSaveButtonClicked(object? sender, EventArgs e)
@@ -657,7 +648,7 @@ public class Form : ContentView
         //
         // set form state to "editable"
         //
-        FormAccessMode = FormAccessModeEnum.Editable;
+        SetFormAccessMode(FormAccessModeEnum.Editable);
 
         // Raise the FormSaved event.
         OnFormSaved(new FormSavedEventArgs(hasChanges));
@@ -699,8 +690,7 @@ public class Form : ContentView
     /// </summary>
     public void RefreshAllFields()
     {
-        foreach (var field in this.GetVisualTreeDescendants().OfType<IBaseFormField>())
-            field.Refresh();
+        ForEachField(field => field.Refresh());
     }
 
     protected override void OnParentSet()
