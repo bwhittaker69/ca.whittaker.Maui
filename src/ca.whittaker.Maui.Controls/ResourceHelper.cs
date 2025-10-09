@@ -1,5 +1,6 @@
 ﻿//#define DEBUGOUT
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace ca.whittaker.Maui.Controls
@@ -34,7 +35,8 @@ namespace ca.whittaker.Maui.Controls
             ButtonStateEnum state,
             ButtonIconEnum icon,
             SizeEnum size,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            bool enforceMinTouchTarget = true)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -42,7 +44,7 @@ namespace ca.whittaker.Maui.Controls
             var asmName = AssemblyNameOf(this);
 
             // Decide both the layout DIP and the pixel bucket here
-            var (dip, bucketPx) = DeviceHelper.GetLayoutAndBucket(size);
+            var (dip, bucketPx) = DeviceHelper.GetLayoutAndBucket(size, enforceMinTouchTarget);
             var suffixTheme = GetResourceThemeSuffix();
             var suffixState = GetResourceStateSuffix(state);
             var iconName = icon.ToString().ToLowerInvariant();
@@ -53,19 +55,25 @@ namespace ca.whittaker.Maui.Controls
                 $"{asmName}.Resources.Images.size{bucketPx}." +
                 $"{iconName}_{bucketPx}{suffixTheme}{suffixState}.png";
 
-#if DEBUGOUT
-            Debug.WriteLine($"[ResourceHelper] Request: dip={dip}, bucket={bucketPx}, name={resourceName}");
+#if DEBUG
+            var wasCached = _imageCache.ContainsKey(resourceName);
+            Debug.WriteLine($"[ResourceHelper] Request state={state} icon={icon} size={size} dip={dip} bucket={bucketPx} theme={suffixTheme} stateSuffix={suffixState} resource={resourceName} cached={wasCached} enforceMin={enforceMinTouchTarget}");
 #endif
 
             // Hot path: serve from cache
             if (_imageCache.TryGetValue(resourceName, out var cached) && cached is not null)
+            {
+#if DEBUG
+                Debug.WriteLine($"[ResourceHelper] Cache hit for {resourceName} dip={dip}");
+#endif
                 return new ImageAsset(cached, dip);
+            }
 
             // Validate existence once (avoids exception-driven flow)
             if (!ResourceExists(resourceName, asm))
             {
-#if DEBUGOUT
-                Debug.WriteLine($"[ResourceHelper] Missing: {resourceName}");
+#if DEBUG
+                Debug.WriteLine($"[ResourceHelper] Missing resource {resourceName}");
 #endif
                 return null;
             }
@@ -74,23 +82,27 @@ namespace ca.whittaker.Maui.Controls
             {
                 var src = ImageSource.FromResource(resourceName, asm);
                 _imageCache[resourceName] = src;
+#if DEBUG
+                Debug.WriteLine($"[ResourceHelper] Loaded resource {resourceName} dip={dip}");
+#endif
                 return new ImageAsset(src, dip);
             }
             catch (Exception ex)
             {
-#if DEBUGOUT
+#if DEBUG
                 Debug.WriteLine($"[ResourceHelper] Load error for {resourceName}: {ex}");
 #endif
                 return null;
             }
         }
 
+
         /// <summary>
         /// Convenience factory: returns an Image with Width/Height set to the correct DIP size.
         /// </summary>
-        public Image? CreateImage(ButtonStateEnum state, ButtonIconEnum icon, SizeEnum size, CancellationToken ct = default)
+        public Image? CreateImage(ButtonStateEnum state, ButtonIconEnum icon, SizeEnum size, CancellationToken ct = default, bool enforceMinTouchTarget = true)
         {
-            var asset = GetImageAsset(state, icon, size, ct);
+            var asset = GetImageAsset(state, icon, size, ct, enforceMinTouchTarget);
             if (asset is null) return null;
 
             return new Image
@@ -107,9 +119,9 @@ namespace ca.whittaker.Maui.Controls
         /// <summary>
         /// Convenience factory: returns an ImageButton sized and padded correctly (fixes WinUI inflation).
         /// </summary>
-        public ImageButton? CreateImageButton(ButtonStateEnum state, ButtonIconEnum icon, SizeEnum size, CancellationToken ct = default)
+        public ImageButton? CreateImageButton(ButtonStateEnum state, ButtonIconEnum icon, SizeEnum size, CancellationToken ct = default, bool enforceMinTouchTarget = true)
         {
-            var asset = GetImageAsset(state, icon, size, ct);
+            var asset = GetImageAsset(state, icon, size, ct, enforceMinTouchTarget);
             if (asset is null) return null;
 
             return new ImageButton
@@ -215,10 +227,11 @@ namespace ca.whittaker.Maui.Controls
             ButtonStateEnum buttonState,
             ButtonIconEnum baseButtonType,
             SizeEnum sizeEnum,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            bool enforceMinTouchTarget = true)
         {
             // Delegate to new API and discard DIP (callers must set Width/Height if they use this).
-            return GetImageAsset(buttonState, baseButtonType, sizeEnum, cancellationToken)?.Source;
+            return GetImageAsset(buttonState, baseButtonType, sizeEnum, cancellationToken, enforceMinTouchTarget)?.Source;
         }
 
         // ----------------- Theme/State helpers -----------------

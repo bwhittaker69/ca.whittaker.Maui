@@ -1,4 +1,5 @@
-﻿using Editor = Microsoft.Maui.Controls.Editor;
+﻿using Microsoft.Maui.Controls;
+using Editor = Microsoft.Maui.Controls.Editor;
 
 namespace ca.whittaker.Maui.Controls.Forms;
 
@@ -236,10 +237,18 @@ public partial class EditorField : BaseFormField<string>
                 // Only apply a row-based height when no explicit FieldHeightRequest was set
                 if (!(FieldHeightRequest is double h) || h <= 0)
                 {
-                    _editorBox.HeightRequest =
-                        (int)newValue * DeviceHelper.GetImageSizeForDevice(DefaultButtonSize) * 1.1;
+                    _editorBox.AutoSize = EditorAutoSizeOption.Disabled;
+                    _editorBox.MinimumHeightRequest = 0;
+                    _editorBox.VerticalOptions = LayoutOptions.Fill;
+
+                    var rows = Math.Max(1, Convert.ToInt32(newValue));
+                    var lineDip = DeviceHelper.GetImageSizeForDevice(DefaultButtonSize, enforceMinTouchTarget: false);
+                    var desiredHeight = Math.Max(lineDip, (int)Math.Ceiling(rows * lineDip * 1.1));
+                    _editorBox.HeightRequest = desiredHeight;
                 }
             });
+
+            Field_RefreshLayout();
         });
     }
 

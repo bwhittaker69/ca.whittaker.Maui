@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using System.Windows.Input;
 using ca.whittaker.Maui.Controls;
 using Microsoft.Maui;
@@ -180,6 +181,44 @@ public class Form : ContentView
     private static ButtonIconEnum? GetIconMetadata(Image image)
         => (ButtonIconEnum?)image.GetValue(IconTypeProperty);
 
+#if DEBUG
+    private static void LogIconDebug(string message)
+        => Debug.WriteLine($"[FormIcon] {message}");
+
+    private void AttachIconDiagnostics(Image image)
+    {
+        image.SizeChanged += (_, __) => LogIconSnapshot(image, "SizeChanged");
+        image.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(VisualElement.WidthRequest) ||
+                e.PropertyName is nameof(VisualElement.HeightRequest) ||
+                e.PropertyName is nameof(VisualElement.Width) ||
+                e.PropertyName is nameof(VisualElement.Height) ||
+                e.PropertyName is nameof(VisualElement.IsVisible) ||
+                e.PropertyName is nameof(Image.Source))
+            {
+                LogIconSnapshot(image, $"PropertyChanged:{e.PropertyName}");
+            }
+        };
+
+        LogIconSnapshot(image, "Initialized");
+    }
+
+    private void LogIconSnapshot(Image image, string reason)
+    {
+        var icon = GetIconMetadata(image);
+        string sourceDescriptor = image.Source switch
+        {
+            null => "<null>",
+            FileImageSource file => $"File:{file.File}",
+            UriImageSource uri => $"Uri:{uri.Uri}",
+            _ => image.Source.GetType().Name
+        };
+
+        LogIconDebug($"{reason} icon={icon} formMode={FormAccessMode} buttonSize={FormButtonSize} widthReq={image.WidthRequest:0.##} heightReq={image.HeightRequest:0.##} minW={image.MinimumWidthRequest:0.##} minH={image.MinimumHeightRequest:0.##} actualW={image.Width:0.##} actualH={image.Height:0.##} visible={image.IsVisible} opacity={image.Opacity:0.##} inputTransparent={image.InputTransparent} source={sourceDescriptor}");
+    }
+#endif
+
     private Image MakeIcon(ButtonIconEnum icon, EventHandler onTapped)
     {
         var img = new Image
@@ -192,6 +231,10 @@ public class Form : ContentView
 
         SetIconMetadata(img, icon);
         UpdateIconImage(img, ButtonStateEnum.Enabled);
+
+#if DEBUG
+        AttachIconDiagnostics(img);
+#endif
 
         var tap = new TapGestureRecognizer { NumberOfTapsRequired = 1 };
         tap.Tapped += (_, __) => onTapped(img, EventArgs.Empty);
@@ -207,8 +250,11 @@ public class Form : ContentView
         if (icon is null)
             return;
 
+#if DEBUG
+        LogIconDebug($"UpdateIconImage start icon={icon} state={state} buttonSize={FormButtonSize}");
+#endif
         using var helper = new ResourceHelper();
-        var asset = helper.GetImageAsset(state, icon.Value, FormButtonSize);
+        var asset = helper.GetImageAsset(state, icon.Value, FormButtonSize, enforceMinTouchTarget: false);
 
         if (asset is not null)
         {
@@ -217,6 +263,10 @@ public class Form : ContentView
             image.HeightRequest = asset.DipSize;
             image.MinimumWidthRequest = asset.DipSize;
             image.MinimumHeightRequest = asset.DipSize;
+#if DEBUG
+            LogIconDebug($"UpdateIconImage asset icon={icon} state={state} dip={asset.DipSize}");
+            LogIconSnapshot(image, "UpdateIconImage asset applied");
+#endif
         }
         else
         {
@@ -226,6 +276,10 @@ public class Form : ContentView
             image.HeightRequest = fallback;
             image.MinimumWidthRequest = fallback;
             image.MinimumHeightRequest = fallback;
+#if DEBUG
+            LogIconDebug($"UpdateIconImage fallback icon={icon} state={state} fallbackDip={fallback}");
+            LogIconSnapshot(image, "UpdateIconImage fallback applied");
+#endif
         }
     }
 
@@ -257,6 +311,9 @@ public class Form : ContentView
     {
         if (img is null) return;
 
+#if DEBUG
+        LogIconSnapshot(img, $"SetIconState start visible={visible} enabled={enabled}");
+#endif
         var state = enabled ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled;
         UpdateIconImage(img, state);
 
@@ -264,6 +321,9 @@ public class Form : ContentView
         img.Opacity = enabled ? 1.0 : 0.4;
         img.InputTransparent = !enabled; // disables tap when “disabled”
         img.InvalidateMeasure();
+#if DEBUG
+        LogIconSnapshot(img, $"SetIconState applied visible={visible} enabled={enabled}");
+#endif
     }
 
     // Refresh icon layout when host toggles FormButtonSize (retained for XAML compatibility)
@@ -348,9 +408,9 @@ public class Form : ContentView
                 break;
 
             case FormAccessModeEnum.Editing:
-                var canCancel = FormHasChanges && !FormHasErrors;
-                SetIconState(_imgCancel, visible: true, enabled: canCancel);
-                SetIconState(_imgSave, visible: true, enabled: true);
+                var canSave = FormHasChanges && !FormHasErrors;
+                SetIconState(_imgCancel, visible: true, enabled: true);
+                SetIconState(_imgSave, visible: true, enabled: canSave);
                 SetIconState(_imgEdit, visible: false, enabled: false);
                 break;
 
@@ -451,6 +511,7 @@ public class Form : ContentView
             ColumnDefinitions =
             {
                 new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = GridLength.Auto },
                 new ColumnDefinition { Width = GridLength.Auto }
             }
         };
@@ -474,19 +535,18 @@ public class Form : ContentView
 
         // Row 0: title
         header.Add(_formLabel, 0, 0);
-        Grid.SetColumnSpan(_formLabel, 2);
+        Grid.SetColumnSpan(_formLabel, 3);
 
         // Row 1: cancel | save
         header.Add(_imgCancel, 0, 1);
-        header.Add(_imgSave, 1, 1);
+        header.Add(_imgSave, 2, 1);
 
         // Row 2: edit (centered)
-        header.Add(_imgEdit, 0, 2);
-        Grid.SetColumnSpan(_imgEdit, 2);
+        header.Add(_imgEdit, 1, 2);
 
         // Row 3: notification
         header.Add(_formLabelNotification, 0, 3);
-        Grid.SetColumnSpan(_formLabelNotification, 2);
+        Grid.SetColumnSpan(_formLabelNotification, 3);
 
         _headerGrid = header;
         FormConfigButtonStates();

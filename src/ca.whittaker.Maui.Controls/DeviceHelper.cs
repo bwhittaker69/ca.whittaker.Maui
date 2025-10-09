@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Diagnostics;
 using Microsoft.Maui.Devices;
 
 namespace ca.whittaker.Maui.Controls;
@@ -8,17 +9,18 @@ public static class DeviceHelper
 {
     public static int GetImageSizeForDevice(SizeEnum size, bool enforceMinTouchTarget = false)
     {
-        var isDesktop = DeviceInfo.Platform == DevicePlatform.WinUI && DeviceInfo.Idiom == DeviceIdiom.Desktop;
-
-        if (isDesktop && !enforceMinTouchTarget)
+        if (!enforceMinTouchTarget)
         {
             return size switch
             {
+                SizeEnum.XXXSmall => 24,
                 SizeEnum.XXSmall => 28,
                 SizeEnum.XSmall => 32,
                 SizeEnum.Small => 36,
                 SizeEnum.Normal => 40,
                 SizeEnum.Large => 48,
+                SizeEnum.XLarge => 56,
+                SizeEnum.XXLarge => 64,
                 _ => 40
             };
         }
@@ -31,6 +33,8 @@ public static class DeviceHelper
             SizeEnum.Small => 40,
             SizeEnum.Normal => 40,
             SizeEnum.Large => 48,
+            SizeEnum.XLarge => 56,
+            SizeEnum.XXLarge => 64,
             _ => 40
         };
     }
@@ -64,8 +68,11 @@ public static class DeviceHelper
     public static (int Dip, int BucketPx) GetLayoutAndBucket(SizeEnum sizeEnum, bool enforceMinTouchTarget = true)
     {
         var dip = GetImageSizeForDevice(sizeEnum, enforceMinTouchTarget);
-        var bucketEnum = GetImageAssetBucket(sizeEnum);
+        var bucketEnum = GetImageAssetBucket(sizeEnum, enforceMinTouchTarget);
         var bucketPx = Convert.ToInt32(bucketEnum);
+#if DEBUG
+        Debug.WriteLine($"[DeviceHelper] GetLayoutAndBucket size={sizeEnum} dip={dip} bucket={bucketEnum}");
+#endif
         return (dip, bucketPx);
     }
 
@@ -119,9 +126,14 @@ public static class DeviceHelper
 
     public static ImageSizes GetImageAssetBucket(SizeEnum scaleFactor, bool enforceMinTouchTarget = true)
     {
-        var chosenButton = GetButtonSizeForDevice(scaleFactor, enforceMinTouchTarget);
-        int desiredPixels = GetPixelSize(chosenButton);
-        return GetClosestEnumValue(_imageSizes, desiredPixels);
+        var targetDip = GetImageSizeForDevice(scaleFactor, enforceMinTouchTarget);
+        var density = NormalizeDensity(DeviceDisplay.MainDisplayInfo.Density);
+        var desiredPixels = (int)Math.Round(targetDip * density);
+        var bucket = GetClosestEnumValue(_imageSizes, desiredPixels);
+#if DEBUG
+        Debug.WriteLine($"[DeviceHelper] GetImageAssetBucket size={scaleFactor} enforceMin={enforceMinTouchTarget} targetDip={targetDip} density={density:0.###} desiredPx={desiredPixels} bucket={bucket}");
+#endif
+        return bucket;
     }
 
     public static int GetDipSize<TEnum>(TEnum size) where TEnum : struct, Enum
