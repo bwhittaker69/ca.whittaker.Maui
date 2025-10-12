@@ -70,9 +70,7 @@ public static class DeviceHelper
         var dip = GetImageSizeForDevice(sizeEnum, enforceMinTouchTarget);
         var bucketEnum = GetImageAssetBucket(sizeEnum, enforceMinTouchTarget);
         var bucketPx = Convert.ToInt32(bucketEnum);
-#if DEBUG
-        Debug.WriteLine($"[DeviceHelper] GetLayoutAndBucket size={sizeEnum} dip={dip} bucket={bucketEnum}");
-#endif
+
         return (dip, bucketPx);
     }
 
@@ -130,9 +128,6 @@ public static class DeviceHelper
         var density = NormalizeDensity(DeviceDisplay.MainDisplayInfo.Density);
         var desiredPixels = (int)Math.Round(targetDip * density);
         var bucket = GetClosestEnumValue(_imageSizes, desiredPixels);
-#if DEBUG
-        Debug.WriteLine($"[DeviceHelper] GetImageAssetBucket size={scaleFactor} enforceMin={enforceMinTouchTarget} targetDip={targetDip} density={density:0.###} desiredPx={desiredPixels} bucket={bucket}");
-#endif
         return bucket;
     }
 

@@ -1,4 +1,4 @@
-﻿#define BUTTONBASE_TRACE   
+﻿#undef BUTTONBASE_TRACE   
 
 using Microsoft.Maui.Controls;
 using Microsoft.Maui;

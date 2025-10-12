@@ -1,4 +1,5 @@
-﻿using System;
+﻿#undef DEBUGOUT
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
@@ -181,7 +182,7 @@ public class Form : ContentView
     private static ButtonIconEnum? GetIconMetadata(Image image)
         => (ButtonIconEnum?)image.GetValue(IconTypeProperty);
 
-#if DEBUG
+#if DEBUGOUT
     private static void LogIconDebug(string message)
         => Debug.WriteLine($"[FormIcon] {message}");
 
@@ -232,7 +233,7 @@ public class Form : ContentView
         SetIconMetadata(img, icon);
         UpdateIconImage(img, ButtonStateEnum.Enabled);
 
-#if DEBUG
+#if DEBUGOUT
         AttachIconDiagnostics(img);
 #endif
 
@@ -250,7 +251,7 @@ public class Form : ContentView
         if (icon is null)
             return;
 
-#if DEBUG
+#if DEBUGOUT
         LogIconDebug($"UpdateIconImage start icon={icon} state={state} buttonSize={FormButtonSize}");
 #endif
         using var helper = new ResourceHelper();
@@ -263,7 +264,7 @@ public class Form : ContentView
             image.HeightRequest = asset.DipSize;
             image.MinimumWidthRequest = asset.DipSize;
             image.MinimumHeightRequest = asset.DipSize;
-#if DEBUG
+#if DEBUGOUT
             LogIconDebug($"UpdateIconImage asset icon={icon} state={state} dip={asset.DipSize}");
             LogIconSnapshot(image, "UpdateIconImage asset applied");
 #endif
@@ -276,7 +277,7 @@ public class Form : ContentView
             image.HeightRequest = fallback;
             image.MinimumWidthRequest = fallback;
             image.MinimumHeightRequest = fallback;
-#if DEBUG
+#if DEBUGOUT
             LogIconDebug($"UpdateIconImage fallback icon={icon} state={state} fallbackDip={fallback}");
             LogIconSnapshot(image, "UpdateIconImage fallback applied");
 #endif
@@ -311,7 +312,7 @@ public class Form : ContentView
     {
         if (img is null) return;
 
-#if DEBUG
+#if DEBUGOUT
         LogIconSnapshot(img, $"SetIconState start visible={visible} enabled={enabled}");
 #endif
         var state = enabled ? ButtonStateEnum.Enabled : ButtonStateEnum.Disabled;
@@ -321,7 +322,7 @@ public class Form : ContentView
         img.Opacity = enabled ? 1.0 : 0.4;
         img.InputTransparent = !enabled; // disables tap when “disabled”
         img.InvalidateMeasure();
-#if DEBUG
+#if DEBUGOUT
         LogIconSnapshot(img, $"SetIconState applied visible={visible} enabled={enabled}");
 #endif
     }
